@@ -14,10 +14,8 @@ ENV PYTHONUNBUFFERED=1 \
 # Set working directory inside container
 WORKDIR /app
 
-# Install system build dependencies required for psycopg2 and C extensions
+# Install lightweight curl for healthchecks
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    libpq-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
