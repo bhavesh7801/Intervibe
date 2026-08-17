@@ -3,15 +3,15 @@
 # ==========================================
 
 # Stage 1: Build static assets using Node.js
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Copy package descriptors first for layer caching
 COPY package*.json ./
 
-# Install npm dependencies
-RUN npm install
+# Install npm dependencies cleanly
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
 # Copy application source code
 COPY . .
