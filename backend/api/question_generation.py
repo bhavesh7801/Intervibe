@@ -29,7 +29,8 @@ HF_ROUTER_URL = "https://router.huggingface.co/v1/chat/completions"
 HF_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "gemma2-9b-it"
+GROQ_MODEL = "openai/gpt-oss-120b"
+GROQ_FALLBACK_MODEL = "openai/gpt-oss-20b"
 
 
 def _create_ssl_context():
@@ -135,38 +136,39 @@ def _call_hf(prompt_system: str, prompt_user: str) -> str:
 
 
 def _call_groq(prompt_system: str, prompt_user: str) -> str:
-    """Call Groq Chat API with llama-3.3-70b-versatile, temperature 0.9, and json_object response format."""
+    """Call Groq Chat API with openai/gpt-oss-120b and fallback to openai/gpt-oss-20b."""
     key = os.getenv("GROQ_API_KEY", "").strip()
     if not key:
         raise ValueError("GROQ_API_KEY is not configured")
-    payload = {
-        "model": GROQ_MODEL,
-        "messages": [
-            {"role": "system", "content": prompt_system},
-            {"role": "user", "content": prompt_user},
-        ],
-        "temperature": 0.9,
-        "max_tokens": 4096
-    }
-    req = urllib.request.Request(
-        GROQ_API_URL,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {key}",
-            "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        },
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, context=_create_ssl_context(), timeout=10) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data["choices"][0]["message"]["content"]
-    except urllib.error.HTTPError as e:
-        err_msg = e.read().decode("utf-8", errors="ignore")
-        raise RuntimeError(f"Groq API HTTP Error {e.code}: {err_msg}")
-    except Exception as e:
-        raise RuntimeError(f"Groq API Error: {str(e)}")
+    
+    for model_name in [GROQ_MODEL, GROQ_FALLBACK_MODEL]:
+        payload = {
+            "model": model_name,
+            "messages": [
+                {"role": "system", "content": prompt_system},
+                {"role": "user", "content": prompt_user},
+            ],
+            "temperature": 0.85,
+            "max_tokens": 4096
+        }
+        req = urllib.request.Request(
+            GROQ_API_URL,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, context=_create_ssl_context(), timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                return data["choices"][0]["message"]["content"]
+        except Exception as e:
+            continue
+            
+    raise RuntimeError("All Groq models failed to generate response")
 
 
 def _call_llm(prompt_system: str, prompt_user: str) -> str:
