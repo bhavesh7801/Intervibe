@@ -55,7 +55,7 @@ Base.metadata.create_all(bind=engine)
 init_db_schema()
 
 app = FastAPI(
-    title="Interview Prep AI Enterprise Server",
+    title="Intervibe AI Enterprise Server",
     description="Modularized AI Interview Intelligence Backend",
     version="2.5.0",
     lifespan=lifespan

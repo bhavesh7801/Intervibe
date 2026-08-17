@@ -152,7 +152,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center gap-3 group shrink-0" data-testid="navbar-logo">
               <InterviewPrepLogo size={34} />
               <span className="text-base sm:text-lg font-extrabold tracking-tight text-white group-hover:text-blue-300 transition-colors">
-                Interview Prep AI
+                Intervibe
               </span>
             </Link>
           </div>
