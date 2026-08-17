@@ -3,10 +3,6 @@ node_modules/
 dist/
 build/
 
-# Environment files
-.env
-.env.*
-
 # Git & IDE Configuration
 .git
 .gitignore

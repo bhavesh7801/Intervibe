@@ -16,6 +16,12 @@ RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 # Copy application source code
 COPY . .
 
+# Build arguments for Vite compilation
+ARG VITE_GOOGLE_CLIENT_ID=658426092732-l6odo2d5esndtljmu4brsvu31f3lp9kk.apps.googleusercontent.com
+ARG VITE_BACKEND_URL=""
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 # Build production bundle using Vite
 RUN npm run build
 
