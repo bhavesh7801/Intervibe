@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { PlayCircle, Award, Clock, CheckCircle2, TrendingUp, Sparkles, Plus, ArrowRight, X, HelpCircle, Zap, Target, Trophy, Settings2, Flame, Activity, FileText, Upload, Star, BookOpen, ShieldCheck, Share2 } from 'lucide-react';
+import { PlayCircle, Award, Clock, CheckCircle2, TrendingUp, Sparkles, Plus, ArrowRight, X, HelpCircle, Zap, Target, Trophy, Settings2, Flame, Activity, FileText, Upload, Star, BookOpen, ShieldCheck, Share2, RefreshCw } from 'lucide-react';
 import QuickActionPillCards from '../components/dashboard/QuickActionPillCards';
 import ReadinessPassportCard from '../components/dashboard/ReadinessPassportCard';
 import ActivityHeatmap from '../components/ActivityHeatmap';
