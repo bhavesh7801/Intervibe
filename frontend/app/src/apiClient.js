@@ -76,4 +76,86 @@ export const api = {
   },
   submitMCQ: (questionId, selectedOption) =>
     apiClient.post('/assessment/submit-mcq', { questionId, selectedOption }),
+  streamEvaluateAnswer: (payload, onToken, onComplete, onError) => {
+    return streamEvaluateAnswer(payload, onToken, onComplete, onError);
+  },
+  transcribeAudio: (audioBlob) => {
+    return transcribeAudio(audioBlob);
+  }
 };
+
+export const streamEvaluateAnswer = async (payload, onToken, onComplete, onError) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${BACKEND_URL}/api/stream/evaluate-answer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => ({}));
+      throw new Error(errJson.detail || `Server returned status ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('data: ')) {
+          const jsonStr = trimmed.replace('data: ', '');
+          try {
+            const data = JSON.parse(jsonStr);
+            if (data.done) {
+              if (onComplete) onComplete(data);
+              return;
+            } else if (data.token) {
+              if (onToken) onToken(data.token);
+            }
+          } catch (parseErr) {
+            console.warn("SSE token parse warning:", parseErr);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Stream reader error:", err);
+    if (onError) onError(err);
+  }
+};
+
+export const transcribeAudio = async (audioBlob) => {
+  const formData = new FormData();
+  formData.append('file', audioBlob, 'recording.webm');
+  const token = localStorage.getItem('token');
+  
+  const response = await fetch(`${BACKEND_URL}/api/audio/transcribe`, {
+    method: 'POST',
+    headers: {
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Audio transcription failed (${response.status}): ${errText}`);
+  }
+
+  return await response.json();
+};
+
+export default apiClient;
