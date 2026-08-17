@@ -1,11 +1,14 @@
 import axios from 'axios';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-console.log("Current Backend URL:", BACKEND_URL);
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL && import.meta.env.VITE_BACKEND_URL.trim() !== '') {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  return ''; // Relative path through Nginx reverse proxy
+};
 
-if (!BACKEND_URL) {
-  console.error("CRITICAL: VITE_BACKEND_URL is not defined in your .env file!");
-}
+const BACKEND_URL = getBackendUrl();
+console.log("Current Backend URL:", BACKEND_URL);
 
 const apiClient = axios.create({
   baseURL: BACKEND_URL,

@@ -180,9 +180,27 @@ const InterviewSession = () => {
     );
   }
 
-  if (!session || !session.questions) return null;
+  if (!session || !session.questions || session.questions.length === 0) {
+    return (
+      <div className="min-h-[calc(100vh-73px)] flex items-center justify-center bg-[#060813] text-white p-6">
+        <div className="text-center space-y-4 max-w-sm">
+          <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto" />
+          <h3 className="text-lg font-bold">No Questions Found</h3>
+          <p className="text-xs text-slate-400">This session has no active questions. Return to the dashboard to start a new interview.</p>
+          <button onClick={() => navigate('/dashboard')} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold transition-all cursor-pointer">
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const currentQuestion = session.questions[currentQuestionIndex];
+  if (currentQuestionIndex >= session.questions.length) {
+    navigate(`/results/${sessionId}`);
+    return null;
+  }
+
+  const currentQuestion = session.questions[currentQuestionIndex] || {};
 
   return (
     <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] py-6 sm:py-8 overflow-x-hidden">
