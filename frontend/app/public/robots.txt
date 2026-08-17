@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /register
+Allow: /feedback
+Allow: /legal
+
+Sitemap: http://intervibe.duckdns.org/sitemap.xml
