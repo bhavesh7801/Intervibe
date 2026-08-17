@@ -1,0 +1,23 @@
+# Environment files & Secrets
+.env
+.env.*
+
+# Python Cache & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# Git & IDE Configuration
+.git
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+
+# Testing & Logs
+.pytest_cache/
+*.log

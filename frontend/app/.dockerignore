@@ -1,0 +1,19 @@
+# Node modules & build outputs
+node_modules/
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+
+# Git & IDE Configuration
+.git
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+
+# Logs & temp
+*.log
+npm-debug.log*

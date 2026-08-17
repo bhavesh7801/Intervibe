@@ -1,0 +1,55 @@
+services:
+  # 1. FastAPI Python Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: interview_prep_backend
+    restart: always
+    ports:
+      - "5000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PISTON_URL=http://piston:2000/api/v2/execute
+    volumes:
+      # Local development hot-reloading
+      - ./backend:/app
+    command: uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - piston
+    networks:
+      - app-network
+
+  # 2. Self-Hosted Piston Code Execution Engine Service (Port 2000)
+  piston:
+    image: ghcr.io/engineer-man/piston
+    container_name: interview_prep_piston
+    restart: always
+    ports:
+      - "2000:2000"
+    privileged: true
+    tmpfs:
+      - /tmp
+    networks:
+      - app-network
+
+  # 3. React + Vite Nginx Frontend Service
+  frontend:
+    build:
+      context: ./frontend/app
+      dockerfile: Dockerfile
+    container_name: interview_prep_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+# Shared Internal Container Network
+networks:
+  app-network:
+    driver: bridge
