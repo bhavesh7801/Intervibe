@@ -555,47 +555,48 @@ const Dashboard = () => {
       {/* Pre-Session Question Prompt Modal */}
       {showPromptModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-2xl card-3d rounded-2xl sm:rounded-3xl p-5 sm:p-10 relative border border-rose-500/40 shadow-[0_0_50px_rgba(244,63,94,0.2)] max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-2xl card-3d rounded-2xl sm:rounded-3xl p-4 sm:p-8 relative border border-rose-500/40 shadow-[0_0_50px_rgba(244,63,94,0.2)] max-h-[90vh] flex flex-col">
             <button
               onClick={() => setShowPromptModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 cursor-pointer z-30"
             >
               <X size={20} />
             </button>
 
             {/* Modal Prompt Header */}
-            <div className="text-center mb-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-pink-500/20 text-rose-400 border border-rose-500/40 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-rose-500/20">
-                <HelpCircle size={24} className="animate-pulse" />
+            <div className="text-center mb-4 shrink-0">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-pink-500/20 text-rose-400 border border-rose-500/40 flex items-center justify-center mx-auto mb-2.5 shadow-lg shadow-rose-500/20">
+                <HelpCircle size={22} className="animate-pulse" />
               </div>
-              <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight">
+              <h3 className="text-base sm:text-2xl font-black text-white tracking-tight">
                 How many questions do you want to practice?
               </h3>
-              <p className="text-xs text-slate-400 mt-1.5">
+              <p className="text-[11px] sm:text-xs text-slate-400 mt-1">
                 Select a quick preset or enter your custom count to customize your session.
               </p>
             </div>
 
-            <div className="space-y-5">
+            {/* Scrollable Content Body */}
+            <div className="overflow-y-auto space-y-4 pr-1 flex-1 scrollbar-thin">
               {/* Target Position Input */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Target Position / Role</label>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Target Position / Role</label>
                 <input
                   type="text"
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                   placeholder="e.g. Full-Stack Developer, Frontend Engineer"
-                  className="w-full px-4 py-3 input-3d rounded-xl placeholder-slate-600 text-sm text-center min-h-[46px]"
+                  className="w-full px-4 py-2.5 input-3d rounded-xl placeholder-slate-600 text-xs sm:text-sm text-center min-h-[42px]"
                   data-testid="session-role-input"
                 />
 
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-1.5 pt-2">
                   {['Aptitude Assessment', 'Business Analyst', 'Data Scientist', 'ECE (Electronics)', 'Electrical (EE)', 'Embedded Systems', 'Mechanical (ME)', 'Product Manager', 'Software Engineer'].map((role) => (
                     <button
                       key={role}
                       type="button"
                       onClick={() => setTargetRole(role)}
-                      className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#090710] hover:bg-[#1A142D] border border-[#2B2144] hover:border-rose-500/40 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold bg-[#090710] hover:bg-[#1A142D] border border-[#2B2144] hover:border-rose-500/40 text-slate-300 hover:text-white transition-colors cursor-pointer"
                     >
                       + {role}
                     </button>
@@ -605,7 +606,7 @@ const Dashboard = () => {
 
               {/* Target Company / Firm Manual Input & Presets */}
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Target Company / Firm Name (Optional)
                   </label>
@@ -616,11 +617,11 @@ const Dashboard = () => {
                   value={targetCompany}
                   onChange={(e) => setTargetCompany(e.target.value)}
                   placeholder="Type any company: e.g. Microsoft, Apple, Uber, Netflix, Tesla, TCS"
-                  className="w-full px-4 py-2.5 input-3d rounded-xl placeholder-slate-600 text-xs sm:text-sm text-center mb-2.5 min-h-[42px]"
+                  className="w-full px-4 py-2 input-3d rounded-xl placeholder-slate-600 text-xs sm:text-sm text-center mb-2 min-h-[40px]"
                   data-testid="target-company-input"
                 />
 
-                <div className="flex flex-wrap gap-2" data-testid="company-presets">
+                <div className="flex flex-wrap gap-1.5" data-testid="company-presets">
                   {[
                     'Amazon', 'Google', 'Meta', 'McKinsey', 'Goldman Sachs', 'Microsoft', 'Apple', 'Tesla', 'Netflix'
                   ].map((firmName) => (
@@ -628,7 +629,7 @@ const Dashboard = () => {
                       key={firmName}
                       type="button"
                       onClick={() => setTargetCompany(firmName)}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer border ${
+                      className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer border ${
                         targetCompany === firmName
                           ? 'bg-gradient-to-r from-amber-500/30 to-rose-500/30 border-amber-500 text-white shadow-md shadow-amber-500/20'
                           : 'bg-[#090710] border-[#2B2144] text-slate-300 hover:border-amber-500/40 hover:text-white'
@@ -643,16 +644,16 @@ const Dashboard = () => {
               {/* AI Resume-Based Questions Toggle Card */}
               <div
                 onClick={() => setUseResumeQuestions(!useResumeQuestions)}
-                className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                   useResumeQuestions
                     ? 'bg-gradient-to-r from-indigo-950/80 to-purple-950/80 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
                     : 'bg-[#090710] border-[#2B2144] text-slate-400 hover:border-slate-600'
                 }`}
                 data-testid="toggle-resume-questions"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold">
-                    <FileText size={18} />
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold shrink-0">
+                    <FileText size={16} />
                   </div>
                   <div className="text-left">
                     <span className="text-xs font-extrabold text-white block">Generate Questions Based on Resume</span>
@@ -663,7 +664,7 @@ const Dashboard = () => {
                   type="checkbox"
                   checked={useResumeQuestions}
                   onChange={(e) => setUseResumeQuestions(e.target.checked)}
-                  className="w-4 h-4 accent-indigo-500 cursor-pointer"
+                  className="w-4 h-4 accent-indigo-500 cursor-pointer shrink-0"
                 />
               </div>
 
@@ -693,50 +694,50 @@ const Dashboard = () => {
               <div>
                 <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Select Question Count</label>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-2">
                   {/* Preset 5 */}
                   <button
                     type="button"
                     onClick={() => { setQuestionCount(5); setIsCustomMode(false); }}
-                    className={`p-3.5 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center ${
+                    className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center ${
                       !isCustomMode && questionCount === 5
                         ? 'bg-gradient-to-b from-rose-500/30 to-purple-600/30 border-rose-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] scale-105'
                         : 'bg-[#090710] border-[#2B2144] text-slate-400 hover:border-slate-600 hover:text-white'
                     }`}
                   >
-                    <Zap size={18} className="text-amber-400 mb-1" />
-                    <span className="text-sm font-black block">5 Questions</span>
-                    <span className="text-[10px] text-slate-400">Quick Practice</span>
+                    <Zap size={16} className="text-amber-400 mb-1" />
+                    <span className="text-xs sm:text-sm font-black block">5 Qs</span>
+                    <span className="text-[9px] text-slate-400">Quick</span>
                   </button>
 
                   {/* Preset 10 (Default) */}
                   <button
                     type="button"
                     onClick={() => { setQuestionCount(10); setIsCustomMode(false); }}
-                    className={`p-3.5 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center ${
+                    className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center ${
                       !isCustomMode && questionCount === 10
                         ? 'bg-gradient-to-b from-rose-500/30 to-purple-600/30 border-rose-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] scale-105'
                         : 'bg-[#090710] border-[#2B2144] text-slate-400 hover:border-slate-600 hover:text-white'
                     }`}
                   >
-                    <Target size={18} className="text-rose-400 mb-1" />
-                    <span className="text-sm font-black block">10 Questions</span>
-                    <span className="text-[10px] text-rose-400 font-bold">Standard</span>
+                    <Target size={16} className="text-rose-400 mb-1" />
+                    <span className="text-xs sm:text-sm font-black block">10 Qs</span>
+                    <span className="text-[9px] text-rose-400 font-bold">Standard</span>
                   </button>
 
                   {/* Preset 15 */}
                   <button
                     type="button"
                     onClick={() => { setQuestionCount(15); setIsCustomMode(false); }}
-                    className={`p-3.5 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center ${
+                    className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center ${
                       !isCustomMode && questionCount === 15
                         ? 'bg-gradient-to-b from-rose-500/30 to-purple-600/30 border-rose-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] scale-105'
                         : 'bg-[#090710] border-[#2B2144] text-slate-400 hover:border-slate-600 hover:text-white'
                     }`}
                   >
-                    <Trophy size={18} className="text-purple-400 mb-1" />
-                    <span className="text-sm font-black block">15 Questions</span>
-                    <span className="text-[10px] text-slate-400">Deep-Dive</span>
+                    <Trophy size={16} className="text-purple-400 mb-1" />
+                    <span className="text-xs sm:text-sm font-black block">15 Qs</span>
+                    <span className="text-[9px] text-slate-400">Deep-Dive</span>
                   </button>
                 </div>
 
@@ -745,13 +746,13 @@ const Dashboard = () => {
                   <button
                     type="button"
                     onClick={() => setIsCustomMode(true)}
-                    className="text-xs text-rose-400 hover:text-rose-300 font-semibold transition-colors cursor-pointer flex items-center gap-1 mt-1"
+                    className="text-[11px] text-rose-400 hover:text-rose-300 font-semibold transition-colors cursor-pointer flex items-center gap-1 mt-1"
                   >
-                    <Settings2 size={13} />
+                    <Settings2 size={12} />
                     <span>Or enter a custom number of questions (Max 50)</span>
                   </button>
                 ) : (
-                  <div className="mt-2">
+                  <div className="mt-1.5">
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -769,18 +770,17 @@ const Dashboard = () => {
                             setCustomCountInput(val);
                           }
                         }}
-                        placeholder="Enter custom count (1 - 50)"
-                        className="flex-1 px-4 py-2.5 input-3d rounded-xl text-xs sm:text-sm text-center min-h-[42px]"
+                        placeholder="Enter count (1 - 50)"
+                        className="flex-1 px-3 py-2 input-3d rounded-xl text-xs text-center min-h-[38px]"
                       />
                       <button
                         type="button"
                         onClick={() => { setIsCustomMode(false); setCustomCountInput(''); }}
-                        className="px-3.5 py-2.5 bg-[#2B2144] hover:bg-[#3D2C60] rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
+                        className="px-3 py-2 bg-[#2B2144] hover:bg-[#3D2C60] rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
                       >
                         Reset
                       </button>
                     </div>
-                    <p className="text-[10px] text-rose-400 font-medium mt-1">Note: Maximum limit is 50 questions per session.</p>
                   </div>
                 )}
               </div>
@@ -788,7 +788,7 @@ const Dashboard = () => {
               {/* Interviewer Persona Selection */}
               <div>
                 <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Interviewer Persona</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
                     { id: 'Standard', label: 'Standard', desc: 'Balanced & professional' },
                     { id: 'Google (FAANG Strict)', label: 'FAANG Strict', desc: 'Deep algorithms & edge cases' },
@@ -800,14 +800,14 @@ const Dashboard = () => {
                       key={persona.id}
                       type="button"
                       onClick={() => setInterviewerPersona(persona.id)}
-                      className={`p-3 rounded-xl border text-left transition-all duration-300 cursor-pointer ${
+                      className={`p-2.5 rounded-xl border text-left transition-all duration-300 cursor-pointer ${
                         interviewerPersona === persona.id
                           ? 'bg-gradient-to-r from-rose-500/20 to-purple-500/20 border-rose-500 text-white shadow-md shadow-rose-500/20'
                           : 'bg-[#090710] border-[#2B2144] text-slate-400 hover:border-slate-600'
                       }`}
                     >
-                      <span className="text-sm font-bold block">{persona.label}</span>
-                      <span className="text-[10px] text-slate-500">{persona.desc}</span>
+                      <span className="text-xs sm:text-sm font-bold block text-white">{persona.label}</span>
+                      <span className="text-[10px] text-slate-400">{persona.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -815,28 +815,31 @@ const Dashboard = () => {
 
             </div>
 
-            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            {/* Fixed Sticky Footer: Cancel and Start Mock Interview Buttons */}
+            <div className="sticky bottom-0 pt-3 pb-1 bg-[#0D121F] border-t border-[#1A253F] z-20 flex flex-col sm:flex-row gap-2.5 sm:gap-4 mt-2 shrink-0">
               <button
+                type="button"
                 onClick={() => setShowPromptModal(false)}
-                className="w-full sm:flex-1 py-3.5 rounded-xl font-bold text-slate-300 bg-[#090710] border border-[#2B2144] hover:bg-[#1A142D] hover:text-white transition-colors cursor-pointer text-center"
+                className="w-full sm:flex-1 py-3 rounded-xl font-bold text-xs sm:text-sm text-slate-300 bg-[#090710] border border-[#2B2144] hover:bg-[#1A142D] hover:text-white transition-colors cursor-pointer text-center"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleStartSession}
                 disabled={creating || !targetRole.trim() || (isCustomMode && (!customCountInput || parseInt(customCountInput) < 1))}
-                className="flex-1 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-400 hover:to-purple-500 transition-colors shadow-lg shadow-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:flex-1 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-400 hover:to-purple-500 transition-colors shadow-lg shadow-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                 data-testid="start-session-button"
               >
                 {creating ? (
                   <>
-                    <RefreshCw className="animate-spin" size={18} />
-                    Preparing...
+                    <RefreshCw className="animate-spin" size={16} />
+                    <span>Preparing...</span>
                   </>
                 ) : (
                   <>
-                    <PlayCircle size={18} />
-                    Start Mock Interview
+                    <PlayCircle size={16} />
+                    <span>Start Mock Interview</span>
                   </>
                 )}
               </button>

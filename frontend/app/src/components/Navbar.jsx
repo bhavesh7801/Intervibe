@@ -266,6 +266,93 @@ const Navbar = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile Quick-Navigation Ribbon (Horizontally Scrollable) */}
+        <div className="lg:hidden flex items-center gap-2 px-4 py-2 bg-[#070B16] border-t border-slate-800/60 overflow-x-auto scrollbar-none text-xs font-bold">
+          <button
+            type="button"
+            onClick={handleAiGeneratorClick}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white shrink-0 shadow-sm border border-cyan-400/30 cursor-pointer"
+          >
+            <Wand2 size={13} className="text-cyan-100 animate-pulse" />
+            <span>AI Generator</span>
+          </button>
+
+          {user && (
+            <Link
+              to="/dashboard"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl shrink-0 border transition-colors ${
+                isActive('/dashboard')
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  : 'bg-[#0E1322] text-slate-300 border-[#1E2840]'
+              }`}
+            >
+              <LayoutGrid size={13} className="text-amber-400" />
+              <span>Dashboard</span>
+            </Link>
+          )}
+
+          <a
+            href="#features"
+            onClick={handleFeaturesClick}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0E1322] text-slate-300 hover:text-white border border-[#1E2840] shrink-0"
+          >
+            <Compass size={13} className="text-blue-400" />
+            <span>Features</span>
+          </a>
+
+          <a
+            href="/coding"
+            onClick={(e) => handleProtectedNav(e, '/coding')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl shrink-0 border transition-colors ${
+              isActive('/coding')
+                ? 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+                : 'bg-[#0E1322] text-slate-300 border-[#1E2840]'
+            }`}
+          >
+            <Code2 size={13} className="text-blue-400" />
+            <span>Problems</span>
+          </a>
+
+          <a
+            href="/assessment"
+            onClick={(e) => handleProtectedNav(e, '/assessment')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl shrink-0 border transition-colors ${
+              isActive('/assessment')
+                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                : 'bg-[#0E1322] text-slate-300 border-[#1E2840]'
+            }`}
+          >
+            <Layers size={13} className="text-purple-400" />
+            <span>Mock Interviews</span>
+          </a>
+
+          <a
+            href="/leaderboard"
+            onClick={(e) => handleProtectedNav(e, '/leaderboard')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl shrink-0 border transition-colors ${
+              isActive('/leaderboard')
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                : 'bg-[#0E1322] text-slate-300 border-[#1E2840]'
+            }`}
+          >
+            <Trophy size={13} className="text-amber-400" />
+            <span>Leaderboard</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={(e) => handleProtectedNav(e, '/coaching')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl shrink-0 border transition-colors cursor-pointer ${
+              isActive('/coaching')
+                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                : 'bg-[#0E1322] text-slate-300 border-[#1E2840]'
+            }`}
+          >
+            <MessageSquare size={13} className="text-emerald-400" />
+            <span>AI Coaching</span>
+          </button>
+        </div>
       </header>
 
       {/* YouTube-Style PC Left Sidebar Drawer & Overlay */}
