@@ -20,7 +20,7 @@ export const Testimonials: React.FC = () => {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         
         {/* Testimonial 1 */}
         <motion.div
@@ -28,7 +28,7 @@ export const Testimonials: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="p-8 rounded-3xl bg-[#0e121f] border border-blue-500/20 space-y-6 shadow-xl flex flex-col justify-between"
+          className="p-5 sm:p-7 rounded-3xl bg-[#0e121f] border border-blue-500/20 space-y-5 shadow-xl flex flex-col justify-between"
         >
           <div className="space-y-4">
             <div className="flex text-amber-400 gap-1">

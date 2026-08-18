@@ -58,7 +58,7 @@ export const CompanyTracks: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {COMPANY_TRACKS.map((track) => (
           <motion.div
             key={track.id}
@@ -67,7 +67,7 @@ export const CompanyTracks: React.FC = () => {
             viewport={{ once: true }}
             whileHover={{ y: -8 }}
             onClick={() => { setSelectedCompany(track.id); navigate('/assessment'); }}
-            className={`p-8 rounded-3xl bg-[#0e121f] border border-blue-500/20 shadow-xl space-y-6 hover:border-blue-500/50 transition-all cursor-pointer group flex flex-col justify-between ${selectedCompany === track.id ? 'ring-2 ring-blue-500/40 bg-blue-950/20' : ''}`}
+            className={`p-5 sm:p-7 rounded-3xl bg-[#0e121f] border border-blue-500/20 shadow-xl space-y-5 hover:border-blue-500/50 transition-all cursor-pointer group flex flex-col justify-between ${selectedCompany === track.id ? 'ring-2 ring-blue-500/40 bg-blue-950/20' : ''}`}
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">

@@ -91,13 +91,13 @@ export const HowItWorks: React.FC = () => {
           viewport={{ once: true }}
           className="lg:col-span-6"
         >
-          <div className="p-8 sm:p-10 rounded-3xl bg-[#0e121f] border border-blue-500/20 shadow-2xl space-y-7">
-            <div className="flex items-center justify-between border-b border-[#162035] pb-5">
+          <div className="p-5 sm:p-8 lg:p-10 rounded-3xl bg-[#0e121f] border border-blue-500/20 shadow-2xl space-y-6 sm:space-y-7">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#162035] pb-4 sm:pb-5 gap-2.5">
               <div>
-                <h4 className="font-extrabold text-white text-lg">Session scorecard</h4>
+                <h4 className="font-extrabold text-white text-base sm:text-lg">Session scorecard</h4>
                 <span className="text-xs text-slate-400 font-mono">Senior Frontend Engineer • Mock #14</span>
               </div>
-              <div className="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-mono font-extrabold">
+              <div className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-mono font-extrabold self-start sm:self-auto">
                 Overall: 8.4/10
               </div>
             </div>

@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl sm:text-7xl lg:text-8xl font-black text-white tracking-tight leading-snug max-w-5xl"
+          className="text-4xl sm:text-6xl lg:text-8xl font-black text-white tracking-tight leading-tight sm:leading-snug max-w-5xl px-2"
         >
           Ace your next{' '}
           <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
@@ -52,34 +52,34 @@ export const HeroSection: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-8 text-lg sm:text-xl lg:text-2xl text-slate-300 max-w-3xl font-medium leading-normal"
+          className="mt-6 sm:mt-8 text-base sm:text-xl lg:text-2xl text-slate-300 max-w-3xl font-medium leading-relaxed px-2"
         >
           Practice with an AI interviewer that asks real questions, listens to your answers, and gives you instant, actionable feedback — for any role, any company, any time.
         </motion.p>
 
         {/* Reliable Spacer Div to guarantee spacing regardless of CSS margin collapse */}
-        <div className="h-16 sm:h-20 w-full shrink-0" />
+        <div className="h-10 sm:h-16 w-full shrink-0" />
 
         {/* Primary Call to Action Buttons */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 w-full sm:w-auto px-4 sm:px-0"
+          className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto px-2 sm:px-0 max-w-md sm:max-w-none"
         >
           <button
             onClick={() => navigate('/assessment')}
-            className="w-fit h-14 sm:h-[72px] px-8 sm:px-12 rounded-full text-xl sm:text-2xl font-black text-white bg-blue-600 hover:bg-blue-500 shadow-2xl shadow-blue-500/40 border border-blue-400/50 flex items-center justify-center gap-3 transition-all cursor-pointer group hover:scale-[1.03] active:scale-95 whitespace-nowrap leading-normal"
+            className="w-full sm:w-auto min-h-[54px] sm:h-[72px] px-6 sm:px-12 rounded-full text-base sm:text-2xl font-black text-white bg-blue-600 hover:bg-blue-500 shadow-2xl shadow-blue-500/40 border border-blue-400/50 flex items-center justify-center gap-3 transition-all cursor-pointer group hover:scale-[1.03] active:scale-95 text-center leading-normal"
           >
             <span>Start a mock interview</span>
-            <ArrowRight size={24} className="group-hover:translate-x-1.5 transition-transform shrink-0" />
+            <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform shrink-0" />
           </button>
 
           <button
             onClick={() => setDemoOpen(true)}
-            className="w-fit h-14 sm:h-[72px] px-8 sm:px-12 rounded-full text-xl sm:text-2xl font-bold text-slate-300 bg-transparent hover:bg-white/5 border border-slate-700 hover:border-slate-500 flex items-center justify-center gap-3 transition-all cursor-pointer hover:scale-[1.03] active:scale-95 whitespace-nowrap leading-normal"
+            className="w-full sm:w-auto min-h-[54px] sm:h-[72px] px-6 sm:px-12 rounded-full text-base sm:text-2xl font-bold text-slate-300 bg-transparent hover:bg-white/5 border border-slate-700 hover:border-slate-500 flex items-center justify-center gap-3 transition-all cursor-pointer hover:scale-[1.03] active:scale-95 text-center leading-normal"
           >
-            <Play size={22} className="text-slate-400 group-hover:text-white shrink-0" />
+            <Play size={20} className="text-slate-400 group-hover:text-white shrink-0" />
             <span>Watch 2-min demo</span>
           </button>
         </motion.div>
