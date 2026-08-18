@@ -350,29 +350,29 @@ const AssessmentWorkspace = () => {
       ) : (
         <>
       {/* Top Navigation Stepper Bar */}
-      <div className="card-3d rounded-xl p-4 mb-5 flex flex-wrap items-center justify-between gap-3 bg-[#140F26]">
+      <div className="card-3d rounded-xl p-3 sm:p-4 mb-5 flex flex-wrap items-center justify-between gap-3 bg-[#140F26]">
         
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold border border-rose-500/30">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold border border-rose-500/30 shrink-0">
             <Layers size={18} />
           </div>
           <div>
-            <h1 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
-              Hybrid Assessment Test
+            <h1 className="text-xs sm:text-base font-extrabold text-white flex items-center gap-2 flex-wrap">
+              <span>Assessment Test</span>
               <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                Question {currentIndex + 1} of {questions.length}
+                Q {currentIndex + 1} of {questions.length}
               </span>
             </h1>
-            <p className="text-[11px] text-slate-400">
-              {isUserTech ? "Technical MCQs & Live Coding Challenges" : "Domain Assessments, Strategic MCQs & Situational Scenarios"}
+            <p className="text-[10px] sm:text-[11px] text-slate-400 truncate max-w-[200px] sm:max-w-none">
+              {isUserTech ? "Technical MCQs & Live Coding Challenges" : "Domain Assessments & Strategic MCQs"}
             </p>
           </div>
         </div>
 
         {/* Stepper Dots & Navigation Controls */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {/* Timed Assessment Clock */}
-          <div className={`px-3 py-1.5 rounded-lg border flex items-center gap-1.5 text-xs font-extrabold ${
+          <div className={`px-2.5 sm:px-3 py-1.5 rounded-lg border flex items-center gap-1.5 text-xs font-extrabold ${
             examTimer < 120
               ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
               : 'bg-purple-500/10 text-purple-300 border-purple-500/30'
@@ -677,7 +677,7 @@ const AssessmentWorkspace = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
           
           {/* Left Problem Description */}
-          <div className="lg:col-span-5 card-3d rounded-xl p-5 bg-[#140F26] border border-[#2B2144] h-[650px] overflow-y-auto space-y-4">
+          <div className="lg:col-span-5 card-3d rounded-xl p-4 sm:p-5 bg-[#140F26] border border-[#2B2144] h-[380px] lg:h-[650px] overflow-y-auto space-y-4">
             <div className="flex items-center justify-between border-b border-[#2B2144] pb-3">
               <h2 className="text-base font-bold text-white">{currentQuestion.title}</h2>
               <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase">
@@ -792,20 +792,20 @@ const AssessmentWorkspace = () => {
          5. DIAGNOSTIC SCORECARD & CERTIFICATE MODAL
          ======================================================== */}
       {isScorecardOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fadeIn">
-          <div className="w-full max-w-4xl bg-[#140F26] border border-purple-500/40 rounded-2xl p-8 shadow-2xl space-y-8 max-h-[90vh] overflow-y-auto animate-scale-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 animate-fadeIn">
+          <div className="w-full max-w-4xl bg-[#140F26] border border-purple-500/40 rounded-2xl p-4 sm:p-8 shadow-2xl space-y-6 sm:space-y-8 max-h-[90vh] overflow-y-auto animate-scale-up">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[#2B2144] pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center">
-                  <Award size={22} />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center shrink-0">
+                  <Award size={20} />
                 </div>
                 <div>
-                  <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                  <h2 className="text-sm sm:text-lg font-black text-white flex items-center gap-2">
                     Assessment Diagnostic Report
                   </h2>
-                  <p className="text-xs text-slate-400">Official Candidate Evaluation & Technical Mastery Scorecard</p>
+                  <p className="text-[10px] sm:text-xs text-slate-400">Official Candidate Evaluation & Technical Scorecard</p>
                 </div>
               </div>
               <button
