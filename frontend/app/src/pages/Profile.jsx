@@ -145,7 +145,7 @@ const Profile = () => {
           )}
         </div>
         {/* 12-Column CSS Grid Layout for High Performance Desktop Scaling */}
-        <div className="grid grid-cols-12 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
           
           {/* ================= LEFT COLUMN ================= */}
           <ProfileSidebar
@@ -155,7 +155,7 @@ const Profile = () => {
             getInitials={getInitials}
           />
           {/* ================= RIGHT COLUMN ================= */}
-          <div className="col-span-12 lg:col-span-8 xl:col-span-8 space-y-10">
+          <div className="col-span-1 lg:col-span-8 xl:col-span-8 space-y-6 sm:space-y-10">
             
             <StatsOverviewGrid
               stats={stats}

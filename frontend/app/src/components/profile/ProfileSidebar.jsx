@@ -13,7 +13,7 @@ import {
 const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
   const navigate = useNavigate();
   return (
-    <div className="col-span-12 lg:col-span-4 xl:col-span-4 space-y-8">
+    <div className="col-span-1 lg:col-span-4 xl:col-span-4 space-y-6 sm:space-y-8">
       
       {/* HERO PROFILE CARD */}
       <div className="card-3d bg-[#080D1A]/80 border-2 border-indigo-500/40 shadow-[0_0_30px_rgba(99,102,241,0.15)] rounded-[2rem] p-6 sm:p-10 backdrop-blur-xl transform-gpu will-change-filter relative overflow-hidden">
