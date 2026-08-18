@@ -280,7 +280,7 @@ const Navbar = () => {
           {/* Left Sliding Sidebar Drawer (Premium Glassmorphism) */}
           <aside 
             ref={dropdownRef}
-            className="fixed top-0 left-0 bottom-0 w-72 sm:w-80 bg-[#060813]/85 backdrop-blur-2xl border-r border-slate-800/60 shadow-[10px_0_40px_rgba(0,0,0,0.5)] z-50 flex flex-col justify-between overflow-y-auto animate-slide-right"
+            className="fixed top-0 left-0 bottom-0 w-72 sm:w-80 max-w-[85vw] bg-[#060813]/85 backdrop-blur-2xl border-r border-slate-800/60 shadow-[10px_0_40px_rgba(0,0,0,0.5)] z-50 flex flex-col justify-between overflow-y-auto animate-slide-right"
             data-testid="youtube-pc-sidebar-drawer"
           >
             <div>
