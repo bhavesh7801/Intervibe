@@ -197,7 +197,7 @@ async def get_user_stats(
     total_questions = db.query(func.count(AnswerDB.id)).join(SessionDB).filter(SessionDB.user_id == user_id).scalar() or 0
     avg_score_res = db.query(func.avg(AnswerDB.ai_score)).join(SessionDB).filter(SessionDB.user_id == user_id).scalar()
     
-    avg_score = round(float(avg_score_res)) if avg_score_res is not None else 80
+    avg_score = round(float(avg_score_res)) if avg_score_res is not None else 0
 
     # Fetch all activity dates
     session_dates = db.query(SessionDB.date).filter(SessionDB.user_id == user_id).all()

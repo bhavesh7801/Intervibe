@@ -33,7 +33,7 @@ const StatsOverviewGrid = ({ stats, recentSessions, userTargetRole }) => {
               Average Score
             </h3>
             <div className="text-5xl font-black text-white">
-              {stats?.avgScore ? `${Math.round(stats.avgScore)}%` : "85%"}
+              {stats?.avgScore || stats?.averageScore ? `${Math.round(stats.avgScore || stats.averageScore)}%` : "0%"}
             </div>
             <p className="text-xs leading-snug text-slate-500 pt-1">
               Overall AI evaluation score

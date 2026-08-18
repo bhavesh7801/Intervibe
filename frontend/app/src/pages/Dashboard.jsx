@@ -11,7 +11,7 @@ import ActivityHeatmap from '../components/ActivityHeatmap';
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ totalSessions: 0, completedSessions: 0, totalQuestionsAnswered: 0, averageScore: 80, practiceStreak: 0, solvedChallenges: 0, activityDates: [] });
+  const [stats, setStats] = useState({ totalSessions: 0, completedSessions: 0, totalQuestionsAnswered: 0, averageScore: 0, practiceStreak: 0, solvedChallenges: 0, activityDates: [] });
 
   const [sessions, setSessions] = useState([]);
 
@@ -57,7 +57,7 @@ const Dashboard = () => {
       const statsData = statsRes.status === 'fulfilled' ? statsRes.value?.data : null;
       const sessionsData = sessionsRes.status === 'fulfilled' ? sessionsRes.value?.data : [];
 
-      const finalStats = statsData || { totalSessions: 0, completedSessions: 0, totalQuestionsAnswered: 0, averageScore: 80 };
+      const finalStats = statsData || { totalSessions: 0, completedSessions: 0, totalQuestionsAnswered: 0, averageScore: 0, practiceStreak: 0, solvedChallenges: 0, activityDates: [] };
       const finalSessions = Array.isArray(sessionsData) ? sessionsData : [];
 
       setStats(finalStats);
@@ -177,30 +177,30 @@ const Dashboard = () => {
             </button>
           </div>
 
-          {/* 4 Stat Metric Cards (Matching Screenshot 1) */}
+          {/* 4 Stat Metric Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
             {/* Card 1: Problems Solved */}
             <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-800 text-center">
-              <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Problems Solved :</span>
-              <span className="text-3xl font-extrabold text-white">{getCalculatedSolvedChallenges() || 21}</span>
+              <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Problems Solved</span>
+              <span className="text-3xl font-extrabold text-white">{stats?.solvedChallenges ?? 0}</span>
             </div>
 
             {/* Card 2: Success Rate */}
             <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-800 text-center">
               <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Success Rate</span>
-              <span className="text-3xl font-extrabold text-emerald-400">{stats?.averageScore || 85}%</span>
+              <span className="text-3xl font-extrabold text-emerald-400">{stats?.totalQuestionsAnswered > 0 ? `${stats.averageScore}%` : '0%'}</span>
             </div>
 
             {/* Card 3: Daily Streak */}
             <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-800 text-center">
               <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Daily Streak</span>
-              <span className="text-3xl font-extrabold text-amber-400">{getCalculatedStreak() || 7} <span className="text-sm font-semibold text-amber-300">Days</span></span>
+              <span className="text-3xl font-extrabold text-amber-400">{stats?.practiceStreak ?? 0} <span className="text-sm font-semibold text-amber-300">Days</span></span>
             </div>
 
             {/* Card 4: AI Review Score */}
             <div className="p-4 rounded-xl bg-[#0C1427] border border-cyan-500/30 text-center shadow-lg shadow-cyan-500/10">
               <span className="text-xs font-bold text-slate-400 uppercase block mb-1">AI Review Score</span>
-              <span className="text-3xl font-extrabold text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.4)]">{Math.min(99, (stats?.averageScore || 90) + 2)}</span>
+              <span className="text-3xl font-extrabold text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.4)]">{stats?.totalQuestionsAnswered > 0 ? stats.averageScore : 0}</span>
             </div>
           </div>
         </div>
