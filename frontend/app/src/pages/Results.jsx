@@ -189,7 +189,7 @@ const Results = () => {
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 space-y-8">
         
         {/* PDF Export Bar */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
           <Link
             to="/dashboard"
             className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-blue-400 transition-colors"
@@ -198,11 +198,11 @@ const Results = () => {
             Back to Dashboard
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setShowCertModal(true)}
-              className="py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 flex items-center gap-2 cursor-pointer transition-all shadow-md shadow-blue-500/10"
+              className="w-full sm:w-auto justify-center py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 flex items-center gap-2 cursor-pointer transition-all shadow-md shadow-blue-500/10"
             >
               <Award size={15} className="text-amber-400" />
               <span>Shareable Certificate</span>
@@ -212,7 +212,7 @@ const Results = () => {
               type="button"
               onClick={handleDownloadPDF}
               disabled={exportingPDF}
-              className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 border border-blue-400/30 flex items-center gap-2 cursor-pointer shadow-lg shadow-blue-500/25 disabled:opacity-50"
+              className="w-full sm:w-auto justify-center py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 border border-blue-400/30 flex items-center gap-2 cursor-pointer shadow-lg shadow-blue-500/25 disabled:opacity-50"
               data-testid="export-pdf-btn"
             >
               <Download size={15} className={exportingPDF ? 'animate-bounce' : ''} />

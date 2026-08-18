@@ -32,22 +32,22 @@ const ResumeUploaderCard = ({ user }) => {
   };
 
   return (
-    <div className="bg-[#080D1A]/80 border-2 border-indigo-500/40 rounded-[2rem] p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(99,102,241,0.15)] flex flex-col gap-8">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 w-full">
-        <div className="flex items-center gap-4 flex-1 min-w-0">
-          <div className="w-12 h-12 rounded-xl bg-[#162035] text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
-            <FileText size={20} />
+    <div className="bg-[#080D1A]/80 border-2 border-indigo-500/40 rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(99,102,241,0.15)] flex flex-col gap-6 sm:gap-8">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 w-full">
+        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#162035] text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
+            <FileText size={18} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-black text-white truncate">
+            <h3 className="text-sm sm:text-base font-black text-white truncate">
               AI Resume Parser & Skill Extractor
             </h3>
-            <p className="text-[11px] leading-snug text-slate-400 mt-1">
+            <p className="text-[11px] leading-snug text-slate-400 mt-0.5">
               Upload your resume to extract skills and personalize AI coding questions.
             </p>
           </div>
         </div>
-        <label className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.4)] cursor-pointer transition-transform hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap">
+        <label className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.4)] cursor-pointer transition-transform hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap">
           <Upload size={16} />
           <span>{resumeLoading ? "Parsing..." : "Upload PDF Resume"}</span>
           <input

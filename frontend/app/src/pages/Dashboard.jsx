@@ -555,7 +555,7 @@ const Dashboard = () => {
       {/* Pre-Session Question Prompt Modal */}
       {showPromptModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-2xl card-3d rounded-2xl sm:rounded-3xl p-6 sm:p-10 relative border border-rose-500/40 shadow-[0_0_50px_rgba(244,63,94,0.2)]">
+          <div className="w-full max-w-2xl card-3d rounded-2xl sm:rounded-3xl p-5 sm:p-10 relative border border-rose-500/40 shadow-[0_0_50px_rgba(244,63,94,0.2)] max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setShowPromptModal(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 cursor-pointer"
@@ -815,10 +815,10 @@ const Dashboard = () => {
 
             </div>
 
-            <div className="mt-8 flex gap-4">
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 onClick={() => setShowPromptModal(false)}
-                className="flex-1 py-3.5 rounded-xl font-bold text-slate-300 bg-[#090710] border border-[#2B2144] hover:bg-[#1A142D] hover:text-white transition-colors cursor-pointer"
+                className="w-full sm:flex-1 py-3.5 rounded-xl font-bold text-slate-300 bg-[#090710] border border-[#2B2144] hover:bg-[#1A142D] hover:text-white transition-colors cursor-pointer text-center"
               >
                 Cancel
               </button>

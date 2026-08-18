@@ -16,7 +16,7 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
     <div className="col-span-12 lg:col-span-4 xl:col-span-4 space-y-8">
       
       {/* HERO PROFILE CARD */}
-      <div className="card-3d bg-[#080D1A]/80 border-2 border-indigo-500/40 shadow-[0_0_30px_rgba(99,102,241,0.15)] rounded-[2rem] p-10 backdrop-blur-xl transform-gpu will-change-filter relative overflow-hidden">
+      <div className="card-3d bg-[#080D1A]/80 border-2 border-indigo-500/40 shadow-[0_0_30px_rgba(99,102,241,0.15)] rounded-[2rem] p-6 sm:p-10 backdrop-blur-xl transform-gpu will-change-filter relative overflow-hidden">
         
         <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-blue-500/10 via-indigo-500/5 to-transparent rounded-full blur-2xl pointer-events-none" />
         <div className="flex flex-col items-center text-center gap-4 relative">
@@ -24,46 +24,46 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
           {/* Avatar Badge */}
           <div className="relative shrink-0">
             
-            <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-[#050A18] border border-blue-500/30 p-1.5 shadow-[0_0_25px_rgba(59,130,246,0.2)]">
+            <div className="w-28 h-28 sm:w-44 sm:h-44 rounded-full bg-[#050A18] border border-blue-500/30 p-1.5 shadow-[0_0_25px_rgba(59,130,246,0.2)]">
               
-              <div className="w-full h-full rounded-full bg-[#0F172A] flex items-center justify-center text-5xl font-black text-white tracking-wider font-mono">
+              <div className="w-full h-full rounded-full bg-[#0F172A] flex items-center justify-center text-3xl sm:text-5xl font-black text-white tracking-wider font-mono">
                 
                 {getInitials(user.name)}
               </div>
             </div>
             <span
-              className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-emerald-500 border-2 border-[#080D1A] flex items-center justify-center text-white shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+              className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 border-2 border-[#080D1A] flex items-center justify-center text-white shadow-[0_0_10px_rgba(16,185,129,0.5)]"
               title="Active Account"
             >
               
-              <CheckCircle2 size={13} />
+              <CheckCircle2 size={12} />
             </span>
           </div>
           {/* Main Info */}
-          <div className="flex-1 text-center space-y-3">
+          <div className="flex-1 text-center space-y-3 w-full">
             
             <div className="flex flex-col items-center gap-2">
               
               <h1
-                className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight"
+                className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight break-words max-w-full"
                 data-testid="profile-name"
               >
                 
                 {user.name}
               </h1>
-              <span className="px-4 py-1.5 rounded-full text-[12px] font-black bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] uppercase tracking-widest">
+              <span className="px-3.5 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-[12px] font-black bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] uppercase tracking-widest">
                 
                 Verified Candidate
               </span>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-300 mt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-300 mt-2">
               
               <span
-                className="flex items-center gap-1.5 text-slate-300"
+                className="flex items-center gap-1.5 text-slate-300 break-all text-xs"
                 data-testid="profile-email"
               >
                 
-                <Mail size={14} className="text-slate-400" /> {user.email}
+                <Mail size={14} className="text-slate-400 shrink-0" /> {user.email}
               </span>
               <span className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase tracking-wide text-xs">
                 

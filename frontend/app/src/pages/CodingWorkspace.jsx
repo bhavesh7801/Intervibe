@@ -1258,7 +1258,7 @@ const CodingWorkspace = () => {
 
         {/* Left Side: Question Description Pane */}
         <div
-          className="w-full lg:shrink-0 lg:w-[var(--left-w)] rounded-xl bg-[#0C1222] border border-[#1A253F] h-[650px] overflow-y-auto"
+          className="w-full lg:shrink-0 lg:w-[var(--left-w)] rounded-xl bg-[#0C1222] border border-[#1A253F] h-[420px] lg:h-[650px] overflow-y-auto"
           style={{ '--left-w': `${leftWidth}%` }}
         >
           {/* Tab bar, LeetCode-style */}

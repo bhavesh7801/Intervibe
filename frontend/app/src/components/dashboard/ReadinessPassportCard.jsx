@@ -29,7 +29,7 @@ const ReadinessPassportCard = ({ stats, onStartMock }) => {
 
         <button
           onClick={onStartMock}
-          className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-xl shadow-blue-500/25 border border-blue-400/30 flex items-center gap-2 transition-all cursor-pointer shrink-0"
+          className="w-full sm:w-auto justify-center px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-xl shadow-blue-500/25 border border-blue-400/30 flex items-center gap-2 transition-all cursor-pointer shrink-0"
         >
           <span>Recalibrate Passport</span>
           <ArrowRight size={14} />

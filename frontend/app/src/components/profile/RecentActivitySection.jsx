@@ -12,13 +12,13 @@ import {
 const RecentActivitySection = ({ recentSessions, userTargetRole }) => {
   const navigate = useNavigate();
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-10">
       {/* RECENT INTERVIEW SESSION */}
-      <div className="bg-[#080D1A]/80 border-2 border-cyan-500/30 rounded-[2rem] p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(6,182,212,0.15)] space-y-8">
-        <div className="flex items-center justify-between border-b border-[#1A253F] pb-5 mb-2">
+      <div className="bg-[#080D1A]/80 border-2 border-cyan-500/30 rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(6,182,212,0.15)] space-y-6 sm:space-y-8">
+        <div className="flex items-center justify-between border-b border-[#1A253F] pb-4 sm:pb-5 mb-2">
           <div className="flex items-center gap-2">
             <Clock size={18} className="text-blue-400" />
-            <h2 className="text-base font-bold text-white">Recent Interview Session</h2>
+            <h2 className="text-sm sm:text-base font-bold text-white">Recent Interview Session</h2>
           </div>
           <button
             onClick={() => navigate("/dashboard")}
@@ -30,7 +30,7 @@ const RecentActivitySection = ({ recentSessions, userTargetRole }) => {
 
         {recentSessions && recentSessions.length > 0 ? (
           <div
-            className="bg-[#050A18] border border-[#1A253F] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 hover:border-blue-500/30 transition-colors group cursor-pointer"
+            className="bg-[#050A18] border border-[#1A253F] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-blue-500/30 transition-colors group cursor-pointer"
             onClick={() => navigate("/dashboard")}
           >
             <div className="flex items-center gap-4">
@@ -50,8 +50,8 @@ const RecentActivitySection = ({ recentSessions, userTargetRole }) => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
+            <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
+              <div className="text-left sm:text-right">
                 <span className="text-[10px] font-bold uppercase text-slate-400 block font-mono">
                   AI SCORE
                 </span>
@@ -74,11 +74,11 @@ const RecentActivitySection = ({ recentSessions, userTargetRole }) => {
         <div className="flex justify-center pt-2 pb-1 relative z-10 w-full">
           <button
             onClick={() => navigate("/dashboard")}
-            className="px-12 py-4 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-white font-black text-base tracking-wide shadow-[0_0_40px_rgba(16,185,129,0.55)] hover:shadow-[0_0_60px_rgba(16,185,129,0.75)] hover:scale-[1.04] active:scale-[0.97] transition-all duration-200 border border-teal-300/50 flex items-center gap-3"
+            className="w-full sm:w-auto justify-center px-6 sm:px-12 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-white font-black text-sm sm:text-base tracking-wide shadow-[0_0_40px_rgba(16,185,129,0.55)] hover:shadow-[0_0_60px_rgba(16,185,129,0.75)] hover:scale-[1.04] active:scale-[0.97] transition-all duration-200 border border-teal-300/50 flex items-center gap-3 cursor-pointer"
           >
             <span>🚀</span>
             <span>Start Mock Interview</span>
-            <ArrowRight size={20} className="ml-1" />
+            <ArrowRight size={18} className="ml-1" />
           </button>
         </div>
       </div>

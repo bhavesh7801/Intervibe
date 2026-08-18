@@ -358,7 +358,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
         {/* RIGHT COLUMN — Glassmorphic Auth Card */}
         <div className="lg:col-span-6 w-full max-w-[500px] mx-auto">
           <Reveal delay={120} y={30}>
-            <div className="bg-[#0C1222] backdrop-blur-2xl border border-[#1A253F] rounded-3xl pt-9 pb-9 px-8 sm:px-10 shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_50px_rgba(37,99,235,0.15)] relative">
+            <div className="bg-[#0C1222] backdrop-blur-2xl border border-[#1A253F] rounded-3xl pt-7 sm:pt-9 pb-7 sm:pb-9 px-5 sm:px-10 shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_50px_rgba(37,99,235,0.15)] relative">
 
               {/* Prominent Card Top Logo Header */}
               <div className="flex items-center justify-center gap-3.5 mb-7 pt-1 cursor-pointer group" onClick={() => navigate('/')}>
