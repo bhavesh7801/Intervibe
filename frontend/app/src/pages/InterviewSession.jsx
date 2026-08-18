@@ -8,7 +8,7 @@ import FeedbackPanel from '../components/FeedbackPanel';
 import WebcamPreview from '../components/WebcamPreview';
 import SystemDesignCanvas from '../components/SystemDesignCanvas';
 import { useAudioRecorder } from '../hooks/useAudioRecorder';
-import { Sparkles, RefreshCw, AlertTriangle, CheckCircle2, ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, RefreshCw, AlertTriangle, CheckCircle2, ArrowRight, ArrowLeft, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
 const InterviewSession = () => {
   const { sessionId } = useParams();
@@ -203,9 +203,26 @@ const InterviewSession = () => {
   const currentQuestion = session.questions[currentQuestionIndex] || {};
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] py-6 sm:py-8 overflow-x-hidden">
+    <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] py-4 sm:py-8 overflow-x-hidden">
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         
+        {/* Top Navigation Bar: Back to Dashboard & Session Details */}
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#162035]">
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-400 hover:text-blue-400 transition-colors cursor-pointer bg-[#080D1A] px-3.5 py-1.5 rounded-xl border border-[#162035]"
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Dashboard</span>
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono font-bold text-blue-300 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/30 max-w-[160px] sm:max-w-none truncate">
+              {session.role || 'Interview Session'}
+            </span>
+          </div>
+        </div>
+
         {/* Network / Stream Error Banner */}
         {streamError && (
           <div className="mb-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between">
@@ -352,20 +369,37 @@ const InterviewSession = () => {
               />
             </div>
 
-            <button
-              onClick={handleSubmitAnswer}
-              disabled={submitting || !textAnswer.trim()}
-              className="w-full mt-6 py-3.5 sm:py-4 px-4 rounded-xl text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/25 border border-blue-400/30 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer min-h-[46px]"
-            >
-              {submitting ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Evaluating your answer with AI Streaming...</span>
-                </>
-              ) : (
-                'Submit Answer for AI Evaluation'
-              )}
-            </button>
+            <div className="flex flex-col sm:flex-row items-center gap-3 mt-6">
+              <button
+                type="button"
+                onClick={handleNextQuestion}
+                disabled={submitting}
+                className="w-full sm:w-1/3 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-300 bg-[#0C1222] hover:bg-[#162035] border border-[#1A253F] hover:border-slate-600 transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[46px]"
+                title="Skip this question and move to the next"
+              >
+                <SkipForward size={16} />
+                <span>Skip Question</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSubmitAnswer}
+                disabled={submitting || !textAnswer.trim()}
+                className="w-full sm:flex-1 py-3.5 sm:py-4 px-4 rounded-xl text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/25 border border-blue-400/30 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer min-h-[46px]"
+              >
+                {submitting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Evaluating your answer with AI Streaming...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Submit Answer for AI Evaluation</span>
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </div>
           </>
         ) : (
           <FeedbackPanel answer={currentAnswer} onNext={handleNextQuestion} />

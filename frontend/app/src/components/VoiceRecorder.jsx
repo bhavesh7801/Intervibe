@@ -22,8 +22,8 @@ const VoiceRecorder = ({
   }
 
   return (
-    <div className="card-3d rounded-2xl p-6 mb-6" data-testid="voice-recorder">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card-3d rounded-2xl p-4 sm:p-6 mb-6" data-testid="voice-recorder">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
             isRecording ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse' : 'bg-[#2B2144] text-rose-400'
@@ -31,7 +31,7 @@ const VoiceRecorder = ({
             <Volume2 size={20} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#E2E8F0]">Voice Answer Recording</h3>
+            <h3 className="text-sm sm:text-base font-bold text-[#E2E8F0]">Voice Answer Recording</h3>
             <p className="text-xs text-slate-400">Speak your answer directly into your microphone</p>
           </div>
         </div>
@@ -39,7 +39,7 @@ const VoiceRecorder = ({
         <button
           type="button"
           onClick={isRecording ? onStop : onStart}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+          className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 w-full sm:w-auto ${
             isRecording
               ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 animate-pulse'
               : 'bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white shadow-md hover:shadow-rose-500/20'
