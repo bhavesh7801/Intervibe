@@ -66,8 +66,6 @@ const StatsOverviewGrid = ({ stats, recentSessions, userTargetRole }) => {
       </div>
 
     </div>
-
-    </div>
   );
 };
 export default StatsOverviewGrid;
