@@ -22,7 +22,8 @@ ARG VITE_BACKEND_URL=""
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
-# Build production bundle using Vite
+# Build production bundle using Vite with memory optimization
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 RUN npm run build
 
 # Stage 2: Serve static production assets with Nginx
