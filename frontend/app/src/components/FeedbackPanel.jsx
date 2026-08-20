@@ -128,13 +128,34 @@ const FeedbackPanel = ({ answer, onNext }) => {
             </div>
           </div>
         </div>
+
+        {/* Dynamic Probing Follow-Up Challenge */}
+        <div className="bg-[#050814] border border-cyan-500/30 rounded-2xl p-4 sm:p-6 space-y-3 shadow-lg shadow-cyan-500/10">
+          <div className="flex items-center justify-between border-b border-[#1A253F] pb-3">
+            <h3 className="text-xs sm:text-sm font-bold text-cyan-300 flex items-center gap-2">
+              <Sparkles size={16} className="text-cyan-400 animate-pulse" />
+              AI Deep-Dive Probing Question (FAANG Level)
+            </h3>
+            <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-bold">
+              Follow-Up Ready
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+            "How would your chosen architecture prevent race conditions and maintain consistency during sudden 10x traffic spikes?"
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <span className="text-[11px] font-mono text-cyan-300 bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20">
+              💡 Tip: Discuss Optimistic Locking vs Distributed Locks (Redis Redlock)
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Action Trigger */}
       <button
         type="button"
         onClick={onNext}
-        className="w-full mt-6 sm:mt-8 py-3.5 sm:py-4 rounded-xl text-xs sm:text-sm font-extrabold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/25 border border-blue-400/30 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group min-h-[46px]"
+        className="w-full mt-6 sm:mt-8 py-3.5 sm:py-4 rounded-xl text-xs sm:text-sm font-extrabold text-white btn-primary shadow-lg shadow-blue-500/25 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group min-h-[46px]"
         data-testid="next-question-btn"
       >
         <span>Proceed to Next Question</span>

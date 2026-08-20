@@ -8,12 +8,15 @@ import StatsOverviewGrid from "../components/profile/StatsOverviewGrid";
 import ResumeUploaderCard from "../components/profile/ResumeUploaderCard";
 import RecentActivitySection from "../components/profile/RecentActivitySection";
 import EditProfileModal from "../components/profile/EditProfileModal";
+import CertificateModal from "../components/profile/CertificateModal";
+
 const Profile = () => {
   const { user, setUser, logout } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [recentSessions, setRecentSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCertOpen, setIsCertOpen] = useState(false);
   /* Edit Modal State */ const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
   const [editTargetRole, setEditTargetRole] = useState("");
@@ -162,6 +165,27 @@ const Profile = () => {
               recentSessions={recentSessions}
               userTargetRole={user.targetRole}
             />
+
+            {/* Verifiable LinkedIn Certificate Banner */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-950/60 via-[#0C1222] to-cyan-950/50 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center text-white font-black shadow-lg shadow-cyan-500/25 shrink-0">
+                  🏆
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-white">Verified Technical Interview Credential</h3>
+                  <p className="text-xs text-slate-300 mt-0.5">Share your verified performance badge directly to your LinkedIn profile with 1-click.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCertOpen(true)}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl btn-primary text-xs font-bold whitespace-nowrap cursor-pointer"
+              >
+                View & Share Certificate
+              </button>
+            </div>
+
             <ResumeUploaderCard user={user} />
             <RecentActivitySection
               recentSessions={recentSessions}
@@ -170,6 +194,15 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {/* ===== VERIFIABLE CERTIFICATE MODAL ===== */}
+      <CertificateModal
+        isOpen={isCertOpen}
+        onClose={() => setIsCertOpen(false)}
+        user={user}
+        userStats={stats}
+      />
+
       {/* ===== EDIT CANDIDATE DETAILS MODAL ===== */}
       <EditProfileModal
         isEditOpen={isEditOpen}

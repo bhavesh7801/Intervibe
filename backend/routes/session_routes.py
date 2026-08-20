@@ -248,3 +248,24 @@ async def get_user_stats(
         "practiceStreak": streak_count,
         "solvedChallenges": solved_challenges
     }
+
+@router.post("/sessions/{session_id}/followup")
+async def generate_question_followup(
+    session_id: int,
+    data: dict,
+    current_user: Optional[UserDB] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Generate an adaptive dynamic follow-up question based on candidate's answer"""
+    question_text = data.get("question_text", "")
+    answer_text = data.get("answer_text", "")
+    role = data.get("role", "Software Engineer")
+    persona = data.get("persona", "Standard")
+    
+    followup_data = await ai_service.generate_adaptive_followup(
+        question=question_text,
+        candidate_answer=answer_text,
+        role=role,
+        persona=persona
+    )
+    return followup_data

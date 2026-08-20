@@ -26,6 +26,8 @@ from routes.session_routes import router as session_router
 from routes.feedback_routes import router as feedback_router
 from routes.resume_routes import router as resume_router
 from routes.leaderboard_routes import router as leaderboard_router
+from routes.system_design_routes import router as system_design_router
+from routes.certificate_routes import router as certificate_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -99,6 +101,8 @@ app.include_router(session_router, dependencies=[Depends(authed_rate_limiter)])
 app.include_router(feedback_router, dependencies=[Depends(authed_rate_limiter)])
 app.include_router(resume_router, dependencies=[Depends(authed_rate_limiter)])
 app.include_router(leaderboard_router, dependencies=[Depends(public_rate_limiter)])
+app.include_router(system_design_router, dependencies=[Depends(authed_rate_limiter)])
+app.include_router(certificate_router, dependencies=[Depends(public_rate_limiter)])
 
 # Mount AI Engine Sub-Routers
 app.include_router(question_generation_router, dependencies=[Depends(authed_rate_limiter)])  # /api/questions/generate

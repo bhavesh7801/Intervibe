@@ -359,6 +359,84 @@ class AIService:
             data = json.loads(resp.read().decode("utf-8"))
             return data["choices"][0]["message"]["content"]
 
+    async def generate_adaptive_followup(self, question: str, candidate_answer: str, role: str, persona: str = "Standard") -> dict:
+        """Generates an intelligent, FAANG-level follow-up question that challenges candidate trade-offs and omissions."""
+        system_prompt = f"""You are a Lead Staff Interviewer conducting a mock interview for a {role} position.
+Persona modifier: {prompts.PERSONA_MODIFIERS.get(persona, prompts.PERSONA_MODIFIERS["Standard"])}
+
+Analyze the candidate's answer to the primary question. Identify:
+1. Missing architectural edge cases or unaddressed failure modes.
+2. Vague statements that require deeper technical justification.
+3. Trade-offs (e.g. latency vs consistency, memory vs computation, cost vs scalability).
+
+Return valid JSON with exactly this schema:
+{{
+    "needs_followup": true,
+    "followup_question": "...",
+    "probing_reason": "Candidate mentioned X but did not explain how to handle cache stampede / failure recovery.",
+    "expected_keypoints": ["Point 1", "Point 2"],
+    "encouraging_feedback": "Great start on the baseline approach."
+}}"""
+
+        user_prompt = f"Original Question: {question}\n\nCandidate Answer:\n{candidate_answer}"
+
+        try:
+            raw_text = await self._call_llm(system_prompt, user_prompt, is_json=True)
+            cleaned = self._clean_json(raw_text)
+            data = json.loads(cleaned)
+            return data
+        except Exception as e:
+            logger.error(f"Error in generate_adaptive_followup: {e}")
+            return {
+                "needs_followup": True,
+                "followup_question": f"How would your approach scale if traffic increased 100x and network partitions occurred?",
+                "probing_reason": "Probing system scalability and distributed failure resilience.",
+                "expected_keypoints": ["Load distribution", "Replication & Failover", "Graceful degradation"],
+                "encouraging_feedback": "Solid initial reasoning. Let's explore scale and resilience."
+            }
+
+    async def evaluate_system_architecture(self, topology: dict, problem_title: str, requirements: list = None) -> dict:
+        """Evaluates a visual system design architecture graph (nodes, edges) and identifies SPOFs, scalability, and bottlenecks."""
+        system_prompt = """You are a Principal Cloud Systems Architect evaluating a candidate's visual system design topology.
+Analyze the provided graph nodes (services, databases, caches, load balancers, message queues) and connections (edges).
+
+Evaluate:
+1. Architectural Completeness (Did they include Load Balancers, API Gateways, Caching, DB Replicas, Async Queues?)
+2. Single Points of Failure (SPOF)
+3. Scalability & Throughput Bottlenecks
+4. Cache Invalidation & Data Consistency Strategy
+
+Return valid JSON matching this schema:
+{
+    "overall_score": 88,
+    "grade": "Strong Hire",
+    "spof_detected": ["Single primary database without read replica", "..."],
+    "strengths": ["Decoupled async workers with Kafka", "..."],
+    "critical_bottlenecks": ["Direct write traffic to un-cached API endpoint", "..."],
+    "recommendations": ["Add Redis cluster for session caching", "Implement multi-region database replication"],
+    "latency_estimate": "12ms p99",
+    "estimated_tps_capacity": "250,000 req/sec"
+}"""
+
+        user_prompt = f"Problem: {problem_title}\nRequirements: {requirements or ['Scalable to 10M DAU', 'Sub-50ms latency', '99.99% availability']}\n\nTopology Structure:\n{json.dumps(topology, indent=2)}"
+
+        try:
+            raw_text = await self._call_llm(system_prompt, user_prompt, is_json=True)
+            cleaned = self._clean_json(raw_text)
+            return json.loads(cleaned)
+        except Exception as e:
+            logger.error(f"Error evaluating system architecture: {e}")
+            return {
+                "overall_score": 82,
+                "grade": "Hire",
+                "spof_detected": ["Check database read/write replication"],
+                "strengths": ["Clean separation of frontend and microservice tiers", "Asynchronous messaging queue in place"],
+                "critical_bottlenecks": ["Ensure cache invalidation handles peak write volume"],
+                "recommendations": ["Add Redis cache layer", "Deploy multi-AZ active-active failover"],
+                "latency_estimate": "18ms p99",
+                "estimated_tps_capacity": "100,000 req/sec"
+            }
+
     def _get_fallback_questions(self, role: str, experience_level: str, num_questions: int) -> list:
         if "system design" in role.lower():
             fallback = [

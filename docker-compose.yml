@@ -1,6 +1,7 @@
 services:
   # 1. FastAPI Python Backend Service
   backend:
+    image: ghcr.io/bhavesh7801/intervibe/backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -34,6 +35,7 @@ services:
 
   # 3. React + Vite Nginx Frontend Service
   frontend:
+    image: ghcr.io/bhavesh7801/intervibe/frontend:latest
     build:
       context: ./frontend/app
       dockerfile: Dockerfile
