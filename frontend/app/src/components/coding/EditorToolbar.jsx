@@ -54,12 +54,19 @@ const EditorToolbar = React.memo(({
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
+        <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-slate-400 font-mono">
+          <kbd className="px-1.5 py-0.5 rounded bg-[#090710] border border-[#1A253F] text-slate-300 text-[10px]">Ctrl</kbd>
+          <span>+</span>
+          <kbd className="px-1.5 py-0.5 rounded bg-[#090710] border border-[#1A253F] text-slate-300 text-[10px]">Enter</kbd>
+          <span className="text-slate-400">to run</span>
+        </span>
+
         <button
           type="button"
           onClick={onRunCoPilot}
           disabled={coPilotReviewing}
-          className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-[11px] font-bold text-white shadow-md flex items-center gap-1.5 cursor-pointer border border-rose-400/30 disabled:opacity-50"
+          className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-[11px] font-bold text-white shadow-md flex items-center gap-1.5 cursor-pointer border border-rose-400/30 disabled:opacity-50 active:scale-[0.97] transition-all"
           aria-label="AI Co-Pilot Review"
         >
           <Wand2 size={13} className="text-amber-200 animate-pulse" />

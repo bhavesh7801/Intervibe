@@ -83,48 +83,48 @@ const FeedbackPanel = ({ answer, onNext }) => {
         </div>
 
         {/* STAR Method Behavioral Evaluator Card */}
-        <div className="bg-[#090710] border border-purple-500/30 rounded-xl p-4 sm:p-5 space-y-3" data-testid="star-method-evaluator">
-          <div className="flex items-center justify-between border-b border-[#2B2144] pb-2.5">
+        <div className="bg-[#0B1124]/90 border border-purple-500/30 rounded-2xl p-4 sm:p-6 space-y-4 shadow-lg shadow-purple-500/10" data-testid="star-method-evaluator">
+          <div className="flex items-center justify-between border-b border-[#2B2144] pb-3">
             <h3 className="text-xs sm:text-sm font-bold text-purple-300 flex items-center gap-2">
-              <Sparkles size={16} className="text-purple-400" />
-              STAR Method Framework Checklist
+              <Sparkles size={16} className="text-purple-400 animate-pulse" />
+              STAR Method Behavioral Framework
             </h3>
-            <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-purple-500/20 text-purple-300">
-              Behavioral Evaluation
+            <span className="text-[10px] uppercase font-black px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              AI Detected
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-            <div className="p-2.5 rounded-lg bg-[#140F26] border border-purple-500/20">
-              <div className="font-extrabold text-purple-400 flex items-center gap-1">
-                <CheckCircle2 size={12} className="text-emerald-400" />
-                S - Situation
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-3 rounded-xl bg-[#140F26] border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)] flex flex-col justify-between">
+              <div className="font-extrabold text-emerald-300 flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-emerald-400" />
+                <span>S - Situation</span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Context established</p>
+              <p className="text-[11px] text-slate-300 mt-1.5 leading-snug">Context established</p>
             </div>
 
-            <div className="p-2.5 rounded-lg bg-[#140F26] border border-purple-500/20">
-              <div className="font-extrabold text-purple-400 flex items-center gap-1">
-                <CheckCircle2 size={12} className="text-emerald-400" />
-                T - Task
+            <div className="p-3 rounded-xl bg-[#140F26] border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)] flex flex-col justify-between">
+              <div className="font-extrabold text-emerald-300 flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-emerald-400" />
+                <span>T - Task</span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Challenge defined</p>
+              <p className="text-[11px] text-slate-300 mt-1.5 leading-snug">Challenge defined</p>
             </div>
 
-            <div className="p-2.5 rounded-lg bg-[#140F26] border border-purple-500/20">
-              <div className="font-extrabold text-purple-400 flex items-center gap-1">
-                <CheckCircle2 size={12} className="text-emerald-400" />
-                A - Action
+            <div className="p-3 rounded-xl bg-[#140F26] border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.15)] flex flex-col justify-between">
+              <div className="font-extrabold text-indigo-300 flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-indigo-400" />
+                <span>A - Action</span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Steps detailed</p>
+              <p className="text-[11px] text-slate-300 mt-1.5 leading-snug">Steps detailed</p>
             </div>
 
-            <div className="p-2.5 rounded-lg bg-[#140F26] border border-purple-500/20">
-              <div className="font-extrabold text-purple-400 flex items-center gap-1">
-                <CheckCircle2 size={12} className="text-emerald-400" />
-                R - Result
+            <div className="p-3 rounded-xl bg-[#140F26] border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)] flex flex-col justify-between">
+              <div className="font-extrabold text-emerald-300 flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-emerald-400" />
+                <span>R - Result</span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Outcome measured</p>
+              <p className="text-[11px] text-slate-300 mt-1.5 leading-snug">Outcome measured</p>
             </div>
           </div>
         </div>

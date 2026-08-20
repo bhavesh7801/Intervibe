@@ -14,11 +14,11 @@ export const HeroSection: React.FC = () => {
 
   return (
     <section className="relative w-full flex flex-col items-center">
-      {/* Background Ambient Glows */}
+      {/* Ambient Mesh Glow Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] mix-blend-screen" />
-        <div className="absolute top-[100%] right-[-10%] w-[35%] h-[35%] bg-cyan-500/20 rounded-full blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-indigo-500/15 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute top-[-5%] left-[25%] -translate-x-1/2 w-[700px] h-[400px] bg-blue-600/25 rounded-full blur-[140px] mix-blend-screen" />
+        <div className="absolute top-[10%] right-[15%] w-[500px] h-[350px] bg-cyan-500/20 rounded-full blur-[140px] mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[400px] bg-indigo-600/20 rounded-full blur-[150px] mix-blend-screen" />
       </div>
 
       <header className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 pt-16 lg:pt-28 pb-20 lg:pb-28 text-center flex flex-col items-center z-10">
@@ -28,11 +28,11 @@ export const HeroSection: React.FC = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 cursor-default hover:bg-blue-500/20 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+          className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/25 cursor-default hover:bg-blue-500/20 transition-colors shadow-[0_0_20px_rgba(59,130,246,0.2)]"
         >
-          <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
           <span className="text-xs font-mono font-bold text-blue-300 tracking-wide uppercase">Now with real-time AI speech feedback & O(N) AST analysis</span>
-          <ArrowRight size={14} className="text-blue-400" />
+          <ArrowRight size={14} className="text-cyan-400" />
         </motion.div>
 
         {/* Massive 3D Headline */}
@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl sm:text-6xl lg:text-8xl font-black text-white tracking-tight leading-tight sm:leading-snug max-w-5xl px-2"
+          className="text-4xl sm:text-6xl lg:text-8xl font-black text-white tracking-tight leading-tight sm:leading-snug max-w-5xl px-2 font-heading"
         >
           Ace your next{' '}
           <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">

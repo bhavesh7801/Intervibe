@@ -120,6 +120,20 @@ const VoiceRecorder = ({
             </div>
           </div>
 
+          {/* Animated Dynamic Waveform Visualizer */}
+          <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-[#050814] rounded-xl border border-rose-500/30">
+            {[35, 65, 85, 55, 100, 75, 45, 90, 80, 60, 95, 50, 70, 40].map((h, i) => (
+              <span
+                key={i}
+                className="w-1.5 bg-gradient-to-t from-rose-500 via-purple-500 to-cyan-400 rounded-full animate-waveform"
+                style={{
+                  height: `${Math.max(8, (h * Math.max(0.3, audioLevel / 100)))}px`,
+                  animationDelay: `${(i % 5) * 0.15}s`
+                }}
+              />
+            ))}
+          </div>
+
           {/* Animated Volume Level Bar */}
           <div className="w-full bg-[#090710] h-2 rounded-full overflow-hidden border border-[#2B2144]">
             <div

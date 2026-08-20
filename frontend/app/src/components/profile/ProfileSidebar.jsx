@@ -176,34 +176,37 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
           </div>
         </div>
       </div>
-      {/* QUICK ACTIONS */}
-      <div className="card-3d bg-[#080D1A]/80 border-2 border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.1)] rounded-[1.5rem] p-8 backdrop-blur-xl transform-gpu will-change-filter">
-        
-        <div className="flex items-center gap-2 border-b border-[#1A253F] pb-5 mb-6">
-          
-          <Sparkles size={18} className="text-blue-400" />
-          <h2 className="text-base font-bold text-white">
-            Practice Workspace
-          </h2>
+      {/* TECHNICAL SKILLS & MASTERY CLOUD */}
+      <div className="card-3d bg-[#0B1124]/90 border border-blue-500/15 shadow-[0_0_20px_rgba(59,130,246,0.1)] rounded-[1.5rem] p-6 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter">
+        <div className="flex items-center justify-between border-b border-[#1A253F] pb-4 mb-5">
+          <div className="flex items-center gap-2">
+            <Sparkles size={18} className="text-cyan-400 animate-pulse" />
+            <h2 className="text-base font-bold text-white">
+              Target Skills & Stack
+            </h2>
+          </div>
+          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30 font-bold">
+            Verified
+          </span>
         </div>
-        <ul className="space-y-4 text-sm text-slate-400">
-          
-          <li className="flex items-start gap-2">
-            
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1 shrink-0"></span>
-            <span>Simulate AI-powered technical interviews.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1 shrink-0"></span>
-            <span>Access coding problems and hints.</span>
-          </li>
-          <li className="flex items-start gap-2">
-            
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1 shrink-0"></span>
-            <span>Review performance insights.</span>
-          </li>
-        </ul>
+
+        <div className="flex flex-wrap gap-2">
+          {['Python', 'React', 'Algorithms', 'System Design', 'FastAPI', 'Docker', 'SQL', 'Git'].map((skill, idx) => (
+            <span
+              key={idx}
+              className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 shadow-[0_0_12px_rgba(99,102,241,0.15)] hover:border-indigo-400 hover:text-white transition-all cursor-default"
+            >
+              ⚡ {skill}
+            </span>
+          ))}
+          <button
+            type="button"
+            onClick={handleOpenEdit}
+            className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#162035] hover:bg-[#202E4C] border border-[#2B3B60] text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1"
+          >
+            <span>+ Add Skill</span>
+          </button>
+        </div>
       </div>
     </div>
   );

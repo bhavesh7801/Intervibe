@@ -28,7 +28,7 @@ export const Testimonials: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="p-5 sm:p-7 rounded-3xl bg-[#0e121f] border border-blue-500/20 space-y-5 shadow-xl flex flex-col justify-between"
+          className="p-6 sm:p-8 rounded-3xl bg-[#0B1124]/90 border border-blue-500/15 hover:border-cyan-500/40 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] transition-all duration-300 space-y-6 flex flex-col justify-between"
         >
           <div className="space-y-4">
             <div className="flex text-amber-400 gap-1">
@@ -36,13 +36,13 @@ export const Testimonials: React.FC = () => {
                 <Star key={i} size={16} className="fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <p className="text-sm sm:text-base text-slate-200 font-medium leading-loose italic">
+            <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed italic">
               "Landed my Google L5 offer! The real-time speech feedback and AST complexity scorecards gave me total confidence."
             </p>
           </div>
 
           <div className="flex items-center gap-3.5 pt-4 border-t border-[#162035]">
-            <div className="w-10 h-10 rounded-full bg-blue-600 border border-blue-400/40 text-white font-black flex items-center justify-center text-xs shadow-md">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 border border-blue-400/40 text-white font-black flex items-center justify-center text-xs shadow-md">
               MC
             </div>
             <div>
@@ -58,7 +58,7 @@ export const Testimonials: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="p-8 rounded-3xl bg-[#0e121f] border border-blue-500/20 space-y-6 shadow-xl flex flex-col justify-between"
+          className="p-6 sm:p-8 rounded-3xl bg-[#0B1124]/90 border border-blue-500/15 hover:border-cyan-500/40 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] transition-all duration-300 space-y-6 flex flex-col justify-between"
         >
           <div className="space-y-4">
             <div className="flex text-amber-400 gap-1">
@@ -66,13 +66,13 @@ export const Testimonials: React.FC = () => {
                 <Star key={i} size={16} className="fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <p className="text-sm sm:text-base text-slate-200 font-medium leading-loose italic">
+            <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed italic">
               "Our candidate prep time dropped drastically. The AI interviewer drills into trade-offs just like a real Meta interviewer."
             </p>
           </div>
 
           <div className="flex items-center gap-3.5 pt-4 border-t border-[#162035]">
-            <div className="w-10 h-10 rounded-full bg-cyan-600 border border-cyan-400/40 text-white font-black flex items-center justify-center text-xs shadow-md">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-indigo-600 border border-cyan-400/40 text-white font-black flex items-center justify-center text-xs shadow-md">
               SV
             </div>
             <div>
@@ -88,7 +88,7 @@ export const Testimonials: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3 }}
-          className="p-8 rounded-3xl bg-[#0e121f] border border-blue-500/20 space-y-6 shadow-xl flex flex-col justify-between"
+          className="p-6 sm:p-8 rounded-3xl bg-[#0B1124]/90 border border-blue-500/15 hover:border-cyan-500/40 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] transition-all duration-300 space-y-6 flex flex-col justify-between sm:col-span-2 lg:col-span-1"
         >
           <div className="space-y-4">
             <div className="flex text-amber-400 gap-1">
@@ -96,18 +96,18 @@ export const Testimonials: React.FC = () => {
                 <Star key={i} size={16} className="fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <p className="text-sm sm:text-base text-slate-200 font-medium leading-loose italic">
-              "The real-time scorecard alone is worth it. It caught my filler word habit on day one and saved my onsite loop."
+            <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed italic">
+              "The custom question generator is unmatched. Practiced 50+ deep system design scenarios tailored exactly to Uber's stack."
             </p>
           </div>
 
           <div className="flex items-center gap-3.5 pt-4 border-t border-[#162035]">
-            <div className="w-10 h-10 rounded-full bg-indigo-600 border border-indigo-400/40 text-white font-black flex items-center justify-center text-xs shadow-md">
-              PN
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 border border-indigo-400/40 text-white font-black flex items-center justify-center text-xs shadow-md">
+              RK
             </div>
             <div>
-              <div className="font-extrabold text-white text-sm">Priya Nair</div>
-              <div className="text-xs text-slate-400">VP Growth, Cobalt</div>
+              <div className="font-extrabold text-white text-sm">Rohan Kapoor</div>
+              <div className="text-xs text-slate-400">Staff Architect, Scale</div>
             </div>
           </div>
         </motion.div>

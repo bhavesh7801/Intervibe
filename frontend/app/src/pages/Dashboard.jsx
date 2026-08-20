@@ -554,24 +554,24 @@ const Dashboard = () => {
 
       {/* Pre-Session Question Prompt Modal */}
       {showPromptModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-2xl card-3d rounded-2xl sm:rounded-3xl p-4 sm:p-8 relative border border-rose-500/40 shadow-[0_0_50px_rgba(244,63,94,0.2)] max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-xl animate-fadeIn">
+          <div className="w-full max-w-2xl bg-[#0B1124]/95 backdrop-blur-2xl border-t sm:border border-blue-500/25 rounded-t-[2rem] sm:rounded-3xl p-5 sm:p-8 relative shadow-[0_25px_80px_rgba(0,0,0,0.9),0_0_50px_rgba(37,99,235,0.2)] max-h-[88vh] flex flex-col animate-slide-up">
             <button
               onClick={() => setShowPromptModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 cursor-pointer z-30"
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full hover:bg-white/5 cursor-pointer z-30 transition-colors"
             >
               <X size={20} />
             </button>
 
             {/* Modal Prompt Header */}
             <div className="text-center mb-4 shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-pink-500/20 text-rose-400 border border-rose-500/40 flex items-center justify-center mx-auto mb-2.5 shadow-lg shadow-rose-500/20">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white flex items-center justify-center mx-auto mb-2.5 shadow-lg shadow-blue-500/25">
                 <HelpCircle size={22} className="animate-pulse" />
               </div>
-              <h3 className="text-base sm:text-2xl font-black text-white tracking-tight">
+              <h3 className="text-base sm:text-2xl font-black text-white tracking-tight font-heading">
                 How many questions do you want to practice?
               </h3>
-              <p className="text-[11px] sm:text-xs text-slate-400 mt-1">
+              <p className="text-[11px] sm:text-xs text-slate-300 mt-1">
                 Select a quick preset or enter your custom count to customize your session.
               </p>
             </div>
@@ -580,7 +580,7 @@ const Dashboard = () => {
             <div className="overflow-y-auto space-y-4 pr-1 flex-1 scrollbar-thin">
               {/* Target Position Input */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Target Position / Role</label>
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Target Position / Role</label>
                 <input
                   type="text"
                   value={targetRole}
@@ -815,12 +815,12 @@ const Dashboard = () => {
 
             </div>
 
-            {/* Fixed Sticky Footer: Cancel and Start Mock Interview Buttons */}
-            <div className="sticky bottom-0 pt-3 pb-1 bg-[#0D121F] border-t border-[#1A253F] z-20 flex flex-col sm:flex-row gap-2.5 sm:gap-4 mt-2 shrink-0">
+            {/* Fixed Sticky Footer: Cancel and Start Mock Interview Buttons (iOS Sheet Style) */}
+            <div className="sticky bottom-0 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-[#0B1124] border-t border-blue-500/15 z-20 flex flex-col sm:flex-row gap-2.5 sm:gap-4 mt-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setShowPromptModal(false)}
-                className="w-full sm:flex-1 py-3 rounded-xl font-bold text-xs sm:text-sm text-slate-300 bg-[#090710] border border-[#2B2144] hover:bg-[#1A142D] hover:text-white transition-colors cursor-pointer text-center"
+                className="w-full sm:flex-1 py-3.5 rounded-2xl font-bold text-xs sm:text-sm text-slate-300 bg-[#060A17] border border-[#1E293B] hover:bg-[#11182C] hover:text-white transition-all cursor-pointer text-center active:scale-[0.97] min-h-[44px]"
               >
                 Cancel
               </button>
@@ -828,13 +828,13 @@ const Dashboard = () => {
                 type="button"
                 onClick={handleStartSession}
                 disabled={creating || !targetRole.trim() || (isCustomMode && (!customCountInput || parseInt(customCountInput) < 1))}
-                className="w-full sm:flex-1 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-400 hover:to-purple-500 transition-colors shadow-lg shadow-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:flex-1 py-3.5 rounded-2xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-400 hover:opacity-95 shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] min-h-[44px]"
                 data-testid="start-session-button"
               >
                 {creating ? (
                   <>
                     <RefreshCw className="animate-spin" size={16} />
-                    <span>Preparing...</span>
+                    <span>Preparing Practice Session...</span>
                   </>
                 ) : (
                   <>

@@ -240,6 +240,19 @@ const CodingWorkspace = () => {
   const [submissionsDrawerOpen, setSubmissionsDrawerOpen] = useState(false);
   const [submissionsFilter, setSubmissionsFilter] = useState('current'); // 'current' or 'all'
   const [expandedSubmissionId, setExpandedSubmissionId] = useState(null);
+  const [mobileTab, setMobileTab] = useState('editor'); // 'problem' | 'editor' | 'testcases'
+
+  // Global Keyboard Shortcut: Ctrl + Enter to Run Code
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleRunCode();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleRunCode]);
 
   // Duel Timer Effect
   useEffect(() => {
@@ -1248,6 +1261,46 @@ const CodingWorkspace = () => {
         </div>
       )}
 
+      {/* Mobile Tab Switcher */}
+      <div className="lg:hidden flex items-center p-1 bg-[#0B1124] border border-blue-500/15 rounded-xl mb-3 gap-1">
+        <button
+          type="button"
+          onClick={() => setMobileTab('problem')}
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileTab === 'problem'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <BookOpen size={13} />
+          <span>Problem</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('editor')}
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileTab === 'editor'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Code2 size={13} />
+          <span>Code Editor</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('testcases')}
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileTab === 'testcases'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Terminal size={13} />
+          <span>Test Cases</span>
+        </button>
+      </div>
+
       {/* Split-Pane Layout: Left Problem Description + Right Monaco Editor & Console.
           Draggable divider — the defining LeetCode-IDE interaction — replaces the
           previous fixed 5/7 grid. */}
@@ -1258,7 +1311,7 @@ const CodingWorkspace = () => {
 
         {/* Left Side: Question Description Pane */}
         <div
-          className="w-full lg:shrink-0 lg:w-[var(--left-w)] rounded-xl bg-[#0C1222] border border-[#1A253F] h-[420px] lg:h-[650px] overflow-y-auto"
+          className={`${mobileTab !== 'problem' ? 'hidden lg:block' : 'block'} w-full lg:shrink-0 lg:w-[var(--left-w)] rounded-xl bg-[#0B1124] border border-blue-500/15 h-[420px] lg:h-[650px] overflow-y-auto`}
           style={{ '--left-w': `${leftWidth}%` }}
         >
           {/* Tab bar, LeetCode-style */}
@@ -1320,7 +1373,7 @@ const CodingWorkspace = () => {
         </div>
 
         {/* Right Side: Monaco Code Editor + Output Drawer */}
-        <div className="w-full flex-1 min-w-0 space-y-4">
+        <div className={`${mobileTab === 'problem' ? 'hidden lg:block' : 'block'} w-full flex-1 min-w-0 space-y-4`}>
 
           {/* Modular Editor Toolbar */}
           <div className="rounded-xl border border-[#1A253F] bg-[#0C1222] overflow-hidden">

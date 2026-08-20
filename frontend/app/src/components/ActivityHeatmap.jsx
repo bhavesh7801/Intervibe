@@ -74,7 +74,7 @@ const ActivityHeatmap = ({ userStats, streakCount = 0, user }) => {
   };
 
   return (
-    <div className="p-5 sm:p-6 rounded-2xl mb-8 border border-slate-800 bg-[#0D121F] shadow-lg space-y-4" data-testid="activity-heatmap-card">
+    <div className="p-5 sm:p-6 rounded-2xl mb-8 border border-blue-500/15 bg-[#0B1124]/90 backdrop-blur-xl shadow-lg space-y-4" data-testid="activity-heatmap-card">
       
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
@@ -90,7 +90,7 @@ const ActivityHeatmap = ({ userStats, streakCount = 0, user }) => {
                 <span>{streakCount} Day Streak</span>
               </span>
             </h3>
-            <p className="text-xs text-slate-400">GitHub & LeetCode style daily practice breakdown</p>
+            <p className="text-xs text-slate-300">GitHub & LeetCode style daily practice breakdown</p>
           </div>
         </div>
 
@@ -106,8 +106,13 @@ const ActivityHeatmap = ({ userStats, streakCount = 0, user }) => {
         </div>
       </div>
 
+      {/* Mobile Swipe Hint Badge */}
+      <div className="sm:hidden flex items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-blue-500/10 border border-blue-500/20 text-[11px] font-bold text-blue-300">
+        <span>← Swipe to view full 365-day history →</span>
+      </div>
+
       {/* Heatmap Grid Section */}
-      <div className="relative overflow-x-auto pb-2">
+      <div className="relative overflow-x-auto pb-2 scrollbar-thin">
         <div className="inline-block min-w-[720px] space-y-1">
           
           {/* Month Labels Header Row */}
