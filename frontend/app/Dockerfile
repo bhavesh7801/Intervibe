@@ -10,8 +10,8 @@ WORKDIR /app
 # Copy package descriptors first for layer caching
 COPY package*.json ./
 
-# Install npm dependencies cleanly
-RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+# Install npm dependencies cleanly with no audit and cleaned cache
+RUN npm ci --legacy-peer-deps --no-audit && npm cache clean --force
 
 # Copy application source code
 COPY . .
