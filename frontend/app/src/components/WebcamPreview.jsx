@@ -39,73 +39,65 @@ const WebcamPreview = ({ isRecording }) => {
   const startCamera = async () => {
     try {
       setError(null);
-      const userStream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 480, height: 360 },
-        audio: true
-      });
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setError("Camera access requires HTTPS or localhost. If on HTTP, please enable microphone/camera permissions in your browser settings.");
+        return;
+      }
+
+      let userStream = null;
+
+      // Tier 1: Try user-facing camera without conflicting audio
+      try {
+        userStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        });
+      } catch (tier1Err) {
+        console.warn("Tier 1 camera init failed, attempting fallback:", tier1Err);
+        // Tier 2: Standard video fallback
+        userStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+      }
+
       streamRef.current = userStream;
       window.activeWebcamStream = userStream;
       setStream(userStream);
+      setCameraOn(true);
+
       if (videoRef.current) {
         videoRef.current.srcObject = userStream;
       }
-      setupAudioAnalyser(userStream);
     } catch (err) {
-      console.warn("Webcam access warning:", err);
-      setError("Webcam stream unavailable. Using audio/text mode.");
-    }
-  };
-
-  const setupAudioAnalyser = (mediaStream) => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      const audioCtx = new AudioCtx();
-      const analyser = audioCtx.createAnalyser();
-      const source = audioCtx.createMediaStreamSource(mediaStream);
-      analyser.fftSize = 64;
-      source.connect(analyser);
-
-      audioContextRef.current = audioCtx;
-      analyserRef.current = analyser;
-
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-      const updateVolume = () => {
-        if (!analyserRef.current) return;
-        analyserRef.current.getByteFrequencyData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          sum += dataArray[i];
-        }
-        const average = sum / dataArray.length;
-        setAudioLevel(Math.min(100, Math.round((average / 128) * 100)));
-        requestAnimationFrame(updateVolume);
-      };
-      updateVolume();
-    } catch (e) {
-      console.warn("Audio meter init error:", e);
-    }
-  };
-
-  const toggleCamera = () => {
-    const activeStream = streamRef.current || stream;
-    if (activeStream) {
-      const videoTrack = activeStream.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.enabled = !cameraOn;
-        setCameraOn(!cameraOn);
+      console.warn("Webcam access error:", err);
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setError("Camera permission denied. Please click the lock/camera icon in your browser's address bar to allow access.");
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        setError("No camera device detected on your system. Continuing in audio/text mode.");
+      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        setError("Camera is currently in use by another application (Zoom, Teams, etc.).");
+      } else {
+        setError("Camera stream unavailable. Click 'Retry Camera' below to grant permission.");
       }
+    }
+  };
+
+  const toggleCamera = async () => {
+    if (!cameraOn) {
+      await startCamera();
+    } else {
+      stopCamera();
+      setCameraOn(false);
     }
   };
 
   const toggleMic = () => {
-    const activeStream = streamRef.current || stream;
-    if (activeStream) {
-      const audioTrack = activeStream.getAudioTracks()[0];
-      if (audioTrack) {
-        audioTrack.enabled = !micOn;
-        setMicOn(!micOn);
-      }
-    }
+    setMicOn(!micOn);
   };
 
   return (
@@ -123,24 +115,25 @@ const WebcamPreview = ({ isRecording }) => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={toggleMic}
-            className={`p-2 rounded-xl transition-all ${
-              micOn ? 'bg-[#1F1735] text-slate-300 hover:text-white' : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
-            }`}
-            title={micOn ? 'Mute Mic' : 'Unmute Mic'}
-          >
-            {micOn ? <Mic size={15} /> : <MicOff size={15} />}
-          </button>
-
-          <button
-            type="button"
             onClick={toggleCamera}
-            className={`p-2 rounded-xl transition-all ${
-              cameraOn ? 'bg-[#1F1735] text-slate-300 hover:text-white' : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              cameraOn && !error 
+                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30' 
+                : 'bg-blue-600 hover:bg-blue-500 text-white shadow-md'
             }`}
             title={cameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
           >
-            {cameraOn ? <Camera size={15} /> : <CameraOff size={15} />}
+            {cameraOn && !error ? (
+              <>
+                <Camera size={14} />
+                <span>Camera On</span>
+              </>
+            ) : (
+              <>
+                <CameraOff size={14} />
+                <span>Enable Camera</span>
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -148,11 +141,26 @@ const WebcamPreview = ({ isRecording }) => {
       {/* Video Stream Container */}
       <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#090710] border border-[#2B2144] flex items-center justify-center">
         {error || !cameraOn ? (
-          <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400">
-            <div className="w-12 h-12 rounded-full bg-[#171227] flex items-center justify-center mb-2 text-slate-500">
-              <CameraOff size={24} />
+          <div className="flex flex-col items-center justify-center p-6 text-center text-slate-300 space-y-3 max-w-md">
+            <div className="w-12 h-12 rounded-2xl bg-[#171227] border border-[#2B2144] flex items-center justify-center text-slate-400">
+              <CameraOff size={22} />
             </div>
-            <p className="text-xs font-semibold">{error || 'Camera is turned off'}</p>
+            <div>
+              <h4 className="text-xs sm:text-sm font-bold text-white mb-1">
+                {error ? 'Camera Unavailable' : 'Camera is currently off'}
+              </h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                {error || 'Click Enable Camera above to turn on your front-facing video feed during mock sessions.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={startCamera}
+              className="px-4 py-1.5 rounded-xl bg-[#1F1735] hover:bg-[#2F2350] border border-rose-500/30 text-rose-300 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Camera size={13} />
+              <span>Retry Camera Permission</span>
+            </button>
           </div>
         ) : (
           <video
