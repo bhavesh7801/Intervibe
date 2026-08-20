@@ -13,27 +13,11 @@ services:
       - ./backend/.env
     environment:
       - PYTHONUNBUFFERED=1
-      - PISTON_URL=http://piston:2000/api/v2/execute
     command: uvicorn server:app --host 0.0.0.0 --port 8000
-    depends_on:
-      - piston
     networks:
       - app-network
 
-  # 2. Self-Hosted Piston Code Execution Engine Service (Port 2000)
-  piston:
-    image: ghcr.io/engineer-man/piston
-    container_name: interview_prep_piston
-    restart: always
-    ports:
-      - "2000:2000"
-    privileged: true
-    tmpfs:
-      - /tmp
-    networks:
-      - app-network
-
-  # 3. React + Vite Nginx Frontend Service
+  # 2. React + Vite Nginx Frontend Service
   frontend:
     image: ghcr.io/bhavesh7801/intervibe/frontend:latest
     build:
