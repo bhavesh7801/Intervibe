@@ -242,18 +242,6 @@ const CodingWorkspace = () => {
   const [expandedSubmissionId, setExpandedSubmissionId] = useState(null);
   const [mobileTab, setMobileTab] = useState('editor'); // 'problem' | 'editor' | 'testcases'
 
-  // Global Keyboard Shortcut: Ctrl + Enter to Run Code
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault();
-        handleRunCode();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleRunCode]);
-
   // Duel Timer Effect
   useEffect(() => {
     let timerInterval = null;
@@ -977,6 +965,18 @@ const CodingWorkspace = () => {
       setExecuting(false);
     }
   };
+
+  // Global Keyboard Shortcut: Ctrl + Enter to Run Code
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleRunCode();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleRunCode]);
 
   const monacoLangMap = {
     python: 'python',
