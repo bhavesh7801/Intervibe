@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mail,
@@ -9,9 +9,51 @@ import {
   LogOut,
   User,
   Sparkles,
+  Plus,
+  X
 } from "lucide-react";
+
 const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
   const navigate = useNavigate();
+
+  // Dynamic Skill Management State
+  const [skills, setSkills] = useState(() => {
+    try {
+      const saved = localStorage.getItem('candidate_skills');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return ['Python', 'React', 'Algorithms', 'System Design', 'FastAPI', 'Docker', 'SQL', 'Git'];
+  });
+
+  const [newSkillInput, setNewSkillInput] = useState('');
+  const [isAddingSkill, setIsAddingSkill] = useState(false);
+
+  const handleAddSkill = (e) => {
+    e?.preventDefault();
+    const trimmed = newSkillInput.trim();
+    if (!trimmed) return;
+    if (!skills.includes(trimmed)) {
+      const updated = [...skills, trimmed];
+      setSkills(updated);
+      try {
+        localStorage.setItem('candidate_skills', JSON.stringify(updated));
+      } catch (err) {}
+    }
+    setNewSkillInput('');
+    setIsAddingSkill(false);
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
+    const updated = skills.filter((s) => s !== skillToRemove);
+    setSkills(updated);
+    try {
+      localStorage.setItem('candidate_skills', JSON.stringify(updated));
+    } catch (err) {}
+  };
+
   return (
     <div className="col-span-1 lg:col-span-4 xl:col-span-4 space-y-6 sm:space-y-8">
       
@@ -58,55 +100,34 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-300 mt-2">
               
-              <span
-                className="flex items-center gap-1.5 text-slate-300 break-all text-xs"
-                data-testid="profile-email"
-              >
+              <div className="flex items-center gap-1.5 bg-[#050A18] px-3 py-1.5 rounded-xl border border-[#1A253F]">
                 
-                <Mail size={14} className="text-slate-400 shrink-0" /> {user.email}
-              </span>
-              <span className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase tracking-wide text-xs">
+                <Briefcase size={14} className="text-blue-400" />
+                <span className="font-bold text-slate-200">
+                  {user.targetRole || "Software Engineer"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-[#050A18] px-3 py-1.5 rounded-xl border border-[#1A253F]">
                 
-                <Briefcase size={14} className="text-emerald-500" />
-                {user.targetRole || "Software Engineer"}
-              </span>
+                <Mail size={14} className="text-indigo-400" />
+                <span className="font-bold text-slate-200">{user.email}</span>
+              </div>
             </div>
-            <p className="text-xs text-slate-400 pt-2 leading-relaxed px-4">
-              
-              Preparing for AI mock interviews, live coding, and
-              multidimensional feedback reporting.
-            </p>
-            {/* Action Buttons */}
-            <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-3 pt-3">
               
               <button
                 onClick={handleOpenEdit}
-                className="px-4 py-2 rounded-full text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-2 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-                data-testid="edit-profile-btn"
+                className="px-5 py-2.5 rounded-full bg-[#162035] hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-2 border border-blue-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
               >
                 
-                <Edit3 size={13} /> <span>Edit Details</span>
-              </button>
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="px-4 py-2 rounded-full text-xs font-bold text-slate-200 bg-[#162035] hover:bg-[#1E293B] border border-slate-700/50 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-              >
-                
-                <LayoutDashboard size={13} className="text-emerald-400" />
-                <span>Dashboard</span>
+                <Edit3 size={14} /> <span>Edit Profile</span>
               </button>
               <button
                 onClick={logout}
-                className="px-4 py-2 rounded-full text-xs font-bold text-slate-300 hover:text-white bg-[#162035] hover:bg-rose-900/30 border border-slate-700/50 hover:border-rose-500/30 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95 cursor-pointer group"
+                className="px-5 py-2.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold text-xs flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 
-                <LogOut
-                  size={13}
-                  className="group-hover:text-rose-400 transition-colors"
-                />
-                <span className="group-hover:text-rose-400 transition-colors">
-                  Logout
-                </span>
+                <LogOut size={14} /> <span>Logout</span>
               </button>
             </div>
           </div>
@@ -186,26 +207,65 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
             </h2>
           </div>
           <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30 font-bold">
-            Verified
+            {skills.length} Skills
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {['Python', 'React', 'Algorithms', 'System Design', 'FastAPI', 'Docker', 'SQL', 'Git'].map((skill, idx) => (
+        <div className="flex flex-wrap gap-2 items-center">
+          {skills.map((skill, idx) => (
             <span
               key={idx}
-              className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 shadow-[0_0_12px_rgba(99,102,241,0.15)] hover:border-indigo-400 hover:text-white transition-all cursor-default"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 shadow-[0_0_12px_rgba(99,102,241,0.15)] hover:border-indigo-400 transition-all cursor-default"
             >
-              ⚡ {skill}
+              <span>⚡ {skill}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveSkill(skill)}
+                className="text-slate-400 hover:text-rose-400 p-0.5 rounded-full hover:bg-rose-500/20 transition-colors ml-0.5 cursor-pointer"
+                title={`Remove ${skill}`}
+              >
+                <X size={11} />
+              </button>
             </span>
           ))}
-          <button
-            type="button"
-            onClick={handleOpenEdit}
-            className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#162035] hover:bg-[#202E4C] border border-[#2B3B60] text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1"
-          >
-            <span>+ Add Skill</span>
-          </button>
+
+          {isAddingSkill ? (
+            <form onSubmit={handleAddSkill} className="inline-flex items-center gap-1.5 animate-fadeIn">
+              <input
+                type="text"
+                autoFocus
+                value={newSkillInput}
+                onChange={(e) => setNewSkillInput(e.target.value)}
+                placeholder="e.g. Kubernetes, Go, AWS..."
+                className="px-3 py-1 text-xs rounded-full bg-[#050A18] border border-cyan-500/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 w-36 sm:w-44 shadow-inner"
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setIsAddingSkill(false);
+                }}
+              />
+              <button
+                type="submit"
+                className="px-2.5 py-1 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAddingSkill(false)}
+                className="p-1 text-slate-400 hover:text-white cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsAddingSkill(true)}
+              className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#162035] hover:bg-[#202E4C] border border-[#2B3B60] text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+            >
+              <Plus size={13} className="text-cyan-400" />
+              <span>Add Skill</span>
+            </button>
+          )}
         </div>
       </div>
     </div>
