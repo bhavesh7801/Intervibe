@@ -37,7 +37,7 @@ const FeedbackPanel = ({ answer, onNext }) => {
         {/* Comprehensive Summary */}
         <div className="bg-[#080D1A] border border-[#162035] rounded-xl p-4 sm:p-5" data-testid="feedback-text">
           <h3 className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5 sm:mb-2">Detailed Evaluation</h3>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{answer.feedback}</p>
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed break-words [overflow-wrap:anywhere]">{answer.feedback}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -52,7 +52,7 @@ const FeedbackPanel = ({ answer, onNext }) => {
                 answer.strengths.map((strength, index) => (
                   <li key={index} className="text-xs text-slate-300 flex items-start gap-2" data-testid={`strength-${index}`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>
-                    <span>{strength}</span>
+                    <span className="break-words [overflow-wrap:anywhere]">{strength}</span>
                   </li>
                 ))
               ) : (
@@ -72,7 +72,7 @@ const FeedbackPanel = ({ answer, onNext }) => {
                 answer.improvements.map((improvement, index) => (
                   <li key={index} className="text-xs text-slate-300 flex items-start gap-2" data-testid={`improvement-${index}`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0"></span>
-                    <span>{improvement}</span>
+                    <span className="break-words [overflow-wrap:anywhere]">{improvement}</span>
                   </li>
                 ))
               ) : (

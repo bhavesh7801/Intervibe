@@ -87,13 +87,13 @@ export const CertificateModal = ({ isOpen, onClose, user, userStats }) => {
             <p className="text-xs uppercase tracking-widest text-slate-400 font-mono font-bold text-center">
               This certifies that
             </p>
-            <h1 className="text-3xl sm:text-5xl font-black text-white font-heading tracking-tight text-center py-1">
+            <h1 className="text-3xl sm:text-5xl font-black text-white font-heading tracking-tight text-center py-1 break-words max-w-full">
               {certData.candidate_name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-200 w-full max-w-lg text-center leading-relaxed mx-auto px-4 font-normal">
               has demonstrated technical excellence and problem-solving mastery in the role of
             </p>
-            <div className="inline-flex items-center justify-center px-6 py-2 rounded-xl bg-blue-500/20 border border-blue-400/40 text-blue-300 font-extrabold text-sm sm:text-base shadow-md">
+            <div className="inline-flex items-center justify-center px-6 py-2 rounded-xl bg-blue-500/20 border border-blue-400/40 text-blue-300 font-extrabold text-sm sm:text-base shadow-md break-words max-w-full text-center">
               {certData.role}
             </div>
           </div>

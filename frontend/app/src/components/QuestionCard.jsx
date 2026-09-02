@@ -116,8 +116,8 @@ const QuestionCard = ({ question, questionNumber, totalQuestions, ttsEnabled = t
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-purple-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0 mt-1">
           <HelpCircle size={20} className="animate-pulse" />
         </div>
-        <div className="flex-1">
-          <h2 className="text-base sm:text-xl md:text-2xl font-bold text-[#F8FAFC] leading-relaxed" data-testid="question-text">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-base sm:text-xl md:text-2xl font-bold text-[#F8FAFC] leading-relaxed break-words [overflow-wrap:anywhere]" data-testid="question-text">
             {question.text}
           </h2>
           {isSpeaking && (

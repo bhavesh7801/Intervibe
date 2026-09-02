@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl sm:text-6xl lg:text-8xl font-black text-white tracking-tight leading-tight sm:leading-snug max-w-5xl px-2 font-heading"
+          className="text-3xl sm:text-5xl lg:text-7xl font-black text-white tracking-tight leading-tight sm:leading-snug max-w-5xl px-2 font-heading break-words"
         >
           Ace your next{' '}
           <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
