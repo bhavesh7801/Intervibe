@@ -426,6 +426,114 @@ TOPIC_QUESTION_BANKS = {
             "correctAnswer": "B",
             "explanation": "Dijkstra relies on the greedy property that adding non-negative edges never decreases path length. A negative weight can violate this assumption, requiring the Bellman-Ford algorithm instead."
         }
+    ],
+
+    "aptitude": [
+        {
+            "title": "Time, Speed & Distance: Train Crossing a Platform",
+            "questionType": "mcq",
+            "category": "Quantitative Aptitude",
+            "difficulty": "Medium",
+            "description": "A train running at a uniform speed of 72 km/h crosses a 260-meter long platform in 23 seconds. What is the length of the train?",
+            "options": [
+                "A. 180 meters",
+                "B. 200 meters",
+                "C. 220 meters",
+                "D. 240 meters"
+            ],
+            "correctAnswer": "B",
+            "explanation": "Speed = 72 km/h = 72 * (5/18) = 20 m/s. Total distance covered in 23 seconds = Speed * Time = 20 * 23 = 460 meters. Train length = Total distance - Platform length = 460 - 260 = 200 meters."
+        },
+        {
+            "title": "Time & Work: Combined Rate of Workers",
+            "questionType": "mcq",
+            "category": "Quantitative Aptitude",
+            "difficulty": "Medium",
+            "description": "Pipe A can fill a tank in 12 hours, while Pipe B can fill the same tank in 18 hours. If both pipes are opened simultaneously into an empty tank, how many hours will it take to fill the tank completely?",
+            "options": [
+                "A. 6.8 hours",
+                "B. 7.2 hours",
+                "C. 7.5 hours",
+                "D. 8.0 hours"
+            ],
+            "correctAnswer": "B",
+            "explanation": "Combined 1-hour work rate = (1/12) + (1/18) = (3 + 2)/36 = 5/36. Total time required to fill the tank = 36 / 5 = 7.2 hours (7 hours and 12 minutes)."
+        },
+        {
+            "title": "Probability: Sum on Two Standard Dice",
+            "questionType": "mcq",
+            "category": "Probability & Statistics",
+            "difficulty": "Easy",
+            "description": "Two fair 6-sided dice are rolled simultaneously. What is the probability that the sum of the numbers showing on top is at least 10?",
+            "options": [
+                "A. 1/6",
+                "B. 1/9",
+                "C. 5/36",
+                "D. 1/12"
+            ],
+            "correctAnswer": "A",
+            "explanation": "Total outcomes = 6 * 6 = 36. Favorable outcomes with sum >= 10: Sum 10: (4,6), (5,5), (6,4) [3 pairs]; Sum 11: (5,6), (6,5) [2 pairs]; Sum 12: (6,6) [1 pair]. Total favorable = 3 + 2 + 1 = 6. Probability = 6/36 = 1/6."
+        },
+        {
+            "title": "Profit, Loss & Successive Discounts",
+            "questionType": "mcq",
+            "category": "Quantitative Aptitude",
+            "difficulty": "Medium",
+            "description": "A merchant offers two successive discounts of 20% and 10% on an article with a marked price of $500. What is the final selling price of the article?",
+            "options": [
+                "A. $340",
+                "B. $350",
+                "C. $360",
+                "D. $380"
+            ],
+            "correctAnswer": "C",
+            "explanation": "Effective single discount = D1 + D2 - (D1 * D2 / 100) = 20 + 10 - (200 / 100) = 28%. Final Selling Price = Marked Price * (1 - 0.28) = $500 * 0.72 = $360."
+        },
+        {
+            "title": "Logical Reasoning: Circular Seating Arrangement",
+            "questionType": "mcq",
+            "category": "Logical Reasoning",
+            "difficulty": "Hard",
+            "description": "Six friends (P, Q, R, S, T, U) are seated around a circular table facing the center. P is opposite S. Q is seated to the immediate right of P. R is seated between S and T. Who is seated to the immediate left of P?",
+            "options": [
+                "A. U",
+                "B. T",
+                "C. R",
+                "D. S"
+            ],
+            "correctAnswer": "A",
+            "explanation": "Facing center: P is at bottom (6 o'clock), S is opposite at 12 o'clock. Q is immediate right (5 o'clock). R is between S and T; since S is 12 and Q is 5, T must be at 2 o'clock and R at 1 o'clock. That leaves position 7 o'clock (immediate left of P) occupied by U."
+        },
+        {
+            "title": "Logical Reasoning: Syllogisms & Truth Values",
+            "questionType": "mcq",
+            "category": "Logical Reasoning",
+            "difficulty": "Medium",
+            "description": "Statements: (1) All engineers are problem solvers. (2) Some problem solvers are inventors. Which of the following conclusions logically follows with certainty?",
+            "options": [
+                "A. All engineers are inventors",
+                "B. Some engineers might be inventors, but it cannot be concluded with certainty that any engineer is an inventor",
+                "C. No engineer is an inventor",
+                "D. All inventors are engineers"
+            ],
+            "correctAnswer": "B",
+            "explanation": "Because the subset of 'problem solvers' that are 'inventors' may or may not overlap with the subset of 'engineers', we cannot state with certainty that any engineer is an inventor."
+        },
+        {
+            "title": "Number Series & Pattern Recognition",
+            "questionType": "mcq",
+            "category": "Logical Reasoning",
+            "difficulty": "Easy",
+            "description": "Find the missing number in the sequence: 4, 9, 25, 49, 121, 169, ?",
+            "options": [
+                "A. 225",
+                "B. 256",
+                "C. 289",
+                "D. 361"
+            ],
+            "correctAnswer": "C",
+            "explanation": "The numbers are the squares of consecutive prime numbers: 2^2=4, 3^2=9, 5^2=25, 7^2=49, 11^2=121, 13^2=169. The next prime number is 17, and 17^2 = 289."
+        }
     ]
 }
 
@@ -439,7 +547,9 @@ def get_curated_assessment_questions(target_role: str, num_questions: int = 5, d
     
     # 1. Topic Keyword Matching
     matched_domain = "dsa"
-    if any(k in role_lower for k in ["react", "frontend", "front-end", "next", "vue", "angular", "css", "html", "ui"]):
+    if any(k in role_lower for k in ["aptitude", "quant", "math", "reasoning", "logic", "puzzle", "analytical", "numerical", "general ability"]):
+        matched_domain = "aptitude"
+    elif any(k in role_lower for k in ["react", "frontend", "front-end", "next", "vue", "angular", "css", "html", "ui"]):
         matched_domain = "react"
     elif any(k in role_lower for k in ["python", "django", "fastapi", "flask"]):
         matched_domain = "python"

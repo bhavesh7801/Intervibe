@@ -53,13 +53,22 @@ Provide a constructive, token-by-token feedback evaluation. Focus on technical a
 # Fallback Data
 
 def get_fallback_questions(role: str, experience_level: str, num_questions: int) -> list:
-    if "system design" in role.lower():
+    role_lower = role.lower()
+    if "system design" in role_lower:
         fallback = [
             {"text": "How would you design a Distributed Rate Limiter to handle 500,000 requests/sec with sub-millisecond latency?", "category": "System Design", "difficulty": "hard"},
             {"text": "Design a scalable URL Shortener service (like Bitly) handling 100M daily active users and 10B redirect lookups.", "category": "System Design", "difficulty": "medium"},
             {"text": "Design a Global Content Delivery Network (CDN) with edge caching, dynamic routing, and cache invalidation.", "category": "System Design", "difficulty": "hard"},
             {"text": "Design a real-time Notification System delivering push messages, SMS, and emails with deduplication at scale.", "category": "System Design", "difficulty": "medium"},
             {"text": "Design a Distributed In-Memory Key-Value Store supporting multi-region replication and automated failover.", "category": "System Design", "difficulty": "hard"}
+        ]
+    elif any(k in role_lower for k in ["aptitude", "quant", "reasoning", "logic", "math"]):
+        fallback = [
+            {"text": "A train passes a 120-meter long platform in 10 seconds and passes a man standing on the platform in 6 seconds. What is the speed and length of the train? Walk me through your step-by-step logic.", "category": "Quantitative Aptitude", "difficulty": "medium"},
+            {"text": "Pipe A can fill a tank in 12 hours, while Pipe B can fill it in 18 hours. If both pipes are opened simultaneously into an empty tank, how many hours will it take to fill the tank? Explain your calculation.", "category": "Quantitative Aptitude", "difficulty": "medium"},
+            {"text": "What is the probability of getting a sum of 9 or higher when rolling two standard fair 6-sided dice? Explain your calculation.", "category": "Probability & Math", "difficulty": "easy"},
+            {"text": "Six people (P, Q, R, S, T, U) are seated around a circular table facing center. P is opposite S. Q is immediate right of P. R is between S and T. Who is immediately left of P? Walk me through your deduction.", "category": "Logical Reasoning", "difficulty": "hard"},
+            {"text": "A merchant offers two successive discounts of 20% and 10% on an article marked at $500. What is the final selling price? Walk through your formula.", "category": "Quantitative Aptitude", "difficulty": "medium"}
         ]
     else:
         fallback = [
