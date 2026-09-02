@@ -32,9 +32,9 @@ class AIService:
         else:
             self.client = None
             
-        self.model = "openai/gpt-oss-120b"
-        self.fallback_model = "openai/gpt-oss-20b"
-        self.gemini_model = "gemini-2.5-flash"
+        self.model = "llama-3.3-70b-versatile"
+        self.fallback_model = "llama-3.1-8b-instant"
+        self.gemini_model = "gemini-2.0-flash"
 
     async def generate_questions(self, role: str, experience_level: str, num_questions: int = 5, persona: str = "Standard") -> list:
         # Check Redis Cache with random batch variation to avoid duplicate static sessions
