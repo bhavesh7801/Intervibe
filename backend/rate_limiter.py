@@ -63,9 +63,17 @@ async def apply_exponential_backoff(key: str, max_attempts: int, window: int):
             headers={"Retry-After": str(delay)}
         )
 
+def get_client_ip(request: Request) -> str:
+    """Extract true client IP address honoring reverse proxies (Nginx/Cloudflare/AWS ALB)."""
+    forwarded = request.headers.get("x-forwarded-for") or request.headers.get("x-real-ip")
+    if forwarded:
+        # X-Forwarded-For can be a comma-separated list; first entry is the client
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "127.0.0.1"
+
 async def auth_rate_limiter(request: Request):
     """Stricter limits for authentication endpoints with exponential backoff."""
-    ip = request.client.host
+    ip = get_client_ip(request)
     email = await get_email_from_request(request)
     
     if ip:
@@ -76,7 +84,7 @@ async def auth_rate_limiter(request: Request):
 
 async def public_rate_limiter(request: Request):
     """Moderate limits for public endpoints (Sliding Window)."""
-    ip = request.client.host
+    ip = get_client_ip(request)
     if not ip or not redis_client.redis:
         return
         
@@ -101,7 +109,7 @@ async def public_rate_limiter(request: Request):
 
 async def authed_rate_limiter(request: Request):
     """Looser limits for authenticated actions."""
-    ip = request.client.host
+    ip = get_client_ip(request)
     if not ip or not redis_client.redis:
         return
         
@@ -126,7 +134,7 @@ async def authed_rate_limiter(request: Request):
 
 async def llm_rate_limiter(request: Request):
     """Extremely strict limits for AI Generation endpoints."""
-    ip = request.client.host
+    ip = get_client_ip(request)
     email = await get_email_from_request(request)
     
     if ip:

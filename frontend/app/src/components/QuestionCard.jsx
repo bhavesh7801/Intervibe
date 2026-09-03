@@ -66,6 +66,7 @@ const QuestionCard = ({ question, questionNumber, totalQuestions, ttsEnabled = t
             <button
               type="button"
               onClick={handleToggleSpeak}
+              aria-label={isSpeaking ? 'Stop reading question aloud' : 'Read question aloud'}
               className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer border ${
                 isSpeaking
                   ? 'bg-rose-600/30 text-rose-300 border-rose-500/60 shadow-[0_0_18px_rgba(244,63,94,0.4)] animate-pulse'

@@ -39,10 +39,13 @@ GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant"
 
 
 def _create_ssl_context():
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    return ctx
+    try:
+        return ssl.create_default_context()
+    except Exception:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx
 
 
 def _call_gemini(prompt_system: str, prompt_user: str) -> str:

@@ -54,12 +54,13 @@ async def get_user_feedbacks(
     db: Session = Depends(get_db),
     current_user: Optional[UserDB] = Depends(get_optional_current_user)
 ):
-    """Retrieve submitted feedback and complaint tickets"""
-    query = db.query(FeedbackDB)
-    if current_user:
-        query = query.filter(FeedbackDB.user_email == current_user.email)
+    """Retrieve submitted feedback and complaint tickets for current user only"""
+    if not current_user:
+        return []
     
-    results = query.order_by(FeedbackDB.created_at.desc()).all()
+    results = db.query(FeedbackDB).filter(
+        FeedbackDB.user_email == current_user.email
+    ).order_by(FeedbackDB.created_at.desc()).all()
     return [
         {
             "id": f.id,

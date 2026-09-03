@@ -36,6 +36,7 @@ export const CertificateModal = ({ isOpen, onClose, user, userStats }) => {
       <div className="w-full max-w-3xl bg-[#0B1124]/95 border border-cyan-500/30 rounded-3xl p-6 sm:p-8 relative shadow-[0_25px_80px_rgba(0,0,0,0.9),0_0_50px_rgba(6,182,212,0.2)] max-h-[92vh] overflow-y-auto scrollbar-thin">
         <button
           onClick={onClose}
+          aria-label="Close Certificate Modal"
           className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full hover:bg-white/5 cursor-pointer z-30 transition-colors"
         >
           <X size={20} />
@@ -146,6 +147,7 @@ export const CertificateModal = ({ isOpen, onClose, user, userStats }) => {
           <button
             type="button"
             onClick={handleCopyLink}
+            aria-label="Copy Certificate Verification URL"
             className="py-3 px-4 rounded-xl bg-[#050814] hover:bg-[#162035] border border-[#1A253F] text-slate-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.97]"
           >
             {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
@@ -155,6 +157,7 @@ export const CertificateModal = ({ isOpen, onClose, user, userStats }) => {
           <button
             type="button"
             onClick={handlePrint}
+            aria-label="Download or Print Certificate"
             className="py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-400 hover:opacity-95 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/25 active:scale-[0.97] cursor-pointer"
           >
             <Download size={16} />

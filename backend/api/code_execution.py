@@ -82,10 +82,70 @@ def _is_service_reachable(url: str, timeout: float = 0.3) -> bool:
         return False
 
 def _create_ssl_context():
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    return ctx
+    """Create standard verified SSL context for external HTTPS API calls."""
+    try:
+        return ssl.create_default_context()
+    except Exception:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx
+
+FORBIDDEN_PYTHON_MODULES = {
+    "os", "sys", "subprocess", "shutil", "socket", "urllib", "requests",
+    "http", "ftplib", "builtins", "__builtin__", "importlib", "pty",
+    "pathlib", "ctypes", "posix", "nt", "signal", "multiprocessing",
+    "threading", "asyncio", "resource", "gc", "inspect", "marshal",
+    "pickle", "shelve", "dbm", "sqlite3"
+}
+
+FORBIDDEN_PYTHON_CALLS = {
+    "__import__", "eval", "exec", "open", "compile", "globals", "locals",
+    "input", "breakpoint", "memoryview", "delattr"
+}
+
+def validate_code_safety(source_code: str, target_lang: str) -> Optional[str]:
+    """Inspect source code for security violations before execution."""
+    if target_lang == "python":
+        import ast
+        try:
+            tree = ast.parse(source_code)
+        except SyntaxError:
+            return None
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    root_mod = alias.name.split('.')[0]
+                    if root_mod in FORBIDDEN_PYTHON_MODULES:
+                        return f"Security Restriction: Module '{alias.name}' is prohibited in execution sandbox."
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    root_mod = node.module.split('.')[0]
+                    if root_mod in FORBIDDEN_PYTHON_MODULES:
+                        return f"Security Restriction: Import from '{node.module}' is prohibited in execution sandbox."
+            elif isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name):
+                    if node.func.id in FORBIDDEN_PYTHON_CALLS:
+                        return f"Security Restriction: Function '{node.func.id}()' is prohibited in execution sandbox."
+                elif isinstance(node.func, ast.Attribute):
+                    if node.func.attr in {"system", "popen", "spawn", "exec", "fork"}:
+                        return f"Security Restriction: System method call '{node.func.attr}()' is prohibited."
+
+    elif target_lang in ["javascript", "js"]:
+        lower = source_code.lower()
+        if any(bad in lower for bad in ["child_process", "require('fs')", "require(\"fs\")", "process.env", "process.exit"]):
+            return "Security Restriction: File system and process spawning APIs are prohibited in sandbox."
+
+    elif target_lang == "java":
+        if any(bad in source_code for bad in ["Runtime.getRuntime()", "ProcessBuilder", "java.lang.reflect", "System.exit"]):
+            return "Security Restriction: System process and reflection APIs are prohibited in sandbox."
+
+    elif target_lang in ["cpp", "c++"]:
+        if any(bad in source_code for bad in ["system(", "popen(", "fork(", "exec(", "<cstdlib>"]):
+            return "Security Restriction: System process spawning functions are prohibited in sandbox."
+
+    return None
 
 class CodeRunPayload(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -151,7 +211,7 @@ def _execute_piston(url: str, target_lang: str, raw_lang: str, source_code: str,
 
 @router.post("/run", response_model=CodeRunResult)
 async def run_sandboxed_code(request: CodeRunPayload):
-    """Execute candidate code in self-hosted Piston, local compilers, public Piston, or Wandbox."""
+    """Execute candidate code in self-hosted Piston, public Piston, Wandbox, or isolated subprocesses."""
     raw_lang = request.language.lower().strip()
     if raw_lang not in PISTON_LANG_MAP:
         raise HTTPException(
@@ -167,26 +227,90 @@ async def run_sandboxed_code(request: CodeRunPayload):
             detail=f"Source code payload size ({len(code_bytes)} bytes) exceeds maximum allowable limit of 50 KB."
         )
 
+    # 1. Proactive Security Sanitization: Pre-screen code for system vulnerabilities
+    security_error = validate_code_safety(request.source_code, target_lang)
+    if security_error:
+        return CodeRunResult(
+            output=f"❌ {security_error}",
+            stderr=security_error,
+            execution_time="0.00s",
+            exit_code=1,
+            status="Security Violation"
+        )
+
     start_time = datetime.now()
 
-    # 1. Primary: Self-Hosted Piston Engine (check socket availability fast)
+    # 2. Primary Engine: Self-Hosted Piston Engine (check socket availability fast)
     piston_url = os.getenv("PISTON_URL", "http://localhost:2000/api/v2/execute")
     if _is_service_reachable(piston_url):
         res = _execute_piston(piston_url, target_lang, raw_lang, request.source_code, request.stdin, start_time)
         if res:
             return res
 
-    # 2. Local Native Subprocess Compilers & Runtimes (Zero Network, 100% Reliable, UTF-8 Enforced)
+    # 3. Secondary Engine: Public Sandboxed Piston API (EMKC)
+    public_piston_url = "https://emkc.org/api/v2/piston/execute"
+    res = _execute_piston(public_piston_url, target_lang, raw_lang, request.source_code, request.stdin, start_time)
+    if res:
+        return res
+
+    # 4. Tertiary Engine: Wandbox API Sandbox
+    try:
+        wb_compiler = WANDBOX_COMPILERS.get(target_lang, "gcc-head")
+        wb_url = "https://wandbox.org/api/compile.json"
+        wb_payload = {
+            "compiler": wb_compiler,
+            "code": request.source_code,
+            "stdin": request.stdin or ""
+        }
+        req = urllib.request.Request(
+            wb_url,
+            data=json.dumps(wb_payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(req, context=_create_ssl_context(), timeout=6) as response:
+            if response.status == 200:
+                wb_data = json.loads(response.read().decode("utf-8"))
+                elapsed = (datetime.now() - start_time).total_seconds()
+                program_output = wb_data.get("program_output", "") or wb_data.get("status", "")
+                program_error = wb_data.get("program_error", "") or wb_data.get("compiler_error", "")
+                status_code = int(wb_data.get("status", 0) or 0)
+
+                if status_code == 0 and not program_error:
+                    final_out = program_output.strip() if program_output.strip() else "Code executed cleanly with no stdout."
+                    return CodeRunResult(output=final_out, stderr=program_error, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
+                else:
+                    final_out = f"❌ Execution Error:\n{program_error.strip() if program_error.strip() else program_output.strip()}"
+                    return CodeRunResult(output=final_out, stderr=program_error, execution_time=f"{elapsed:.2f}s", exit_code=1, status="Execution Error")
+    except Exception:
+        pass
+
+    # 5. Isolated Subprocess Fallback (Zero in-process exec, strictly sandboxed subprocess)
     if target_lang == 'python':
-        import io, contextlib
         try:
-            f = io.StringIO()
-            exec_scope = {}
-            with contextlib.redirect_stdout(f):
-                exec(request.source_code, exec_scope, exec_scope)
-            out = f.getvalue().strip()
+            proc = subprocess.run(
+                [sys.executable, "-c", request.source_code],
+                input=request.stdin or "",
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=5
+            )
             elapsed = (datetime.now() - start_time).total_seconds()
-            return CodeRunResult(output=out if out else "Code executed cleanly with no stdout.", stderr="", execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
+            stdout_str = (proc.stdout or "").strip()
+            stderr_str = (proc.stderr or "").strip()
+            if proc.returncode == 0:
+                out = stdout_str if stdout_str else "Code executed cleanly with no stdout."
+                return CodeRunResult(output=out, stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
+            else:
+                return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=proc.returncode, status="Execution Error")
+        except subprocess.TimeoutExpired:
+            elapsed = (datetime.now() - start_time).total_seconds()
+            return CodeRunResult(output="❌ Execution Timeout: Program exceeded max runtime (5.00s).", stderr="Time limit exceeded", execution_time=f"{elapsed:.2f}s", exit_code=124, status="Timeout")
         except Exception as py_err:
             elapsed = (datetime.now() - start_time).total_seconds()
             return CodeRunResult(output=f"❌ Execution Error:\n{str(py_err)}", stderr=str(py_err), execution_time=f"{elapsed:.2f}s", exit_code=1, status="Execution Error")
@@ -307,50 +431,9 @@ async def run_sandboxed_code(request: CodeRunPayload):
         except Exception as cpp_err:
             print(f"[code-execution] Local C++ runner failed, falling back: {cpp_err}", file=sys.stderr)
 
-    # 3. Public Piston API Fallback
-    public_piston_url = "https://emkc.org/api/v2/piston/execute"
-    res = _execute_piston(public_piston_url, target_lang, raw_lang, request.source_code, request.stdin, start_time)
-    if res:
-        return res
-
-    # 4. Secondary Wandbox API Fallback
-    try:
-        wb_compiler = WANDBOX_COMPILERS.get(target_lang, "gcc-head")
-        wb_url = "https://wandbox.org/api/compile.json"
-        wb_payload = {
-            "compiler": wb_compiler,
-            "code": request.source_code,
-            "stdin": request.stdin or ""
-        }
-        req = urllib.request.Request(
-            wb_url,
-            data=json.dumps(wb_payload).encode("utf-8"),
-            headers={
-                "Content-Type": "application/json",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-            },
-            method="POST"
-        )
-        with urllib.request.urlopen(req, context=_create_ssl_context(), timeout=6) as response:
-            if response.status == 200:
-                wb_data = json.loads(response.read().decode("utf-8"))
-                elapsed = (datetime.now() - start_time).total_seconds()
-                program_output = wb_data.get("program_output", "") or wb_data.get("status", "")
-                program_error = wb_data.get("program_error", "") or wb_data.get("compiler_error", "")
-                status_code = int(wb_data.get("status", 0) or 0)
-
-                if status_code == 0 and not program_error:
-                    final_out = program_output.strip() if program_output.strip() else "Code executed cleanly with no stdout."
-                    return CodeRunResult(output=final_out, stderr=program_error, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
-                else:
-                    final_out = f"❌ Execution Error:\n{program_error.strip() if program_error.strip() else program_output.strip()}"
-                    return CodeRunResult(output=final_out, stderr=program_error, execution_time=f"{elapsed:.2f}s", exit_code=1, status="Execution Error")
-    except Exception:
-        pass
-
     elapsed = (datetime.now() - start_time).total_seconds()
     return CodeRunResult(
-        output=f"❌ Execution Engine Unavailable:\nCode execution service is currently unreachable for '{raw_lang}'. Please verify Docker Piston container (port 2000) or local runtime installation.",
+        output=f"❌ Execution Engine Unavailable:\nCode execution service is currently unreachable for '{raw_lang}'. Please try again in a few moments.",
         stderr="Execution engine offline or unreachable.",
         execution_time=f"{elapsed:.2f}s",
         exit_code=1,

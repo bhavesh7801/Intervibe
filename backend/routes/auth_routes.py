@@ -51,7 +51,8 @@ class UpdateProfileRequest(BaseModel):
 @router.post("/auth/register", dependencies=[Depends(auth_rate_limiter)])
 async def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     """Register candidate account with hashed passwords"""
-    existing_user = db.query(UserDB).filter(UserDB.email == payload.email).first()
+    norm_email = payload.email.lower().strip()
+    existing_user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="An account with this email address already exists.")
     
@@ -59,8 +60,8 @@ async def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     otp = f"{random.randint(100000, 999999)}"
     
     user = UserDB(
-        name=payload.name,
-        email=payload.email,
+        name=payload.name.strip(),
+        email=norm_email,
         password_hash=hashed_pwd,
         target_role=payload.targetRole or "Software Engineer",
         experience_level=payload.experienceLevel or "Mid Level",
@@ -87,7 +88,8 @@ async def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/auth/login", dependencies=[Depends(auth_rate_limiter)])
 async def login(payload: LoginRequest, db: Session = Depends(get_db)):
     """Authenticate candidate credentials"""
-    user = db.query(UserDB).filter(UserDB.email == payload.email).first()
+    norm_email = payload.email.lower().strip()
+    user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     if not user or not user.password_hash or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
     
@@ -105,9 +107,12 @@ async def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 def verify_google_token_sync(token: str) -> Optional[dict]:
     """Verify Google token supporting both OAuth2 Access Tokens and ID Tokens."""
-    ssl_ctx = ssl.create_default_context()
-    ssl_ctx.check_hostname = False
-    ssl_ctx.verify_mode = ssl.CERT_NONE
+    try:
+        ssl_ctx = ssl.create_default_context()
+    except Exception:
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
 
     # 1. Access Token via Header
     try:
@@ -139,7 +144,7 @@ async def google_auth(payload: GoogleAuthRequest, db: Session = Depends(get_db))
     if not user_info:
         raise HTTPException(status_code=401, detail="Invalid or expired Google authentication token.")
         
-    email = user_info.get("email")
+    email = user_info.get("email", "").lower().strip()
     name = user_info.get("name")
     if not email:
         raise HTTPException(status_code=400, detail="Google account must have a verified email.")
@@ -173,7 +178,8 @@ async def google_auth(payload: GoogleAuthRequest, db: Session = Depends(get_db))
 @router.post("/auth/verify-otp", dependencies=[Depends(auth_rate_limiter)])
 async def verify_otp(payload: VerifyOTPRequest, db: Session = Depends(get_db)):
     """Verify 6-digit email OTP"""
-    user = db.query(UserDB).filter(UserDB.email == payload.email).first()
+    norm_email = payload.email.lower().strip()
+    user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User account not found.")
         
@@ -194,7 +200,8 @@ async def verify_otp(payload: VerifyOTPRequest, db: Session = Depends(get_db)):
 @router.post("/auth/resend-otp", dependencies=[Depends(auth_rate_limiter)])
 async def resend_otp(payload: ResendOTPRequest, db: Session = Depends(get_db)):
     """Resend 6-digit OTP code"""
-    user = db.query(UserDB).filter(UserDB.email == payload.email).first()
+    norm_email = payload.email.lower().strip()
+    user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User account not found.")
         

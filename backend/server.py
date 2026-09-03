@@ -28,6 +28,7 @@ from routes.resume_routes import router as resume_router
 from routes.leaderboard_routes import router as leaderboard_router
 from routes.system_design_routes import router as system_design_router
 from routes.certificate_routes import router as certificate_router
+from routes.linkedin_routes import router as linkedin_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -63,6 +64,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Inject defensive HTTP response security headers on all endpoints."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """
@@ -77,19 +88,22 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An internal server error occurred. Please try again later."}
     )
 
-# CORS Configuration
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
-# In production, DO NOT use "*". Only use the actual frontend URL.
-allowed_origins = [FRONTEND_URL] if FRONTEND_URL != "*" else ["*"]
-# If they left it default, we also allow standard localhost for dev
-if "localhost" in FRONTEND_URL and "http://localhost:5173" not in allowed_origins:
-    allowed_origins.append("http://localhost:5173")
+# Robust Multi-Origin CORS Configuration
+cors_raw = os.environ.get("CORS_ORIGINS") or os.environ.get("FRONTEND_URL") or "http://localhost:5173"
+if cors_raw == "*":
+    allowed_origins = ["*"]
+else:
+    allowed_origins = [orig.strip() for orig in cors_raw.split(",") if orig.strip()]
+    for default_origin in [
+        "http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173",
+        "http://intervibe.duckdns.org", "https://intervibe.duckdns.org"
+    ]:
+        if default_origin not in allowed_origins:
+            allowed_origins.append(default_origin)
 
-# We still include "*" here to ensure it doesn't immediately break if FRONTEND_URL isn't set yet, 
-# but we strongly recommend the user removes "*" when deploying.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, "http://localhost:5173"], # Locked down for production
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -97,6 +111,7 @@ app.add_middleware(
 
 # Mount Domain APIRouters (Auth routes have internal specific rate limiters)
 app.include_router(auth_router)
+app.include_router(linkedin_router)
 app.include_router(session_router, dependencies=[Depends(authed_rate_limiter)])
 app.include_router(feedback_router, dependencies=[Depends(authed_rate_limiter)])
 app.include_router(resume_router, dependencies=[Depends(authed_rate_limiter)])
