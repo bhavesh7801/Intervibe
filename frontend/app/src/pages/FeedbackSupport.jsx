@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../apiClient';
 import {
   MessageSquare, AlertCircle, Sparkles, Send, Star,
-  CheckCircle2, HelpCircle, ShieldAlert, History, Filter, ArrowLeft
+  CheckCircle2, ShieldAlert, History, ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,32 +17,39 @@ const FeedbackSupport = () => {
   const [description, setDescription] = useState('');
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [successTicket, setSuccessTicket] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [myFeedbacks, setMyFeedbacks] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setEmail(user.email || '');
-    }
-    fetchFeedbackHistory();
-  }, [user]);
+    let isMounted = true;
+    api.getFeedbacks()
+      .then((res) => {
+        if (isMounted) {
+          setMyFeedbacks(res.data || []);
+          setLoadingHistory(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load feedback tickets:", err);
+        if (isMounted) setLoadingHistory(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const fetchFeedbackHistory = async () => {
-    setLoadingHistory(true);
+  const refreshFeedbackHistory = async () => {
     try {
       const res = await api.getFeedbacks();
       setMyFeedbacks(res.data || []);
     } catch (err) {
       console.error("Failed to load feedback tickets:", err);
-    } finally {
-      setLoadingHistory(false);
     }
   };
 
@@ -61,15 +69,15 @@ const FeedbackSupport = () => {
         subject: subject.trim(),
         description: description.trim(),
         rating,
-        name: name.trim(),
-        email: email.trim()
+        name: (name || user?.name || '').trim(),
+        email: (email || user?.email || '').trim()
       };
 
       const res = await api.submitFeedback(payload);
       setSuccessTicket(res.data.ticketId || 'FB-SUCCESS');
       setSubject('');
       setDescription('');
-      fetchFeedbackHistory();
+      await refreshFeedbackHistory();
     } catch (err) {
       console.error("Submit feedback error:", err);
       setErrorMsg(err.response?.data?.detail || 'Failed to submit feedback. Please try again.');
@@ -90,7 +98,7 @@ const FeedbackSupport = () => {
       <div className="w-full max-w-[1200px] mx-auto space-y-8 px-4">
         
         {/* Header Navigation */}
-        <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#162035]">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-700/60">
           <button
             onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2 text-xs sm:text-sm text-slate-400 hover:text-blue-400 transition-colors cursor-pointer"
@@ -117,38 +125,56 @@ const FeedbackSupport = () => {
           </p>
         </div>
 
-        {/* Success Ticket Modal / Banner */}
-        {successTicket && (
-          <div className="mb-8 p-6 bg-[#080D1A] border border-emerald-500/50 rounded-2xl animate-entrance shadow-xl">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/40">
-                <CheckCircle2 size={24} />
+        {/* Success Ticket Banner — AnimatePresence for smooth entry/exit */}
+        <AnimatePresence>
+          {successTicket && (
+            <motion.div
+              key="success-ticket"
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ duration: 0.25 }}
+              className="mb-8 p-6 bg-[#080D1A] border border-emerald-500/50 rounded-2xl shadow-xl"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/40">
+                  <CheckCircle2 size={24} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-emerald-300">Ticket Created Successfully!</h3>
+                  <p className="text-xs sm:text-sm text-emerald-200/80 mt-1 break-words">
+                    Your reference ID is <strong className="text-white font-mono bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/40">{successTicket}</strong>. Our support team will review your report shortly.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSuccessTicket(null)}
+                  className="text-xs font-semibold text-emerald-400 hover:text-white cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded"
+                >
+                  Dismiss
+                </button>
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-emerald-300">Ticket Created Successfully!</h3>
-                <p className="text-xs sm:text-sm text-emerald-200/80 mt-1">
-                  Your reference ID is <strong className="text-white font-mono bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/40">{successTicket}</strong>. Our support team will review your report shortly.
-                </p>
-              </div>
-              <button
-                onClick={() => setSuccessTicket(null)}
-                className="text-xs font-semibold text-emerald-400 hover:text-white cursor-pointer"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Error Banner */}
-        {errorMsg && (
-          <div className="mb-8 p-4 bg-rose-950/60 border border-rose-800 text-rose-300 rounded-xl text-xs sm:text-sm text-center animate-shake">
-            {errorMsg}
-          </div>
-        )}
+        {/* Error Banner — AnimatePresence for smooth entry/exit */}
+        <AnimatePresence>
+          {errorMsg && (
+            <motion.div
+              key="error-msg"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="mb-8 p-4 bg-rose-950/60 border border-rose-800 text-rose-300 rounded-xl text-xs sm:text-sm text-center"
+            >
+              {errorMsg}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Submission Form Card */}
-        <div className="card-3d p-6 sm:p-8 rounded-2xl mb-12 bg-[#0C1222] border border-[#1A253F]" data-testid="feedback-form">
+        <div className="card-3d p-6 sm:p-8 rounded-2xl mb-12 bg-[#0C1222] border border-slate-700/60 w-full max-w-2xl mx-auto" data-testid="feedback-form">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Category Selection Chips */}
@@ -168,7 +194,7 @@ const FeedbackSupport = () => {
                       className={`p-4 rounded-xl border text-left transition-all duration-300 cursor-pointer flex items-start gap-3.5 ${
                         isSelected
                           ? 'bg-blue-600/20 border-blue-500 text-white shadow-lg shadow-blue-500/20 scale-[1.01]'
-                          : 'bg-[#080D1A] border-[#162035] text-slate-400 hover:border-slate-600 hover:text-white'
+                          : 'bg-[#080D1A] border-slate-700/60 text-slate-400 hover:border-slate-600 hover:text-white'
                       }`}
                     >
                       <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
@@ -191,7 +217,7 @@ const FeedbackSupport = () => {
               <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                 2. Platform Experience Rating
               </label>
-              <div className="flex items-center gap-2 bg-[#080D1A] p-3.5 rounded-xl border border-[#162035] w-fit">
+              <div className="flex items-center gap-2 bg-[#080D1A] p-3.5 rounded-xl border border-slate-700/60 w-fit">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -224,10 +250,10 @@ const FeedbackSupport = () => {
                 <input
                   type="text"
                   required
-                  value={name}
+                  value={name || (user?.name ?? '')}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full px-4 py-3 bg-[#080D1A] border border-[#162035] text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[46px]"
+                  className="w-full px-4 py-3 bg-[#080D1A] border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[46px]"
                 />
               </div>
               <div>
@@ -235,10 +261,10 @@ const FeedbackSupport = () => {
                 <input
                   type="email"
                   required
-                  value={email}
+                  value={email || (user?.email ?? '')}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@example.com"
-                  className="w-full px-4 py-3 bg-[#080D1A] border border-[#162035] text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[46px]"
+                  className="w-full px-4 py-3 bg-[#080D1A] border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[46px]"
                 />
               </div>
             </div>
@@ -252,7 +278,7 @@ const FeedbackSupport = () => {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g. AI Score appeal for session #3 or Voice recorder issue"
-                className="w-full px-4 py-3 bg-[#080D1A] border border-[#162035] text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[46px]"
+                className="w-full px-4 py-3 bg-[#080D1A] border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[46px]"
               />
             </div>
 
@@ -265,7 +291,7 @@ const FeedbackSupport = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Please describe your feedback, issue, or complaint in detail..."
-                className="w-full px-4 py-3 bg-[#080D1A] border border-[#162035] text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[120px]"
+                className="w-full px-4 py-3 bg-[#080D1A] border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:border-blue-500 min-h-[120px]"
               />
             </div>
 
@@ -282,8 +308,8 @@ const FeedbackSupport = () => {
         </div>
 
         {/* History / Previous Submitted Tickets List */}
-        <div className="card-3d p-6 sm:p-8 rounded-2xl bg-[#0C1222] border border-[#1A253F]">
-          <div className="flex items-center justify-between mb-6 pb-3 border-b border-[#162035]">
+        <div className="card-3d p-6 sm:p-8 rounded-2xl bg-[#0C1222] border border-slate-700/60 w-full max-w-2xl mx-auto">
+          <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-700/60">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
                 <History size={18} />
@@ -306,20 +332,23 @@ const FeedbackSupport = () => {
             </div>
           ) : (
             <div className="space-y-3.5">
-              {myFeedbacks.map((item) => (
-                <div
+              {myFeedbacks.map((item, idx) => (
+                <motion.div
                   key={item.id}
-                  className="p-4 rounded-xl bg-[#080D1A] border border-[#162035] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: idx * 0.06 }}
+                  className="p-4 rounded-xl bg-[#080D1A] border border-slate-700/60 hover:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/30">
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-mono text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/30 shrink-0">
                         {item.ticketId}
                       </span>
-                      <span className="text-xs font-bold text-white">{item.subject}</span>
+                      <span className="text-xs font-bold text-white min-w-0 truncate">{item.subject}</span>
                     </div>
-                    <p className="text-xs text-slate-400 line-clamp-1">{item.description}</p>
-                    <div className="flex items-center gap-3 text-[11px] text-slate-500">
+                    <p className="text-xs text-slate-400 line-clamp-1 break-words">{item.description}</p>
+                    <div className="flex items-center gap-3 text-[11px] text-slate-500 flex-wrap">
                       <span>Category: {item.category}</span>
                       <span>•</span>
                       <span>Rating: {item.rating}/5 ★</span>
@@ -327,7 +356,7 @@ const FeedbackSupport = () => {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                    <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
                       item.status === 'resolved'
                         ? 'bg-emerald-950/50 border-emerald-800 text-emerald-300'
                         : 'bg-amber-950/50 border-amber-800 text-amber-300'
@@ -335,7 +364,7 @@ const FeedbackSupport = () => {
                       {item.status || 'open'}
                     </span>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}

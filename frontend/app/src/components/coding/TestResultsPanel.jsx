@@ -10,10 +10,10 @@ const TestResultsPanel = React.memo(({
   complexityResult
 }) => {
   return (
-    <div className="rounded-2xl border border-[#1E293B] bg-[#05070E] p-4 space-y-4 shadow-2xl h-full flex flex-col" data-testid="output-panel">
+    <div className="rounded-2xl border border-slate-700/60 bg-[#05070E] p-4 space-y-4 shadow-2xl h-full flex flex-col" data-testid="output-panel">
       
       {/* AST Complexity Analysis Box (Matching Screenshot) */}
-      <div className="p-3.5 rounded-xl border border-[#1E293B] bg-[#0A0D16] space-y-2">
+      <div className="p-3.5 rounded-xl border border-slate-700/60 bg-[#0A0D16] space-y-2">
         <div className="flex items-center justify-between text-xs font-bold text-cyan-400">
           <div className="flex items-center gap-1.5">
             <span className="text-cyan-400">⚙️</span>
@@ -33,7 +33,7 @@ const TestResultsPanel = React.memo(({
       </div>
 
       {/* Tabs bar */}
-      <div className="flex items-center justify-between border-b border-[#1E293B] pb-2">
+      <div className="flex items-center justify-between border-b border-slate-700/60 pb-2">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -71,7 +71,7 @@ const TestResultsPanel = React.memo(({
 
       {/* Tab 1: Execution Terminal (Matching Screenshot) */}
       {activeOutputTab === 'terminal' && (
-        <div className="bg-[#030408] p-4 rounded-xl border border-[#1E293B] font-mono text-xs text-slate-200 flex-1 min-h-[220px] overflow-y-auto whitespace-pre-wrap flex flex-col items-center justify-center text-center">
+        <div className="bg-[#030408] p-4 rounded-xl border border-slate-700/60 font-mono text-xs text-slate-200 flex-1 min-h-[220px] overflow-y-auto whitespace-pre-wrap flex flex-col items-center justify-center text-center">
           {executing ? (
             <span className="text-amber-400 animate-pulse font-bold">Running algorithm solution across test suite...</span>
           ) : consoleOutput ? (
@@ -143,20 +143,20 @@ const TestResultsPanel = React.memo(({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-[11px]">
-                  <div className="bg-[#050409] p-2 rounded border border-[#2B2144]">
-                    <span className="text-[10px] text-slate-400 font-sans block font-bold">Input:</span>
-                    <span className="text-slate-200">{tc.input}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-[11px] sm:text-xs">
+                  <div className="bg-[#050409] p-2 rounded border border-slate-700/60 overflow-hidden break-words">
+                    <span className="text-xs text-slate-400 font-sans block font-bold">Input:</span>
+                    <span className="text-slate-200 whitespace-pre-wrap break-words">{tc.input}</span>
                   </div>
 
-                  <div className="bg-[#050409] p-2 rounded border border-[#2B2144]">
-                    <span className="text-[10px] text-slate-400 font-sans block font-bold">Expected:</span>
-                    <span className="text-emerald-400">{tc.expected}</span>
+                  <div className="bg-[#050409] p-2 rounded border border-slate-700/60 overflow-hidden break-words">
+                    <span className="text-xs text-slate-400 font-sans block font-bold">Expected:</span>
+                    <span className="text-emerald-400 whitespace-pre-wrap break-words">{tc.expected}</span>
                   </div>
 
-                  <div className="bg-[#050409] p-2 rounded border border-[#2B2144]">
-                    <span className="text-[10px] text-slate-400 font-sans block font-bold">Your Output:</span>
-                    <span className={tc.passed ? 'text-emerald-400' : 'text-rose-400 font-bold'}>{tc.actual || 'No output'}</span>
+                  <div className="bg-[#050409] p-2 rounded border border-slate-700/60 overflow-hidden break-words">
+                    <span className="text-xs text-slate-400 font-sans block font-bold">Your Output:</span>
+                    <span className={`whitespace-pre-wrap break-words ${tc.passed ? 'text-emerald-400' : 'text-rose-400 font-bold'}`}>{tc.actual || 'No output'}</span>
                   </div>
                 </div>
               </div>

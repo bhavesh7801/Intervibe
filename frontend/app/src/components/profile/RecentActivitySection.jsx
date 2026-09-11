@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -14,15 +13,15 @@ const RecentActivitySection = ({ recentSessions, userTargetRole }) => {
   return (
     <div className="space-y-6 sm:space-y-10">
       {/* RECENT INTERVIEW SESSION */}
-      <div className="bg-[#080D1A]/80 border-2 border-cyan-500/30 rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(6,182,212,0.15)] space-y-6 sm:space-y-8">
-        <div className="flex items-center justify-between border-b border-[#1A253F] pb-4 sm:pb-5 mb-2">
+      <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl space-y-6 sm:space-y-8">
+        <div className="flex items-center justify-between border-b border-slate-700/60 pb-4 sm:pb-5 mb-2">
           <div className="flex items-center gap-2">
-            <Clock size={18} className="text-blue-400" />
+            <Clock size={18} className="text-blue-400 shrink-0" />
             <h2 className="text-sm sm:text-base font-bold text-white">Recent Interview Session</h2>
           </div>
           <button
             onClick={() => navigate("/dashboard")}
-            className="text-[11px] font-bold text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+            className="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
           >
             See All <ChevronRight size={12} />
           </button>
@@ -30,29 +29,29 @@ const RecentActivitySection = ({ recentSessions, userTargetRole }) => {
 
         {recentSessions && recentSessions.length > 0 ? (
           <div
-            className="bg-[#050A18] border border-[#1A253F] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-blue-500/30 transition-colors group cursor-pointer"
+            className="bg-[#050A18] border border-slate-700/60 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-blue-500/50 transition-colors group cursor-pointer"
             onClick={() => navigate("/dashboard")}
           >
-            <div className="flex items-center gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-black text-white">
+            <div className="flex items-center gap-4 min-w-0 w-full sm:w-auto flex-1">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-sm font-black text-white truncate min-w-0">
                     {recentSessions[0].role || userTargetRole || "Software Engineer"}
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">
                     {recentSessions[0].status || "in_progress"}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono mt-1">
-                  <span className="flex items-center gap-1"><User size={10} /> Active</span>
+                <div className="flex items-center gap-3 text-[11px] sm:text-xs text-slate-400 font-mono mt-1">
+                  <span className="flex items-center gap-1"><User size={12} className="shrink-0" /> Active</span>
                   <span>•</span>
                   <span>{recentSessions[0].questions?.length || 10} Questions</span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
+            <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 shrink-0">
               <div className="text-left sm:text-right">
-                <span className="text-[10px] font-bold uppercase text-slate-400 block font-mono">
+                <span className="text-xs font-bold uppercase text-slate-400 block font-mono">
                   AI SCORE
                 </span>
                 <span className="text-xl font-black text-emerald-400 font-mono group-hover:text-emerald-300 transition-colors">
@@ -84,27 +83,27 @@ const RecentActivitySection = ({ recentSessions, userTargetRole }) => {
       </div>
 
       {/* BOTTOM SPLIT CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-[#080D1A]/80 border-2 border-blue-500/30 rounded-[2rem] p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_20px_rgba(59,130,246,0.1)] group">
-          <div className="flex items-center justify-between border-b border-[#1A253F] pb-5 mb-5">
-            <h2 className="text-sm font-bold text-white pl-1">FAANG Interview Streak</h2>
-            <Award size={14} className="text-blue-400" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-6 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl group">
+          <div className="flex items-center justify-between border-b border-slate-700/60 pb-4 sm:pb-5 mb-4 sm:mb-5">
+            <h2 className="text-sm sm:text-base font-bold text-white pl-1">FAANG Interview Streak</h2>
+            <Award size={16} className="text-blue-400 shrink-0" />
           </div>
           <div className="flex items-center gap-4 pl-1">
-            <div className="text-4xl flex items-center gap-1 cursor-default hover:scale-105 transition-transform">
+            <div className="text-3xl sm:text-4xl flex items-center gap-1 cursor-default hover:scale-105 transition-transform">
               🔥🔥🔥🔥
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-slate-200">3 Day Streak</div>
-              <div className="text-[10px] text-pink-400">Severe Agenda</div>
+              <div className="text-xs sm:text-sm font-bold text-slate-200">3 Day Streak</div>
+              <div className="text-[11px] sm:text-xs text-pink-400">Severe Agenda</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-[#080D1A]/80 border-2 border-blue-500/30 rounded-[2rem] p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_20px_rgba(59,130,246,0.1)] group">
-          <div className="flex items-center justify-between border-b border-[#1A253F] pb-5 mb-5">
-            <h2 className="text-sm font-bold text-white">Practice Workspace</h2>
-            <Code2 size={14} className="text-blue-400 group-hover:text-blue-300 transition-colors" />
+        <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-6 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl group">
+          <div className="flex items-center justify-between border-b border-slate-700/60 pb-4 sm:pb-5 mb-4 sm:mb-5">
+            <h2 className="text-sm sm:text-base font-bold text-white">Practice Workspace</h2>
+            <Code2 size={16} className="text-blue-400 group-hover:text-blue-300 transition-colors shrink-0" />
           </div>
           <ul className="space-y-4 text-sm text-slate-400">
             <li className="flex items-start gap-2 hover:text-slate-200 transition-colors cursor-default">

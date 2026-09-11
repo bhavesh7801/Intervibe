@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { api } from '../api';
-import { Play, Code2, CheckCircle2, AlertCircle, RefreshCw, Terminal, Clock, Sparkles, BookOpen, XCircle, ChevronDown, GripVertical, Star, Cpu, AlignLeft, HelpCircle, Lightbulb, Building2, Bot } from 'lucide-react';
+import { Code2, CheckCircle2, AlertCircle, RefreshCw, Terminal, Clock, Sparkles, BookOpen, XCircle, ChevronDown, Star, Cpu, AlignLeft, Lightbulb, Building2, Bot } from 'lucide-react';
 
 import QuestionGeneratorModal from '../components/QuestionGeneratorModal';
 import EditorToolbar from '../components/coding/EditorToolbar';
@@ -108,52 +108,41 @@ const LANGUAGE_LABELS = {
   swift: 'Swift',
 };
 
-const MONACO_LANG_MAP = {
-  python: 'python',
-  javascript: 'javascript',
-  cpp: 'cpp',
-  java: 'java',
-  c: 'c',
-  typescript: 'typescript',
-  go: 'go',
-  ruby: 'ruby',
-  rust: 'rust',
-  csharp: 'csharp',
-  php: 'php',
-  kotlin: 'kotlin',
-  swift: 'swift',
-};
-
 const DEFAULT_LANGUAGES = ['python', 'javascript', 'cpp', 'java'];
-
-/* Compiled languages that need a synthesized main()/entry-point wrapper
-   before they can run standalone — see buildTestCaseScript and the
-   `needsEntryPoint` check in handleRunCode. Currently only cpp/java have
-   an actual wrapper implemented; the others are listed here so it's obvious
-   where support needs to be extended if a question shows up in them. */
-const ENTRY_POINT_LANGUAGES = ['cpp', 'java'];
 
 const CodingWorkspace = () => {
   const location = useLocation();
   const [questions, setQuestions] = useState(() => {
+    let list = DEFAULT_CODING_QUESTIONS;
     try {
       const stored = localStorage.getItem('all_coding_questions');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
       }
-    } catch (e) {}
-    return DEFAULT_CODING_QUESTIONS;
+    } catch {
+      /* ignore storage error */
+    }
+    if (location.state?.newQuestion) {
+      const newQ = location.state.newQuestion;
+      return [newQ, ...list.filter((q) => q.id !== newQ.id && q.title !== newQ.title)];
+    }
+    return list;
   });
 
   const [currentQuestion, setCurrentQuestion] = useState(() => {
+    if (location.state?.newQuestion) {
+      return location.state.newQuestion;
+    }
     try {
       const savedQ = localStorage.getItem('active_coding_question');
       if (savedQ) {
         const parsed = JSON.parse(savedQ);
         if (parsed && parsed.id && parsed.title && parsed.description) return parsed;
       }
-    } catch (e) {}
+    } catch {
+      /* ignore storage error */
+    }
     return DEFAULT_CODING_QUESTIONS[0];
   });
 
@@ -166,16 +155,21 @@ const CodingWorkspace = () => {
   });
 
   const [code, setCode] = useState(() => {
+    const lang = localStorage.getItem('active_coding_language') || 'python';
+    if (location.state?.newQuestion?.starterCode) {
+      return location.state.newQuestion.starterCode[lang] || location.state.newQuestion.starterCode.python || Object.values(location.state.newQuestion.starterCode)[0] || '';
+    }
     try {
       const savedQId = localStorage.getItem('active_coding_question_id') || DEFAULT_CODING_QUESTIONS[0].id;
-      const lang = localStorage.getItem('active_coding_language') || 'python';
       const savedCode = localStorage.getItem(`saved_code_${savedQId}_${lang}`);
       if (savedCode) return savedCode;
 
       const subHistory = JSON.parse(localStorage.getItem('user_coding_submissions') || '[]');
       const pastSub = subHistory.find((s) => s.questionId === savedQId && s.language === lang);
       if (pastSub?.sourceCode) return pastSub.sourceCode;
-    } catch (e) {}
+    } catch {
+      /* ignore storage error */
+    }
     return DEFAULT_CODING_QUESTIONS[0].starterCode.python;
   });
   const [executing, setExecuting] = useState(false);
@@ -199,7 +193,6 @@ const CodingWorkspace = () => {
   const [analyzingComplexity, setAnalyzingComplexity] = useState(false);
   const [complexityResult, setComplexityResult] = useState(null);
   const [isComplexityModalOpen, setIsComplexityModalOpen] = useState(false);
-  const [filterStarredOnly, setFilterStarredOnly] = useState(false);
 
   // Company Filters & AI Progressive Hint State
   const COMPANY_TAGS = ['All Companies', 'Google', 'Amazon', 'Meta', 'Microsoft', 'Netflix', 'Custom Company...'];
@@ -285,21 +278,6 @@ const CodingWorkspace = () => {
   // --- Keyboard Shortcut: Ctrl+Enter or Cmd+Enter to Run Code ---
   const handleRunCodeRef = useRef(null);
 
-  useEffect(() => {
-    handleRunCodeRef.current = handleRunCode;
-  });
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault();
-        handleRunCode();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [code, selectedLanguage, currentQuestion]);
-
   const handleEditorMount = (editor, monaco) => {
     setEditorLoaded(true);
     try {
@@ -315,8 +293,8 @@ const CodingWorkspace = () => {
           }
         }
       });
-    } catch (e) {
-      console.warn("Monaco keybinding note:", e);
+    } catch {
+      /* ignore monaco action error */
     }
   };
 
@@ -357,7 +335,9 @@ const CodingWorkspace = () => {
       try {
         localStorage.setItem('active_coding_question', JSON.stringify(currentQuestion));
         localStorage.setItem('active_coding_question_id', currentQuestion.id);
-      } catch (e) {}
+      } catch {
+        /* ignore storage error */
+      }
     }
   }, [currentQuestion]);
 
@@ -365,7 +345,9 @@ const CodingWorkspace = () => {
     if (questions && questions.length > 0) {
       try {
         localStorage.setItem('all_coding_questions', JSON.stringify(questions));
-      } catch (e) {}
+      } catch {
+        /* ignore storage error */
+      }
     }
   }, [questions]);
 
@@ -373,7 +355,9 @@ const CodingWorkspace = () => {
     if (selectedLanguage) {
       try {
         localStorage.setItem('active_coding_language', selectedLanguage);
-      } catch (e) {}
+      } catch {
+        /* ignore storage error */
+      }
     }
   }, [selectedLanguage]);
 
@@ -381,42 +365,55 @@ const CodingWorkspace = () => {
     if (currentQuestion?.id && selectedLanguage && code) {
       try {
         localStorage.setItem(`saved_code_${currentQuestion.id}_${selectedLanguage}`, code);
-      } catch (e) {}
+      } catch {
+        /* ignore storage error */
+      }
     }
   }, [code, currentQuestion, selectedLanguage]);
 
+  const handleQuestionGenerated = useCallback((newQ) => {
+    if (!newQ) return;
+    setQuestions((prev) => {
+      const filtered = prev.filter((q) => q.id !== newQ.id && q.title !== newQ.title);
+      return [newQ, ...filtered];
+    });
+    setCurrentQuestion(newQ);
+    setConsoleOutput(null);
+    setTestResults([]);
+    if (newQ.starterCode) {
+      const langCode = newQ.starterCode[selectedLanguage] || newQ.starterCode.python || Object.values(newQ.starterCode)[0] || '';
+      setCode(langCode);
+    }
+  }, [selectedLanguage]);
+
   useEffect(() => {
-    if (location.state?.newQuestion) {
-      handleQuestionGenerated(location.state.newQuestion);
-    } else {
-      fetchQuestions();
-    }
-  }, [location.state]);
+    let isMounted = true;
+    if (!location.state?.newQuestion) {
+      api.getCodingQuestions()
+        .then((response) => {
+          if (!isMounted) return;
+          if (response.data && response.data.length > 0) {
+            setQuestions((prev) => {
+              const existingIds = new Set(response.data.map((q) => q.id));
+              const customOnes = prev.filter((q) => !existingIds.has(q.id));
+              return [...response.data, ...customOnes];
+            });
 
-  const fetchQuestions = async () => {
-    try {
-      const response = await api.getCodingQuestions();
-      if (response.data && response.data.length > 0) {
-        setQuestions((prev) => {
-          const existingIds = new Set(response.data.map((q) => q.id));
-          const customOnes = prev.filter((q) => !existingIds.has(q.id));
-          return [...response.data, ...customOnes];
-        });
-
-        const savedQId = localStorage.getItem('active_coding_question_id');
-        if (savedQId) {
-          if (currentQuestion?.id === savedQId) return;
-          const found = response.data.find((q) => q.id === savedQId);
-          if (found) {
-            setCurrentQuestion(found);
-            return;
+            const savedQId = localStorage.getItem('active_coding_question_id');
+            if (savedQId) {
+              const found = response.data.find((q) => q.id === savedQId);
+              if (found) setCurrentQuestion(found);
+            }
           }
-        }
-      }
-    } catch (err) {
-      console.warn("Using default fallback coding questions:", err);
+        })
+        .catch((err) => {
+          console.warn("Using default fallback coding questions:", err);
+        });
     }
-  };
+    return () => {
+      isMounted = false;
+    };
+  }, [location.state]);
 
   const handleQuestionChange = (qId) => {
     const targetQ = questions.find((q) => q.id === qId);
@@ -435,21 +432,6 @@ const CodingWorkspace = () => {
 
     setConsoleOutput(null);
     setTestResults([]);
-  };
-
-  const handleQuestionGenerated = (newQ) => {
-    if (!newQ) return;
-    setQuestions((prev) => {
-      const filtered = prev.filter((q) => q.id !== newQ.id && q.title !== newQ.title);
-      return [newQ, ...filtered];
-    });
-    setCurrentQuestion(newQ);
-    setConsoleOutput(null);
-    setTestResults([]);
-    if (newQ.starterCode) {
-      const langCode = newQ.starterCode[selectedLanguage] || newQ.starterCode.python || Object.values(newQ.starterCode)[0] || '';
-      setCode(langCode);
-    }
   };
 
   const handleFetchHint = async (tier) => {
@@ -689,7 +671,7 @@ const CodingWorkspace = () => {
           }
 
           // Safe C++ Test Input Formatter
-          let cppInputCode = '';
+          let cppInputCode;
           if (testCase.input.includes('tiles') || testCase.input.includes(':')) {
             cppInputCode = 'vector<pair<string, string>> tiles = {{"A", "red"}, {"B", "blue"}, {"C", "green"}};\n    int n = 3;\n    vector<int> permutation = {2, 1, 0};';
           } else {
@@ -699,7 +681,7 @@ const CodingWorkspace = () => {
                 .replace(/\]/g, '}')
                 .replace(/([a-zA-Z0-9_]+)\s*=/g, 'auto $1 =')
                 .replace(/,/g, ';');
-            } catch (e) {
+            } catch {
               cppInputCode = '// Custom input';
             }
           }
@@ -768,6 +750,10 @@ const CodingWorkspace = () => {
         }
     }
 }`);
+      }
+
+      if (missingImports) {
+        script = missingImports + script;
       }
     }
 
@@ -866,8 +852,8 @@ const CodingWorkspace = () => {
           const actualLower = actualOutput.toLowerCase();
           const expectedLower = expectedStr.toLowerCase();
 
-          const actualClean = actualLower.replace(/[\s\n\r\[\]\"\'\`]/g, '');
-          const expectedClean = expectedLower.replace(/[\s\n\r\[\]\"\'\`]/g, '');
+          const actualClean = actualLower.replace(/[\s\n\r[\]"'`]/g, '');
+          const expectedClean = expectedLower.replace(/[\s\n\r[\]"'`]/g, '');
           const sortedActual = actualClean.split(',').sort().join(',');
           const sortedExpected = expectedClean.split(',').sort().join(',');
 
@@ -885,7 +871,7 @@ const CodingWorkspace = () => {
             actual: actualOutput,
             passed: isPass
           });
-        } catch (tcErr) {
+        } catch {
           evaluatedResults.push({
             input: tc.input,
             expected: tc.expected,
@@ -966,17 +952,21 @@ const CodingWorkspace = () => {
     }
   };
 
+  useEffect(() => {
+    handleRunCodeRef.current = handleRunCode;
+  });
+
   // Global Keyboard Shortcut: Ctrl + Enter to Run Code
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        handleRunCode();
+        handleRunCodeRef.current?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleRunCode]);
+  }, []);
 
   const monacoLangMap = {
     python: 'python',
@@ -990,7 +980,7 @@ const CodingWorkspace = () => {
   // Show every default language plus any extra ones this specific question
   // actually has starter code for (e.g. an AI-generated question that came
   // back with TypeScript or Go), instead of a fixed four-language list.
-  const availableLanguages = React.useMemo(() => {
+  const availableLanguages = useMemo(() => {
     const extra = currentQuestion?.starterCode
       ? Object.keys(currentQuestion.starterCode).filter((l) => !DEFAULT_LANGUAGES.includes(l))
       : [];

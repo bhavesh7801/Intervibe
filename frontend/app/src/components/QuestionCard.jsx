@@ -50,7 +50,7 @@ const QuestionCard = ({ question, questionNumber, totalQuestions, ttsEnabled = t
 
   return (
     <div className="card-3d rounded-2xl p-4 sm:p-8 mb-5 sm:mb-6 animate-entrance" data-testid="question-card">
-      <div className="flex flex-wrap justify-between items-center gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-[#162035]">
+      <div className="flex flex-wrap justify-between items-center gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-700/60">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center font-bold text-xs">
             {questionNumber}
@@ -70,7 +70,7 @@ const QuestionCard = ({ question, questionNumber, totalQuestions, ttsEnabled = t
               className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer border ${
                 isSpeaking
                   ? 'bg-rose-600/30 text-rose-300 border-rose-500/60 shadow-[0_0_18px_rgba(244,63,94,0.4)] animate-pulse'
-                  : 'bg-[#18132B] hover:bg-[#261E42] text-slate-300 border-[#382A5C] hover:border-rose-500/50'
+                  : 'bg-[#18132B] hover:bg-[#261E42] text-slate-300 border-slate-700/60 hover:border-rose-500/50'
               }`}
               title={isSpeaking ? 'Mute Question Audio' : 'Speak Question Aloud'}
               data-testid="speak-question-btn"
@@ -114,7 +114,7 @@ const QuestionCard = ({ question, questionNumber, totalQuestions, ttsEnabled = t
       </div>
 
       <div className="flex items-start gap-3 sm:gap-4">
-        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-purple-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0 mt-1">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-purple-500/20 border border-slate-700/60 flex items-center justify-center text-rose-400 shrink-0 mt-1">
           <HelpCircle size={20} className="animate-pulse" />
         </div>
         <div className="flex-1 min-w-0">

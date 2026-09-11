@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState, useRef } from 'react';
 import { 
   Server, Database, Zap, Layers, Cpu, Globe, 
-  ShieldAlert, CheckCircle2, Play, RefreshCw, 
-  ArrowRight, HardDrive, Share2, Sparkles, X, Plus
+  ShieldAlert, CheckCircle2, RefreshCw, 
+  ArrowRight, HardDrive, Sparkles, X, Plus
 } from 'lucide-react';
 import { api } from '../../apiClient';
 
@@ -34,6 +34,7 @@ const DEFAULT_PROBLEMS = [
 ];
 
 export const SystemDesignCanvas = () => {
+  const nextNodeIdRef = useRef(100);
   const [selectedProblemIndex, setSelectedProblemIndex] = useState(0);
   const [nodes, setNodes] = useState([
     { id: 1, type: 'client', name: 'Client App', role: 'Web & iOS Users', x: 40, y: 120 },
@@ -50,15 +51,16 @@ export const SystemDesignCanvas = () => {
   const activeProblem = DEFAULT_PROBLEMS[selectedProblemIndex];
 
   const handleAddComponent = (paletteItem) => {
+    nextNodeIdRef.current += 1;
     const newNode = {
-      id: Date.now(),
+      id: nextNodeIdRef.current,
       type: paletteItem.id,
       name: paletteItem.name,
       role: paletteItem.defaultRole,
       x: 200 + (nodes.length * 30) % 300,
       y: 100 + (nodes.length * 40) % 200
     };
-    setNodes([...nodes, newNode]);
+    setNodes(prev => [...prev, newNode]);
   };
 
   const handleRemoveNode = (nodeId) => {

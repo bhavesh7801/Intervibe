@@ -16,9 +16,8 @@ export default defineConfig({
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
     },
   },
-  // Ensure Lucide is not being treated as a separate bundle
   optimizeDeps: {
-    include: ['lucide-react'],
+    include: ['lucide-react', 'motion', 'motion/react'],
   },
   build: {
     chunkSizeWarningLimit: 1000,

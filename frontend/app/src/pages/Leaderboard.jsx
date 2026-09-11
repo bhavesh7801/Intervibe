@@ -1,32 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { Trophy, Award, Flame, ShieldCheck, Sparkles, TrendingUp, User, ArrowLeft, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Trophy, Flame, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../apiClient';
 
 const Leaderboard = () => {
   const [candidates, setCandidates] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchLeaderboard();
-  }, []);
-
-  const fetchLeaderboard = async () => {
-    try {
-      const res = await api.getLeaderboard();
-      if (res.data?.leaderboard) {
-        setCandidates(res.data.leaderboard);
+    let isMounted = true;
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await api.getLeaderboard();
+        if (isMounted && res.data?.leaderboard) {
+          setCandidates(res.data.leaderboard);
+        }
+      } catch (e) {
+        console.error('Error fetching leaderboard:', e);
       }
-    } catch (e) {
-      console.error('Error fetching leaderboard:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchLeaderboard();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-[calc(100vh-73px)] w-full flex flex-col items-center justify-center bg-[#060813] text-slate-200 py-8 px-4 overflow-x-hidden">
-      <div className="w-full max-w-[1400px] mx-auto space-y-8 px-4">
+      <div className="w-full max-w-[1400px] mx-auto space-y-8">
         
         {/* Header Bar */}
         <div className="flex justify-between items-center">
@@ -62,13 +63,13 @@ const Leaderboard = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-[#1A253F] bg-[#060813] text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                <tr className="border-b border-slate-700/60 bg-[#060813] text-[11px] sm:text-xs font-black text-slate-400 uppercase tracking-wider">
                   <th className="py-3.5 px-4 text-center">Rank</th>
                   <th className="py-3.5 px-4">Candidate</th>
-                  <th className="py-3.5 px-4">Target Role</th>
-                  <th className="py-3.5 px-4 text-center">Completed</th>
+                  <th className="py-3.5 px-4 hidden sm:table-cell">Target Role</th>
+                  <th className="py-3.5 px-4 text-center hidden sm:table-cell">Completed</th>
                   <th className="py-3.5 px-4 text-center">Avg Score</th>
-                  <th className="py-3.5 px-4 text-right">FAANG Percentile</th>
+                  <th className="py-3.5 px-4 text-right hidden md:table-cell">FAANG Percentile</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#162035] text-xs sm:text-sm">
@@ -91,32 +92,34 @@ const Leaderboard = () => {
                       )}
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-md shrink-0">
                           {c.name.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <div className="font-bold text-white flex items-center gap-1.5">
-                            {c.name}
+                        <div className="min-w-0">
+                          <div className="font-bold text-white flex items-center gap-1.5 min-w-0">
+                            <span className="truncate min-w-0">{c.name}</span>
                             {c.isCurrentUser && (
-                              <span className="text-[10px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/40">You</span>
+                              <span className="text-xs bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded-xl border border-purple-500/40 shrink-0">You</span>
                             )}
                           </div>
-                          <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                            <Flame size={11} className="text-amber-400" /> {c.streakDays} Day Streak
+                          <div className="text-xs text-slate-400 flex items-center gap-1">
+                            <Flame size={11} className="text-amber-400 shrink-0" /> {c.streakDays} Day Streak
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-300 font-semibold">{c.targetRole}</td>
-                    <td className="py-3.5 px-4 text-center font-bold text-slate-300">{c.completedSessions} Sessions</td>
+                    <td className="py-3.5 px-4 text-slate-300 font-semibold hidden sm:table-cell">
+                      <span className="truncate block max-w-[140px]">{c.targetRole}</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-bold text-slate-300 hidden sm:table-cell">{c.completedSessions} Sessions</td>
                     <td className="py-3.5 px-4 text-center">
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 font-black text-xs border border-emerald-500/30">
+                      <span className="px-2.5 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 font-black text-xs border border-emerald-500/30">
                         {c.averageScore}%
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <span className="text-xs font-black text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/30 inline-flex items-center gap-1">
+                    <td className="py-3.5 px-4 text-right hidden md:table-cell">
+                      <span className="text-xs font-black text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/30 inline-flex items-center gap-1">
                         <ShieldCheck size={13} className="text-amber-400" /> Top {100 - c.readinessPercentile}%
                       </span>
                     </td>

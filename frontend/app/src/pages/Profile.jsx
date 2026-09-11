@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../apiClient";
@@ -15,7 +15,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [recentSessions, setRecentSessions] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isCertOpen, setIsCertOpen] = useState(false);
   /* Edit Modal State */ const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -24,23 +23,29 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+
   useEffect(() => {
+    let isMounted = true;
+    const fetchProfileData = async () => {
+      try {
+        const [statsRes, sessionsRes] = await Promise.all([
+          api.getStats().catch(() => ({ data: null })),
+          api.getSessions().catch(() => ({ data: [] })),
+        ]);
+        if (isMounted) {
+          if (statsRes?.data) setStats(statsRes.data);
+          if (sessionsRes?.data) setRecentSessions(sessionsRes.data);
+        }
+      } catch (err) {
+        console.error("Error loading profile data:", err);
+      }
+    };
+
     fetchProfileData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
-  const fetchProfileData = async () => {
-    try {
-      const [statsRes, sessionsRes] = await Promise.all([
-        api.getStats().catch(() => ({ data: null })),
-        api.getSessions().catch(() => ({ data: [] })),
-      ]);
-      if (statsRes?.data) setStats(statsRes.data);
-      if (sessionsRes?.data) setRecentSessions(sessionsRes.data);
-    } catch (err) {
-      console.error("Error loading profile data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleOpenEdit = () => {
     setEditName(user?.name || "");
     setEditTargetRole(user?.targetRole || "Software Engineer");
@@ -109,10 +114,10 @@ const Profile = () => {
   if (!user) return null;
   return (
     <div
-      className="min-h-screen bg-[#050A18] text-slate-100 py-10 px-4 sm:px-6 lg:py-14 lg:px-10 relative overflow-x-hidden font-sans bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"
+      className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#050A18] text-slate-100 font-sans bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"
       data-testid="profile-page"
     >
-      
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-10 relative">
       {/* Deep Space Background ambient lighting */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         
@@ -167,7 +172,7 @@ const Profile = () => {
             />
 
             {/* Verifiable LinkedIn Certificate Banner */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-950/60 via-[#0C1222] to-cyan-950/50 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-950/60 via-[#0C1222] to-cyan-950/50 border border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center text-white font-black shadow-lg shadow-cyan-500/25 shrink-0">
                   🏆
@@ -217,6 +222,7 @@ const Profile = () => {
         saving={saving}
         errorMsg={errorMsg}
       />
+      </div>
     </div>
   );
 };

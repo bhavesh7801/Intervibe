@@ -1,14 +1,13 @@
-import React from "react";
 import { BarChart3, Award, Briefcase } from "lucide-react";
 
 const StatsOverviewGrid = ({ stats, recentSessions, userTargetRole }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
 
-      <div className="bg-[#080D1A]/80 border-2 border-indigo-500/40 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(99,102,241,0.15)] relative group hover:border-indigo-500/60 transition-colors">
+      <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl relative group hover:border-indigo-500/60 transition-colors flex-1">
         <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="flex items-start justify-between relative z-10 gap-3">
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0 flex-1">
             <h3 className="text-xs leading-snug font-bold text-slate-400 uppercase tracking-widest">
               Total Mock Calls
             </h3>
@@ -25,10 +24,10 @@ const StatsOverviewGrid = ({ stats, recentSessions, userTargetRole }) => {
         </div>
       </div>
 
-      <div className="bg-[#080D1A]/80 border-2 border-blue-500/40 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(59,130,246,0.15)] relative group hover:border-blue-500/60 transition-colors">
+      <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl relative group hover:border-blue-500/60 transition-colors flex-1">
         <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="flex items-start justify-between relative z-10 gap-3">
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0 flex-1">
             <h3 className="text-xs leading-snug font-bold text-slate-400 uppercase tracking-widest">
               Average Score
             </h3>
@@ -45,10 +44,10 @@ const StatsOverviewGrid = ({ stats, recentSessions, userTargetRole }) => {
         </div>
       </div>
 
-      <div className="bg-[#080D1A]/80 border-2 border-amber-500/40 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(245,158,11,0.15)] relative group hover:border-amber-500/60 transition-colors sm:col-span-2 lg:col-span-1">
+      <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl relative group hover:border-amber-500/60 transition-colors sm:col-span-2 lg:col-span-1 flex-1">
         <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="flex items-start justify-between relative z-10 gap-3">
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 flex-1">
             <h3 className="text-xs leading-snug font-bold text-slate-400 uppercase tracking-widest">
               Target Role
             </h3>

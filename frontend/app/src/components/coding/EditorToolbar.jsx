@@ -12,13 +12,13 @@ const EditorToolbar = React.memo(({
   coPilotReviewing
 }) => {
   return (
-    <div className="flex items-center justify-between px-3 py-2 border-b border-[#1A253F] bg-[#0C1222] rounded-t-xl" data-testid="editor-toolbar">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-b border-slate-700/60 bg-[#0C1222] rounded-t-xl" data-testid="editor-toolbar">
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
         <div className="relative">
           <select
             value={selectedLanguage}
             onChange={(e) => onLanguageChange(e.target.value)}
-            className="appearance-none bg-[#080D1A] border border-[#162035] rounded-full pl-3 pr-7 py-1 text-xs font-bold text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer"
+            className="appearance-none bg-[#080D1A] border border-slate-700/60 rounded-full pl-3 pr-7 py-1 text-xs font-bold text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer"
             aria-label="Select Programming Language"
             data-testid="language-select"
           >
@@ -34,7 +34,7 @@ const EditorToolbar = React.memo(({
         <button
           type="button"
           onClick={onResetCode}
-          className="px-2.5 py-1 rounded-full bg-[#090710] border border-[#2B2144] hover:border-amber-500/40 text-[11px] font-semibold text-slate-300 hover:text-amber-400 transition-all flex items-center gap-1 cursor-pointer"
+          className="px-2.5 py-1 rounded-full bg-[#090710] border border-slate-700/60 hover:border-amber-500/40 text-[11px] font-semibold text-slate-300 hover:text-amber-400 transition-all flex items-center gap-1 cursor-pointer shrink-0"
           title="Reset starter template code"
           aria-label="Reset Code Template"
         >
@@ -45,7 +45,7 @@ const EditorToolbar = React.memo(({
         <button
           type="button"
           onClick={onFormatCode}
-          className="px-2.5 py-1 rounded-full bg-[#090710] border border-[#2B2144] hover:border-purple-500/40 text-[11px] font-semibold text-slate-300 hover:text-purple-400 transition-all flex items-center gap-1 cursor-pointer"
+          className="px-2.5 py-1 rounded-full bg-[#090710] border border-slate-700/60 hover:border-purple-500/40 text-[11px] font-semibold text-slate-300 hover:text-purple-400 transition-all flex items-center gap-1 cursor-pointer shrink-0"
           title="Auto-format code indentation"
           aria-label="Format Code"
         >
@@ -54,11 +54,11 @@ const EditorToolbar = React.memo(({
         </button>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-slate-400 font-mono">
-          <kbd className="px-1.5 py-0.5 rounded bg-[#090710] border border-[#1A253F] text-slate-300 text-[10px]">Ctrl</kbd>
+          <kbd className="px-1.5 py-0.5 rounded bg-[#090710] border border-slate-700/60 text-slate-300 text-[10px]">Ctrl</kbd>
           <span>+</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-[#090710] border border-[#1A253F] text-slate-300 text-[10px]">Enter</kbd>
+          <kbd className="px-1.5 py-0.5 rounded bg-[#090710] border border-slate-700/60 text-slate-300 text-[10px]">Enter</kbd>
           <span className="text-slate-400">to run</span>
         </span>
 

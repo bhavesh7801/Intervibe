@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { api } from '../apiClient';
-import { Play, Code2, CheckCircle2, AlertCircle, RefreshCw, Terminal, Clock, Sparkles, BookOpen, Layers, ArrowRight, HelpCircle, Wand2, Flag, XCircle, Award, ShieldAlert, Timer, CheckSquare, FileText, BarChart3 } from 'lucide-react';
+import { Play, Code2, CheckCircle2, AlertCircle, RefreshCw, Terminal, Clock, Sparkles, BookOpen, Layers, ArrowRight, HelpCircle, Wand2, Flag, XCircle, Award, ShieldAlert, Timer, CheckSquare, BarChart3 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 import { isTechRole } from '../utils/roleUtils';
@@ -93,6 +93,26 @@ const AssessmentWorkspace = () => {
     );
   };
 
+  const setupQuestionState = useCallback((q) => {
+    setSelectedOption('');
+    setMcqResult(null);
+    setConsoleOutput(null);
+
+    if (q?.questionType === 'coding' && q.starterCode) {
+      setCode(q.starterCode[selectedLanguage] || q.starterCode.python || '');
+    }
+  }, [selectedLanguage]);
+
+  const handleQuestionGenerated = useCallback((newQ) => {
+    if (!newQ) return;
+    setQuestions((prev) => {
+      const filtered = prev.filter((q) => q.id !== newQ.id && q.title !== newQ.title);
+      return [newQ, ...filtered];
+    });
+    setCurrentIndex(0);
+    setupQuestionState(newQ);
+  }, [setupQuestionState]);
+
   useEffect(() => {
     if (location.state?.newQuestion) {
       const newQ = location.state.newQuestion;
@@ -102,20 +122,11 @@ const AssessmentWorkspace = () => {
         setShowConfigModal(false);
       }
     }
-  }, [location.state, user?.targetRole]);
+  }, [location.state, handleQuestionGenerated]);
 
   const [isGeneratingExam, setIsGeneratingExam] = useState(false);
 
-  const shuffleArray = (array) => {
-    const arr = [...array];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  };
-
-    const fetchHybridQuestions = async (topic = configTopic, count = configCount, difficulty = configDifficulty) => {
+  const fetchHybridQuestions = async (topic = configTopic, count = configCount, difficulty = configDifficulty) => {
     setIsGeneratingExam(true);
     setFetchError(null);
     try {
@@ -134,26 +145,6 @@ const AssessmentWorkspace = () => {
       setFetchError("Unable to connect to the assessment generator. Please check your connection and try again.");
     } finally {
       setIsGeneratingExam(false);
-    }
-  };
-
-  const handleQuestionGenerated = (newQ) => {
-    if (!newQ) return;
-    setQuestions((prev) => {
-      const filtered = prev.filter((q) => q.id !== newQ.id && q.title !== newQ.title);
-      return [newQ, ...filtered];
-    });
-    setCurrentIndex(0);
-    setupQuestionState(newQ);
-  };
-
-  const setupQuestionState = (q) => {
-    setSelectedOption('');
-    setMcqResult(null);
-    setConsoleOutput(null);
-
-    if (q.questionType === 'coding' && q.starterCode) {
-      setCode(q.starterCode[selectedLanguage] || q.starterCode.python || '');
     }
   };
 

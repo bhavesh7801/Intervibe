@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../api';
 import { Award, CheckCircle2, AlertTriangle, ArrowLeft, RefreshCw, Sparkles, Download, FileText, ShieldCheck, Share2, Copy, X } from 'lucide-react';
@@ -19,21 +19,27 @@ const Results = () => {
   const [copiedCertLink, setCopiedCertLink] = useState(false);
 
   useEffect(() => {
-    fetchSession();
-  }, [sessionId]);
+    let isMounted = true;
+    const fetchSession = async () => {
+      try {
+        const response = await api.getSession(sessionId);
+        if (isMounted) setSession(response.data);
+      } catch (error) {
+        console.error('Error fetching session:', error);
+        if (isMounted) {
+          alert('Session not found');
+          navigate('/dashboard');
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-  const fetchSession = async () => {
-    try {
-      const response = await api.getSession(sessionId);
-      setSession(response.data);
-    } catch (error) {
-      console.error('Error fetching session:', error);
-      alert('Session not found');
-      navigate('/dashboard');
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchSession();
+    return () => {
+      isMounted = false;
+    };
+  }, [sessionId, navigate]);
 
   const handleDownloadPDF = async () => {
     if (!session) return;
@@ -420,7 +426,7 @@ const Results = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-400 border-t border-[#2B2144] pt-3">
-                <div>Verified Date: <span className="text-slate-200 font-semibold">{new Date(session.date || Date.now()).toLocaleDateString()}</span></div>
+                <div>Verified Date: <span className="text-slate-200 font-semibold">{new Date(session.date || session.created_at).toLocaleDateString()}</span></div>
                 <div>Status: <span className="text-emerald-400 font-bold">FAANG Competency Verified</span></div>
               </div>
             </div>

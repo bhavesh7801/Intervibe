@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Mic, Briefcase, Award, Lightbulb, Cpu, Zap, Sparkles } from 'lucide-react';
 import VoiceAICoachTab from '../components/coaching/VoiceAICoachTab';
 import ResumeJobFitTab from '../components/coaching/ResumeJobFitTab';
@@ -19,17 +18,9 @@ const TABS = [
 
 const AICoachingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTabParam = searchParams.get('tab') || 'voice';
-  const [activeTab, setActiveTab] = useState(activeTabParam);
-
-  useEffect(() => {
-    if (searchParams.get('tab')) {
-      setActiveTab(searchParams.get('tab'));
-    }
-  }, [searchParams]);
+  const activeTab = searchParams.get('tab') || 'voice';
 
   const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
     setSearchParams({ tab: tabId });
   };
 

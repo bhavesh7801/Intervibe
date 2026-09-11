@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
-  Award, CheckCircle2, ShieldCheck, Share2, 
-  Download, ExternalLink, X, Sparkles, Copy, Check 
+  CheckCircle2, ShieldCheck, Share2, 
+  Download, X, Sparkles, Copy, Check 
 } from 'lucide-react';
-import { api } from '../../apiClient';
 
 export const CertificateModal = ({ isOpen, onClose, user, userStats }) => {
   const [copied, setCopied] = useState(false);
-  const [certData, setCertData] = useState(() => ({
+  const [certData] = useState(() => ({
     certificate_id: `IV-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
     verification_hash: '9F82A4C17B3E52D0',
     candidate_name: user?.name || 'Verified Candidate',

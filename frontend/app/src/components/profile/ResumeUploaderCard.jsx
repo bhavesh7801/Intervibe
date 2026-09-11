@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FileText,
   Upload,
@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { api } from "../../apiClient";
 
-const ResumeUploaderCard = ({ user }) => {
+const ResumeUploaderCard = () => {
   const [resumeLoading, setResumeLoading] = useState(false);
   const [resumeResult, setResumeResult] = useState(null);
 
@@ -32,7 +32,7 @@ const ResumeUploaderCard = ({ user }) => {
   };
 
   return (
-    <div className="bg-[#080D1A]/80 border-2 border-indigo-500/40 rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-[0_0_25px_rgba(99,102,241,0.15)] flex flex-col gap-6 sm:gap-8">
+    <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl flex flex-col gap-6 sm:gap-8">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 w-full">
         <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full">
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#162035] text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
@@ -61,8 +61,8 @@ const ResumeUploaderCard = ({ user }) => {
       </div>
 
       {resumeResult && (
-        <div className="bg-[#050A18] p-6 rounded-2xl border border-[#1A253F] space-y-6 animate-fade-in">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1A253F] pb-3 text-sm text-blue-300 font-bold">
+        <div className="bg-[#050A18] p-6 rounded-2xl border border-slate-700/60 space-y-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-700/60 pb-3 text-sm text-blue-300 font-bold">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={24} className="text-emerald-400" /> Processed: {resumeResult.filename}
             </span>
@@ -73,8 +73,8 @@ const ResumeUploaderCard = ({ user }) => {
 
           {resumeResult.analysis && (
             <div className="space-y-6">
-              <div className="p-6 rounded-xl bg-[#080D1A] border border-[#1A253F] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
+              <div className="p-6 rounded-xl bg-[#080D1A] border border-slate-700/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="min-w-0">
                   <span className="text-sm font-extrabold uppercase tracking-wider text-blue-400 font-mono">
                     Resume Alignment
                   </span>

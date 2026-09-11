@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   Mail,
   Briefcase,
   CheckCircle2,
   Edit3,
-  LayoutDashboard,
   LogOut,
   User,
   Sparkles,
@@ -14,8 +12,6 @@ import {
 } from "lucide-react";
 
 const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
-  const navigate = useNavigate();
-
   // Dynamic Skill Management State
   const [skills, setSkills] = useState(() => {
     try {
@@ -24,7 +20,9 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-    } catch {}
+    } catch {
+      /* ignore storage error */
+    }
     return ['Python', 'React', 'Algorithms', 'System Design', 'FastAPI', 'Docker', 'SQL', 'Git'];
   });
 
@@ -40,7 +38,9 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
       setSkills(updated);
       try {
         localStorage.setItem('candidate_skills', JSON.stringify(updated));
-      } catch (err) {}
+      } catch {
+        /* ignore storage error */
+      }
     }
     setNewSkillInput('');
     setIsAddingSkill(false);
@@ -51,7 +51,9 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
     setSkills(updated);
     try {
       localStorage.setItem('candidate_skills', JSON.stringify(updated));
-    } catch (err) {}
+    } catch {
+      /* ignore storage error */
+    }
   };
 
   return (
@@ -98,19 +100,19 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
                 Verified Candidate
               </span>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-300 mt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-300 mt-2 w-full">
               
-              <div className="flex items-center gap-1.5 bg-[#050A18] px-3 py-1.5 rounded-xl border border-[#1A253F]">
+              <div className="flex items-center gap-1.5 bg-[#050A18] px-3 py-1.5 rounded-xl border border-slate-700/60 min-w-0 max-w-full">
                 
-                <Briefcase size={14} className="text-blue-400" />
-                <span className="font-bold text-slate-200">
+                <Briefcase size={14} className="text-blue-400 shrink-0" />
+                <span className="font-bold text-slate-200 truncate min-w-0">
                   {user.targetRole || "Software Engineer"}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 bg-[#050A18] px-3 py-1.5 rounded-xl border border-[#1A253F]">
+              <div className="flex items-center gap-1.5 bg-[#050A18] px-3 py-1.5 rounded-xl border border-slate-700/60 min-w-0 max-w-full">
                 
-                <Mail size={14} className="text-indigo-400" />
-                <span className="font-bold text-slate-200">{user.email}</span>
+                <Mail size={14} className="text-indigo-400 shrink-0" />
+                <span className="font-bold text-slate-200 truncate min-w-0">{user.email}</span>
               </div>
             </div>
             <div className="flex items-center justify-center gap-3 pt-3">
@@ -156,43 +158,38 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
             <Edit3 size={12} /> <span>Edit</span>
           </button>
         </div>
-        <div className="space-y-6 text-sm font-medium">
+        <div className="space-y-4 text-sm font-medium">
           
-          <div className="flex items-center justify-between">
-            
-            <span className="text-slate-400 flex items-center gap-2">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-slate-400 flex items-center gap-2 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
               Full Name
             </span>
-            <span className="font-bold text-slate-200">{user.name}</span>
+            <span className="font-bold text-slate-200 truncate min-w-0 text-right">{user.name}</span>
           </div>
-          <div className="flex items-center justify-between">
-            
-            <span className="text-slate-400 flex items-center gap-2">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-slate-400 flex items-center gap-2 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-              Email Address
+              Email
             </span>
-            <span className="font-bold text-slate-200">{user.email}</span>
+            <span className="font-bold text-slate-200 truncate min-w-0 text-right">{user.email}</span>
           </div>
-          <div className="flex items-center justify-between">
-            
-            <span className="text-slate-400 flex items-center gap-2">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-slate-400 flex items-center gap-2 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Target Role Track
+              Target Role
             </span>
-            <span className="font-bold text-emerald-400">
+            <span className="font-bold text-emerald-400 truncate min-w-0 text-right">
               {user.targetRole || "Software Engineer"}
             </span>
           </div>
-          <div className="flex items-center justify-between">
-            
-            <span className="text-slate-400 flex items-center gap-2">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-slate-400 flex items-center gap-2 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-              Account Status
+              Status
             </span>
-            <span className="inline-flex items-center gap-1 font-bold text-emerald-400">
-              
-              <CheckCircle2 size={12} /> Active Candidate
+            <span className="inline-flex items-center gap-1 font-bold text-emerald-400 shrink-0">
+              <CheckCircle2 size={12} /> Active
             </span>
           </div>
         </div>
@@ -206,7 +203,7 @@ const ProfileSidebar = ({ user, handleOpenEdit, logout, getInitials }) => {
               Target Skills & Stack
             </h2>
           </div>
-          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30 font-bold">
+          <span className="text-xs uppercase font-mono px-2 py-0.5 rounded-xl bg-blue-500/15 text-blue-300 border border-blue-500/30 font-bold">
             {skills.length} Skills
           </span>
         </div>

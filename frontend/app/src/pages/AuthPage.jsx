@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import MotionReveal from '../components/MotionReveal';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -31,24 +33,9 @@ const TARGET_ROLES = [
   'Other / Non-technical'
 ];
 
-/* ---------- Reveal-on-mount wrapper ---------- */
-const Reveal = ({ children, delay = 0, y = 24, className = '' }) => {
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setShown(true), 40);
-    return () => clearTimeout(t);
-  }, []);
-  return (
-    <div
-      className={`${className} transition-all duration-700 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
-        shown ? 'opacity-100 translate-y-0' : 'opacity-0'
-      }`}
-      style={{ transform: shown ? 'translateY(0)' : `translateY(${y}px)`, transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-};
+/* Reveal is now provided by the shared MotionReveal component above.
+   The local alias keeps all existing JSX (<Reveal ...>) working unchanged. */
+const Reveal = MotionReveal;
 
 /* ---------- Password strength calculation ---------- */
 const scorePassword = (pwd) => {
@@ -158,7 +145,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
       });
 
       client.requestAccessToken();
-    } catch (err) {
+    } catch {
       setError("Failed to initialize Google login.");
       setLoading(false);
     }
@@ -401,21 +388,39 @@ const AuthPage = ({ initialMode = 'login' }) => {
                 </button>
               </div>
 
-              {/* Success Message Banner */}
-              {successMsg && (
-                <div className="mb-6 p-4 rounded-xl bg-emerald-950/50 border border-emerald-500/50 text-emerald-300 text-xs sm:text-sm font-medium flex items-center gap-2.5">
-                  <Sparkles size={16} className="text-emerald-400 shrink-0" />
-                  <span>{successMsg}</span>
-                </div>
-              )}
+              {/* Success Message Banner — AnimatePresence for smooth exit */}
+              <AnimatePresence>
+                {successMsg && (
+                  <motion.div
+                    key="success-banner"
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0,  scale: 1    }}
+                    exit={{    opacity: 0, y: -8,  scale: 0.97 }}
+                    transition={{ duration: 0.25 }}
+                    className="mb-6 p-4 rounded-xl bg-emerald-950/50 border border-emerald-500/50 text-emerald-300 text-xs sm:text-sm font-medium flex items-center gap-2.5"
+                  >
+                    <Sparkles size={16} className="text-emerald-400 shrink-0" />
+                    <span>{successMsg}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              {/* Error Message Banner */}
-              {error && (
-                <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs sm:text-sm font-medium animate-shake">
-                  <AlertCircle size={16} className="text-rose-400 shrink-0 mt-0.5" />
-                  <span>{error}</span>
-                </div>
-              )}
+              {/* Error Message Banner — AnimatePresence for smooth exit */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    key="error-banner"
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0,  scale: 1    }}
+                    exit={{    opacity: 0, y: -8,  scale: 0.97 }}
+                    transition={{ duration: 0.25 }}
+                    className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs sm:text-sm font-medium"
+                  >
+                    <AlertCircle size={16} className="text-rose-400 shrink-0 mt-0.5" />
+                    <span>{error}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {step === 'form' ? (
                 <form onSubmit={handleSubmit} className="space-y-5" data-testid="auth-form">

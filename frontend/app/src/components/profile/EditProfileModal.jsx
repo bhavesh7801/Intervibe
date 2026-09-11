@@ -1,4 +1,3 @@
-import React from "react";
 import { X, AlertCircle, Save } from "lucide-react";
 import { COMMON_ROLE_TRACKS } from "../../utils/roleUtils";
 const ROLE_OPTIONS = COMMON_ROLE_TRACKS;
@@ -25,7 +24,7 @@ const EditProfileModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/75 backdrop-blur-md animate-fade-in">
       
-      <div className="card-3d bg-[#080D1A] border border-blue-500/20 rounded-[2rem] p-6 sm:p-10 max-w-2xl w-full shadow-[0_0_30px_rgba(59,130,246,0.1)] space-y-6 relative">
+      <div className="card-3d bg-[#080D1A] border border-slate-700/60 rounded-[2rem] p-6 sm:p-10 w-full max-w-xl shadow-[0_0_30px_rgba(59,130,246,0.1)] space-y-6 relative">
         
         <button
           onClick={() => setIsEditOpen(false)}
@@ -67,7 +66,7 @@ const EditProfileModal = ({
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               placeholder="Enter your name"
-              className="w-full px-4 py-3 rounded-xl bg-[#050A18] border border-[#1A253F] text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner"
+              className="w-full px-4 py-3 rounded-xl bg-[#050A18] border border-slate-700 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner"
               required
             />
           </div>
@@ -79,7 +78,7 @@ const EditProfileModal = ({
             <select
               value={editTargetRole}
               onChange={(e) => setEditTargetRole(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[#050A18] border border-[#1A253F] text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner cursor-pointer"
+              className="w-full px-4 py-3 rounded-xl bg-[#050A18] border border-slate-700 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner cursor-pointer"
             >
               
               {ROLE_OPTIONS.map((role) => (
@@ -97,7 +96,7 @@ const EditProfileModal = ({
             <select
               value={editExperienceLevel}
               onChange={(e) => setEditExperienceLevel(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[#050A18] border border-[#1A253F] text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner cursor-pointer"
+              className="w-full px-4 py-3 rounded-xl bg-[#050A18] border border-slate-700 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner cursor-pointer"
             >
               
               {EXPERIENCE_OPTIONS.map((exp) => (

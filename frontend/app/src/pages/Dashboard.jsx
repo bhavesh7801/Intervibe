@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { PlayCircle, Award, Clock, CheckCircle2, TrendingUp, Sparkles, Plus, ArrowRight, X, HelpCircle, Zap, Target, Trophy, Settings2, Flame, Activity, FileText, Upload, Star, BookOpen, ShieldCheck, Share2, RefreshCw } from 'lucide-react';
+import { PlayCircle, TrendingUp, Sparkles, Plus, ArrowRight, X, HelpCircle, Zap, Target, Trophy, Settings2, FileText, Upload, Star, BookOpen, RefreshCw } from 'lucide-react';
 import QuickActionPillCards from '../components/dashboard/QuickActionPillCards';
 import ReadinessPassportCard from '../components/dashboard/ReadinessPassportCard';
 import ActivityHeatmap from '../components/ActivityHeatmap';
@@ -32,7 +32,42 @@ const Dashboard = () => {
   const [modalResumeInfo, setModalResumeInfo] = useState(null);
   const [modalResumeLoading, setModalResumeLoading] = useState(false);
 
+  const [starredQuestions] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('starredQuestions') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
   useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        const [statsRes, sessionsRes] = await Promise.allSettled([
+          api.getStats(),
+          api.getSessions()
+        ]);
+        
+        const statsData = statsRes.status === 'fulfilled' ? statsRes.value?.data : null;
+        const sessionsData = sessionsRes.status === 'fulfilled' ? sessionsRes.value?.data : [];
+
+        const finalStats = statsData || { totalSessions: 0, completedSessions: 0, totalQuestionsAnswered: 0, averageScore: 0, practiceStreak: 0, solvedChallenges: 0, activityDates: [] };
+        const finalSessions = Array.isArray(sessionsData) ? sessionsData : [];
+
+        if (isMounted) {
+          setStats(finalStats);
+          setSessions(finalSessions);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     fetchData();
 
     // Automatically shut down & release active camera and microphone hardware when on Dashboard
@@ -42,32 +77,16 @@ const Dashboard = () => {
           track.stop();
           track.enabled = false;
         });
-      } catch (e) {}
+      } catch {
+        /* ignore camera stream stop errors */
+      }
       window.activeWebcamStream = null;
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  const fetchData = async () => {
-    try {
-      const [statsRes, sessionsRes] = await Promise.allSettled([
-        api.getStats(),
-        api.getSessions()
-      ]);
-      
-      const statsData = statsRes.status === 'fulfilled' ? statsRes.value?.data : null;
-      const sessionsData = sessionsRes.status === 'fulfilled' ? sessionsRes.value?.data : [];
-
-      const finalStats = statsData || { totalSessions: 0, completedSessions: 0, totalQuestionsAnswered: 0, averageScore: 0, practiceStreak: 0, solvedChallenges: 0, activityDates: [] };
-      const finalSessions = Array.isArray(sessionsData) ? sessionsData : [];
-
-      setStats(finalStats);
-      setSessions(finalSessions);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleModalResumeUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -90,8 +109,8 @@ const Dashboard = () => {
     setTargetRole(prefilledRole || user?.targetRole || 'Software Engineer');
     setTargetCompany('');
     setQuestionCount(10);
-    setIsCustomMode(false);
     setCustomCountInput('');
+    setIsCustomMode(false);
     setUseResumeQuestions(false);
     setInterviewerPersona('Standard');
     setShowPromptModal(true);
@@ -101,13 +120,9 @@ const Dashboard = () => {
     if (!targetRole.trim()) return;
     
     // Determine effective practice question count (between 1 and 50)
-    let countToPractice = 10;
-    if (isCustomMode && customCountInput) {
-      const parsed = parseInt(customCountInput, 10);
-      countToPractice = Math.max(1, Math.min(50, parsed || 10));
-    } else {
-      countToPractice = questionCount;
-    }
+    const countToPractice = isCustomMode && customCountInput
+      ? Math.max(1, Math.min(50, parseInt(customCountInput, 10) || 10))
+      : questionCount;
     
     setCreating(true);
     try {
@@ -131,10 +146,6 @@ const Dashboard = () => {
 
   const getCalculatedStreak = () => {
     return stats?.practiceStreak || 0;
-  };
-
-  const getCalculatedSolvedChallenges = () => {
-    return stats?.solvedChallenges || 0;
   };
 
   if (loading) {
@@ -161,7 +172,7 @@ const Dashboard = () => {
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" data-testid="dashboard-title">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight" data-testid="dashboard-title">
                 Welcome Back, <span className="text-blue-400">{user?.name || 'Alex'}</span>!
               </h1>
               <p className="text-sm text-slate-400 mt-1">Your FAANG Interview Practice Awaits.</p>
@@ -178,27 +189,27 @@ const Dashboard = () => {
           </div>
 
           {/* 4 Stat Metric Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
             {/* Card 1: Problems Solved */}
-            <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-800 text-center">
+            <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-700/60 text-center">
               <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Problems Solved</span>
               <span className="text-3xl font-extrabold text-white">{stats?.solvedChallenges ?? 0}</span>
             </div>
 
             {/* Card 2: Success Rate */}
-            <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-800 text-center">
+            <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-700/60 text-center">
               <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Success Rate</span>
               <span className="text-3xl font-extrabold text-emerald-400">{stats?.totalQuestionsAnswered > 0 ? `${stats.averageScore}%` : '0%'}</span>
             </div>
 
             {/* Card 3: Daily Streak */}
-            <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-800 text-center">
+            <div className="p-4 rounded-xl bg-[#141A2B] border border-slate-700/60 text-center">
               <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Daily Streak</span>
               <span className="text-3xl font-extrabold text-amber-400">{stats?.practiceStreak ?? 0} <span className="text-sm font-semibold text-amber-300">Days</span></span>
             </div>
 
             {/* Card 4: AI Review Score */}
-            <div className="p-4 rounded-xl bg-[#0C1427] border border-cyan-500/30 text-center shadow-lg shadow-cyan-500/10">
+            <div className="p-4 rounded-xl bg-[#0C1427] border border-cyan-500/30 text-center shadow-lg shadow-cyan-500/10 hover:border-cyan-500/50 transition-colors">
               <span className="text-xs font-bold text-slate-400 uppercase block mb-1">AI Review Score</span>
               <span className="text-3xl font-extrabold text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.4)]">{stats?.totalQuestionsAnswered > 0 ? stats.averageScore : 0}</span>
             </div>
@@ -208,8 +219,8 @@ const Dashboard = () => {
         {/* Recommended Topics & Recent Challenges Row (Matching Screenshot 1) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Recommended Topics Box */}
-          <div className="p-5 rounded-2xl bg-[#0D121F] border border-slate-800 space-y-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+          <div className="p-5 rounded-2xl bg-[#0D121F] border border-slate-700/60 space-y-3">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-700/60 pb-2">
               <span className="w-2.5 h-2.5 rounded bg-blue-500" />
               <span>Recommended Topics</span>
             </h3>
@@ -222,7 +233,7 @@ const Dashboard = () => {
                 <div
                   key={i}
                   onClick={() => navigate('/coding')}
-                  className="p-3 rounded-xl bg-[#141A2B] border border-slate-800 hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-3 text-xs font-bold text-slate-200"
+                  className="p-3 rounded-xl bg-[#141A2B] border border-slate-700/60 hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-3 text-xs font-bold text-slate-200"
                 >
                   <span className="text-base">{topic.icon}</span>
                   <span>{topic.title}</span>
@@ -232,8 +243,8 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Challenges Box */}
-          <div className="p-5 rounded-2xl bg-[#0D121F] border border-slate-800 space-y-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+          <div className="p-5 rounded-2xl bg-[#0D121F] border border-slate-700/60 space-y-3">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-700/60 pb-2">
               <span className="w-2.5 h-2.5 rounded bg-blue-500" />
               <span>Recent Challenges</span>
             </h3>
@@ -246,7 +257,7 @@ const Dashboard = () => {
                 <div
                   key={i}
                   onClick={() => navigate('/coding')}
-                  className="p-3 rounded-xl bg-[#141A2B] border border-slate-800 hover:border-blue-500/50 transition-all cursor-pointer flex items-center justify-between text-xs font-bold"
+                  className="p-3 rounded-xl bg-[#141A2B] border border-slate-700/60 hover:border-blue-500/50 transition-all cursor-pointer flex items-center justify-between text-xs font-bold"
                 >
                   <span className="text-slate-200">{ch.name}</span>
                   <span className={ch.color}>{ch.diff}</span>
@@ -258,7 +269,7 @@ const Dashboard = () => {
 
         {/* Performance Growth Trend Line Chart */}
         <div className="mb-8 p-6 rounded-2xl bg-[#0D121F] border border-blue-500/20 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-[#1A253F] pb-3">
+          <div className="flex items-center justify-between border-b border-slate-700/60 pb-3">
             <div className="flex items-center gap-2">
               <span className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
                 <TrendingUp size={16} />
@@ -297,7 +308,7 @@ const Dashboard = () => {
 
         {/* Mock Interview Simulation Section */}
         <div className="mb-8">
-          <div className="p-6 sm:p-8 rounded-2xl bg-[#0D121F] border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="p-6 sm:p-8 rounded-2xl bg-[#0D121F] border border-slate-700/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
@@ -354,8 +365,8 @@ const Dashboard = () => {
         {/* Charts Grid: Trajectory & Skill Radar */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 sm:mb-10">
           {/* Progress Analytics Chart */}
-          <div className="p-4 sm:p-6 rounded-2xl bg-[#0D121F] border border-slate-800 animate-entrance stagger-4 shadow-lg" data-testid="progress-chart">
-            <div className="flex items-center justify-between mb-4 sm:mb-6 pb-3 border-b border-slate-800">
+          <div className="p-4 sm:p-6 rounded-2xl bg-[#0D121F] border border-slate-700/60 animate-entrance stagger-4 shadow-lg" data-testid="progress-chart">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 pb-3 border-b border-slate-700/60">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
                   <TrendingUp size={18} />
@@ -396,8 +407,8 @@ const Dashboard = () => {
           </div>
 
           {/* Skill Radar Chart */}
-          <div className="p-4 sm:p-6 rounded-2xl bg-[#0D121F] border border-slate-800 animate-entrance stagger-4 shadow-lg">
-            <div className="flex items-center justify-between mb-4 sm:mb-6 pb-3 border-b border-slate-800">
+          <div className="p-4 sm:p-6 rounded-2xl bg-[#0D121F] border border-slate-700/60 animate-entrance stagger-4 shadow-lg">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 pb-3 border-b border-slate-700/60">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
                   <Target size={18} />
@@ -449,40 +460,32 @@ const Dashboard = () => {
             </button>
           </div>
 
-          {(() => {
-            try {
-              const starred = JSON.parse(localStorage.getItem('starredQuestions') || '[]');
-              if (starred.length === 0) {
-                return (
-                  <p className="text-xs text-slate-400 italic text-center py-4 bg-[#090710] rounded-xl border border-[#2B2144]">
-                    ⭐ No starred questions yet. Click the star icon next to any problem in the Coding IDE to save it here for targeted review.
-                  </p>
-                );
-              }
-              return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {starred.map((qId) => (
-                    <div
-                      key={qId}
-                      onClick={() => navigate('/coding')}
-                      className="p-3.5 rounded-xl bg-[#090710] border border-amber-500/20 hover:border-amber-500/50 transition-all cursor-pointer flex items-center justify-between group"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <BookOpen size={16} className="text-amber-400 shrink-0" />
-                        <div>
-                          <h4 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors capitalize">
-                            {qId.replace(/-/g, ' ')}
-                          </h4>
-                          <span className="text-[10px] text-slate-400 font-medium">Click to solve</span>
-                        </div>
-                      </div>
-                      <ArrowRight size={14} className="text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+          {starredQuestions.length === 0 ? (
+            <p className="text-xs text-slate-400 italic text-center py-4 bg-[#090710] rounded-xl border border-[#2B2144]">
+              ⭐ No starred questions yet. Click the star icon next to any problem in the Coding IDE to save it here for targeted review.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {starredQuestions.map((qId) => (
+                <div
+                  key={qId}
+                  onClick={() => navigate('/coding')}
+                  className="p-3.5 rounded-xl bg-[#090710] border border-amber-500/20 hover:border-amber-500/50 transition-all cursor-pointer flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <BookOpen size={16} className="text-amber-400 shrink-0" />
+                    <div>
+                      <h4 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors capitalize">
+                        {qId.replace(/-/g, ' ')}
+                      </h4>
+                      <span className="text-[10px] text-slate-400 font-medium">Click to solve</span>
                     </div>
-                  ))}
+                  </div>
+                  <ArrowRight size={14} className="text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
                 </div>
-              );
-            } catch (e) { return null; }
-          })()}
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Recent Sessions List */}

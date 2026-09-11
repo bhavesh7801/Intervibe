@@ -1,7 +1,6 @@
-import React from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, Award, CheckCircle2, ArrowLeft, Share2, Sparkles, Trophy } from 'lucide-react';
+import { ShieldCheck, Award, CheckCircle2, ArrowLeft, Share2 } from 'lucide-react';
 
 const CertificateVerification = () => {
   const { certId } = useParams();

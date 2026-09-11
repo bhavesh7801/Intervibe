@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api, streamEvaluateAnswer } from '../api';
 
@@ -8,7 +8,7 @@ import FeedbackPanel from '../components/FeedbackPanel';
 import WebcamPreview from '../components/WebcamPreview';
 import SystemDesignCanvas from '../components/SystemDesignCanvas';
 import { useAudioRecorder } from '../hooks/useAudioRecorder';
-import { Sparkles, RefreshCw, AlertTriangle, CheckCircle2, ArrowRight, ArrowLeft, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, RefreshCw, AlertTriangle, ArrowRight, ArrowLeft, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
 const InterviewSession = () => {
   const { sessionId } = useParams();
@@ -42,10 +42,34 @@ const InterviewSession = () => {
   const [ttsEnabled, setTtsEnabled] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+    const fetchSession = async () => {
+      try {
+        const response = await api.getSession(sessionId);
+        if (isMounted) {
+          setSession(response.data);
+          if (response.data.answers && response.data.answers.length > 0) {
+            setCurrentQuestionIndex(response.data.answers.length);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching session:', error);
+        if (isMounted) {
+          alert('Session not found');
+          navigate('/dashboard');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     fetchSession();
-  }, [sessionId]);
-
-
+    return () => {
+      isMounted = false;
+    };
+  }, [sessionId, navigate]);
 
   const handleStartRecording = () => {
     initialTextRef.current = textAnswer.trim();
@@ -65,22 +89,6 @@ const InterviewSession = () => {
       setTextAnswer((prefix + transcript).trim());
     }
   }, [transcript, interimTranscript, isRecording]);
-
-  const fetchSession = async () => {
-    try {
-      const response = await api.getSession(sessionId);
-      setSession(response.data);
-      if (response.data.answers && response.data.answers.length > 0) {
-        setCurrentQuestionIndex(response.data.answers.length);
-      }
-    } catch (error) {
-      console.error('Error fetching session:', error);
-      alert('Session not found');
-      navigate('/dashboard');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmitAnswer = async () => {
     const finalAnswerText = textAnswer.trim() || transcript.trim();
@@ -207,11 +215,11 @@ const InterviewSession = () => {
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Navigation Bar: Back to Dashboard & Session Details */}
-        <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#162035]">
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-700/60">
           <button
             type="button"
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-400 hover:text-blue-400 transition-colors cursor-pointer bg-[#080D1A] px-3.5 py-1.5 rounded-xl border border-[#162035]"
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-400 hover:text-blue-400 transition-colors cursor-pointer bg-[#080D1A] px-3.5 py-1.5 rounded-xl border border-slate-700/60"
           >
             <ArrowLeft size={16} />
             <span>Back to Dashboard</span>

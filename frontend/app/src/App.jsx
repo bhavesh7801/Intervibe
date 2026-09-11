@@ -1,13 +1,14 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
+import ErrorBoundary from './components/ErrorBoundary';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Legal from './pages/Legal';
 import './App.css';
-import { isTechRole } from './utils/roleUtils';
 
 // Lazy-loaded heavy routes for code-splitting & production bundle optimization
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -36,15 +37,6 @@ const ProtectedRoute = ({ children, redirectTo = "/register" }) => {
   return user ? children : <Navigate to={redirectTo} replace />;
 };
 
-// Route wrapper for tech/software-specific modules (Coding IDE)
-const TechRoute = ({ children }) => {
-  const { user } = useAuth();
-  if (user && !isTechRole(user.targetRole)) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  return children;
-};
-
 // Public Route
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -69,11 +61,10 @@ const PageLoader = () => (
   </div>
 );
 
-import ErrorBoundary from './components/ErrorBoundary';
-
 function App() {
   return (
     <AuthProvider>
+      <ToastProvider>
       <div className="App">
         <Navbar />
         <ErrorBoundary>
@@ -108,6 +99,7 @@ function App() {
           </Suspense>
         </ErrorBoundary>
       </div>
+      </ToastProvider>
     </AuthProvider>
   );
 }
