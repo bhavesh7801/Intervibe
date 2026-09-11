@@ -32,9 +32,9 @@ class AIService:
         else:
             self.client = None
             
-        self.model = "llama-3.3-70b-versatile"
-        self.fallback_model = "llama-3.1-8b-instant"
-        self.gemini_model = "gemini-2.0-flash"
+        self.model = "openai/gpt-oss-120b"
+        self.fallback_model = "openai/gpt-oss-20b"
+        self.gemini_model = "gemini-2.5-flash"
 
     async def generate_questions(self, role: str, experience_level: str, num_questions: int = 5, persona: str = "Standard") -> list:
         # Check Redis Cache with random batch variation to avoid duplicate static sessions
@@ -47,7 +47,6 @@ class AIService:
             return cached_questions
 
         # If cache miss, generate questions using LLM with high entropy
-        import random
         rand_salt = random.randint(1000, 9999)
         json_template = '[{"text": "...", "category": "System Design", "difficulty": "medium"}]'
         
@@ -64,6 +63,7 @@ class AIService:
             system_message = prompts.GENERAL_INTERVIEW_PROMPT.format(num_questions=num_questions, experience_level=experience_level, role=role, json_template=json_template, persona=persona_directive)
         
         try:
+            content = None
             if self.client:
                 try:
                     response = await self.client.chat.completions.create(
@@ -77,21 +77,35 @@ class AIService:
                     content = response.choices[0].message.content
                 except Exception as e_groq:
                     logger.warning(f"Groq primary model failed ({e_groq}), trying fallback model: {self.fallback_model}")
-                    response = await self.client.chat.completions.create(
-                        model=self.fallback_model,
-                        messages=[
-                            {"role": "system", "content": system_message},
-                            {"role": "user", "content": f"Generate {num_questions} distinct questions for {experience_level} {role} (Seed #{rand_salt})"}
-                        ],
-                        temperature=0.85
-                    )
-                    content = response.choices[0].message.content
-            elif self.gemini_key:
-                content = await asyncio.to_thread(self._call_gemini_sync, system_message, f"Generate {num_questions} distinct questions for {experience_level} {role} (Seed #{rand_salt})", True)
-            elif self.hf_token:
-                content = await asyncio.to_thread(self._call_hf_sync, system_message, f"Generate {num_questions} distinct questions for {experience_level} {role} (Seed #{rand_salt})")
-            else:
-                raise ValueError("No LLM key configured")
+                    try:
+                        response = await self.client.chat.completions.create(
+                            model=self.fallback_model,
+                            messages=[
+                                {"role": "system", "content": system_message},
+                                {"role": "user", "content": f"Generate {num_questions} distinct questions for {experience_level} {role} (Seed #{rand_salt})"}
+                            ],
+                            temperature=0.85
+                        )
+                        content = response.choices[0].message.content
+                    except Exception as e_fb:
+                        logger.warning(f"Groq fallback failed ({e_fb})")
+
+            # Fallback to Gemini if Groq failed or was unconfigured
+            if not content and self.gemini_key:
+                try:
+                    content = await asyncio.to_thread(self._call_gemini_sync, system_message, f"Generate {num_questions} distinct questions for {experience_level} {role} (Seed #{rand_salt})", True)
+                except Exception as e_gem:
+                    logger.warning(f"Gemini fallback failed: {e_gem}")
+
+            # Fallback to HF
+            if not content and self.hf_token:
+                try:
+                    content = await asyncio.to_thread(self._call_hf_sync, system_message, f"Generate {num_questions} distinct questions for {experience_level} {role} (Seed #{rand_salt})")
+                except Exception as e_hf:
+                    logger.warning(f"HF fallback failed: {e_hf}")
+
+            if not content:
+                raise ValueError("No LLM key configured or all providers failed")
             
             json_match = re.search(r'\[.*\]', content, re.DOTALL)
             questions = json.loads(json_match.group()) if json_match else json.loads(content)

@@ -34,8 +34,8 @@ HF_ROUTER_URL = "https://router.huggingface.co/v1/chat/completions"
 HF_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
-GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = "openai/gpt-oss-120b"
+GROQ_FALLBACK_MODEL = "openai/gpt-oss-20b"
 
 
 def _create_ssl_context():
@@ -49,15 +49,17 @@ def _create_ssl_context():
 
 
 def _call_gemini(prompt_system: str, prompt_user: str) -> str:
-    """Call Google Gemini API using GEMINI_API_KEY with 10s timeout."""
+    """Call Google Gemini API using GEMINI_API_KEY with 15s timeout."""
     key = os.getenv("GEMINI_API_KEY", "").strip().strip('"').strip("'")
     if not key or len(key) < 10:
         raise ValueError("GEMINI_API_KEY is missing or too short")
     
     models_to_try = [
+        "gemini-2.5-flash",
+        "gemini-flash-latest",
         "gemini-2.0-flash",
         "gemini-1.5-flash",
-        "gemini-1.5-pro"
+        "gemini-2.5-pro"
     ]
     
     payload = {
@@ -144,11 +146,35 @@ def _call_hf(prompt_system: str, prompt_user: str) -> str:
 
 
 def _call_groq(prompt_system: str, prompt_user: str) -> str:
-    """Call Groq Chat API with openai/gpt-oss-120b and fallback to openai/gpt-oss-20b."""
+    """Call Groq Chat API with primary and fallback models."""
     key = os.getenv("GROQ_API_KEY", "").strip()
     if not key:
         raise ValueError("GROQ_API_KEY is not configured")
     
+    # Try official Groq SDK first
+    try:
+        from groq import Groq
+        client = Groq(api_key=key)
+        for model_name in [GROQ_MODEL, GROQ_FALLBACK_MODEL]:
+            try:
+                resp = client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": prompt_system},
+                        {"role": "user", "content": prompt_user},
+                    ],
+                    temperature=0.85,
+                    max_tokens=4096
+                )
+                text = resp.choices[0].message.content
+                if text and text.strip():
+                    return text
+            except Exception:
+                continue
+    except ImportError:
+        pass
+
+    # Fallback to direct HTTP request
     for model_name in [GROQ_MODEL, GROQ_FALLBACK_MODEL]:
         payload = {
             "model": model_name,
@@ -165,15 +191,14 @@ def _call_groq(prompt_system: str, prompt_user: str) -> str:
             headers={
                 "Authorization": f"Bearer {key}",
                 "Content-Type": "application/json",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             },
             method="POST",
         )
         try:
-            with urllib.request.urlopen(req, context=_create_ssl_context(), timeout=15) as resp:
+            with urllib.request.urlopen(req, context=_create_ssl_context(), timeout=20) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 return data["choices"][0]["message"]["content"]
-        except Exception as e:
+        except Exception:
             continue
             
     raise RuntimeError("All Groq models failed to generate response")
