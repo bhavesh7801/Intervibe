@@ -1,6 +1,5 @@
 import React from 'react';
 import { HeroSection } from '../components/landing/HeroSection';
-import { MockInterviewPreview } from '../components/landing/MockInterviewPreview';
 import { CompanyTracks } from '../components/landing/CompanyTracks';
 import { HowItWorks } from '../components/landing/HowItWorks';
 import { SystemDesignPreview } from '../components/landing/SystemDesignPreview';
@@ -13,9 +12,8 @@ import { Footer } from '../components/landing/Footer';
 const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#060813] text-slate-100 font-sans relative overflow-x-hidden selection:bg-blue-500 selection:text-white" data-testid="landing-page">
-      <main className="relative z-10 flex flex-col gap-12 sm:gap-16 lg:gap-24 pb-24">
+      <main className="relative z-10 flex flex-col gap-10 sm:gap-14 lg:gap-20 pb-20">
         <HeroSection />
-        <MockInterviewPreview />
         <CompanyTracks />
         <HowItWorks />
         <SystemDesignPreview />
