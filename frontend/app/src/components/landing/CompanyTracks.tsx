@@ -47,14 +47,14 @@ export const CompanyTracks: React.FC = () => {
   const [selectedCompany, setSelectedCompany] = useState<string>('google');
 
   return (
-    <section aria-labelledby="tracks-heading" className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-16 lg:py-24 border-t border-[#162035]/60 relative z-10">
-      <div className="text-center space-y-4 mb-16 flex flex-col items-center">
+    <section aria-labelledby="tracks-heading" className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 border-t border-[#162035]/60 relative z-10">
+      <div className="text-center space-y-3 mb-10 sm:mb-12 flex flex-col items-center">
         <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest">COMPANY TARGET TRACKS</span>
-        <h2 id="tracks-heading" className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
-          Tailored specifically for top-tier loops
+        <h2 id="tracks-heading" className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
+          Tailored for Top-Tier Tech Loops
         </h2>
-        <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-loose">
-          Every company evaluates differently. Practice with company-specific question distributions and scoring rubrics.
+        <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+          Practice with company-specific question distributions, evaluation criteria, and system design expectations.
         </p>
       </div>
 

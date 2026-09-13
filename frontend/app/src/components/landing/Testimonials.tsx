@@ -4,19 +4,19 @@ import { Star } from 'lucide-react';
 
 export const Testimonials: React.FC = () => {
   return (
-    <section aria-labelledby="testimonials-heading" className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-16 lg:py-24 border-t border-[#162035]/60">
+    <section aria-labelledby="testimonials-heading" className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 border-t border-[#162035]/60">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center space-y-4 mb-16 flex flex-col items-center"
+        className="text-center space-y-3 mb-10 sm:mb-12 flex flex-col items-center"
       >
-        <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest">VOICES</span>
-        <h2 id="testimonials-heading" className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
-          Loved by candidates & engineers who ship
+        <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest">CANDIDATE VOICES</span>
+        <h2 id="testimonials-heading" className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
+          Loved by Engineers Who Land Offers
         </h2>
-        <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-loose pt-1">
-          From solo candidates to senior engineers — here is what people say after practicing with Interview Prep AI.
+        <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
+          From solo interview prep to senior staff loops — what candidates achieve with Intervibe.
         </p>
       </motion.div>
 

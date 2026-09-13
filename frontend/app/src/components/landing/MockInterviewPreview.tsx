@@ -6,13 +6,13 @@ export const MockInterviewPreview: React.FC = () => {
   const [activeStage, setActiveStage] = useState<'intro' | 'behavioral' | 'coding' | 'system' | 'questions'>('coding');
 
   return (
-    <section className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 pb-16 flex justify-center relative z-10">
+    <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-6 flex justify-center relative z-10">
       <motion.div
-        initial={{ opacity: 0, y: 35 }}
+        initial={{ opacity: 0, y: 25 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-        className="mt-8 w-full max-w-5xl text-left"
+        transition={{ duration: 0.7 }}
+        className="w-full max-w-5xl text-left"
       >
         <div className="rounded-3xl bg-[#0e121f] border border-blue-500/20 shadow-2xl shadow-blue-500/10 p-6 sm:p-8 backdrop-blur-xl relative overflow-hidden">
           

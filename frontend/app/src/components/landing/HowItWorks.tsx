@@ -4,23 +4,23 @@ import { CheckCircle2 } from 'lucide-react';
 
 export const HowItWorks: React.FC = () => {
   return (
-    <section aria-labelledby="how-it-works-heading" className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-16 lg:py-24 border-t border-[#162035]/60 relative z-10">
+    <section aria-labelledby="how-it-works-heading" className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 border-t border-[#162035]/60 relative z-10">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-left space-y-4 mb-16"
+        className="text-left space-y-3 mb-10 sm:mb-12"
       >
         <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest">HOW IT WORKS</span>
-        <h2 id="how-it-works-heading" className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
-          From nervous to natural<br className="hidden sm:inline" /> in three steps
+        <h2 id="how-it-works-heading" className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
+          From nervous to natural<br className="hidden sm:inline" /> in three simple steps
         </h2>
-        <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-loose">
-          No scheduling, no waiting, no judgment. Just you and an AI that has interviewed thousands of candidates at top companies.
+        <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+          No scheduling, no waiting, no judgment. Practice real coding and behavioral questions with instant AI feedback.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         
         {/* Left Column: 3 Step Steps */}
         <div className="lg:col-span-6 space-y-9">

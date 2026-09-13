@@ -7,40 +7,40 @@ export const SystemDesignPreview: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-16 lg:py-24 border-t border-[#162035]/60 relative z-10">
+    <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 border-t border-[#162035]/60 relative z-10">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="rounded-3xl bg-[#080d1a] border border-blue-500/20 p-5 sm:p-10 lg:p-14 shadow-2xl relative overflow-hidden"
+        className="rounded-3xl bg-[#080d1a] border border-blue-500/20 p-6 sm:p-10 lg:p-12 shadow-2xl relative overflow-hidden"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           
-          <div className="lg:col-span-5 space-y-5 sm:space-y-6">
+          <div className="lg:col-span-5 space-y-4 sm:space-y-5">
             <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">SYSTEM DESIGN CANVAS</span>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
-              Master High-Level System Architecture
+              Master High-Level Architecture
             </h2>
-            <p className="text-xs sm:text-base text-slate-300 leading-relaxed sm:leading-loose">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Practice whiteboard design loops for distributed databases, load balancers, caching layers, and microservices with instant AI architecture feedback.
             </p>
-            <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm text-slate-300">
+            <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
               <li className="flex items-center gap-2.5">
-                <CheckCircle2 size={18} className="text-cyan-400 shrink-0" />
+                <CheckCircle2 size={16} className="text-cyan-400 shrink-0" />
                 <span>Interactive node topology canvas with drag-and-drop connections</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <CheckCircle2 size={18} className="text-cyan-400 shrink-0" />
+                <CheckCircle2 size={16} className="text-cyan-400 shrink-0" />
                 <span>p99 latency bottleneck calculation & throughput stress tests</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <CheckCircle2 size={18} className="text-cyan-400 shrink-0" />
+                <CheckCircle2 size={16} className="text-cyan-400 shrink-0" />
                 <span>Real-time feedback on single-points-of-failure (SPOF)</span>
               </li>
             </ul>
             <button
-              onClick={() => navigate('/system-design')}
-              className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-blue-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer group hover:scale-[1.03] active:scale-95 text-center"
+              onClick={() => navigate('/assessment')}
+              className="w-full sm:w-auto h-12 sm:h-13 px-6 sm:px-8 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm sm:text-base shadow-xl shadow-blue-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer group hover:scale-[1.02] active:scale-95 text-center mt-2"
             >
               <span>Explore System Design Canvas</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

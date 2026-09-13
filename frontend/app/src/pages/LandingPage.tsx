@@ -13,7 +13,7 @@ import { Footer } from '../components/landing/Footer';
 const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#060813] text-slate-100 font-sans relative overflow-x-hidden selection:bg-blue-500 selection:text-white" data-testid="landing-page">
-      <main className="relative z-10 flex flex-col gap-28 lg:gap-40 pb-32">
+      <main className="relative z-10 flex flex-col gap-12 sm:gap-16 lg:gap-24 pb-24">
         <HeroSection />
         <MockInterviewPreview />
         <CompanyTracks />

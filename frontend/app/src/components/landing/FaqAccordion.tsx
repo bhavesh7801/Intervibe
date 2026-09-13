@@ -25,16 +25,16 @@ export const FaqAccordion: React.FC = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   return (
-    <section aria-labelledby="faq-heading" className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-16 lg:py-24 border-t border-[#162035]/60">
+    <section aria-labelledby="faq-heading" className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 border-t border-[#162035]/60">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center space-y-4 mb-16 flex flex-col items-center"
+        className="text-center space-y-3 mb-10 sm:mb-12 flex flex-col items-center"
       >
         <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest">FREQUENTLY ASKED QUESTIONS</span>
-        <h2 id="faq-heading" className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
-          Got questions? We've got answers.
+        <h2 id="faq-heading" className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug">
+          Got Questions? We've Got Answers.
         </h2>
       </motion.div>
 
