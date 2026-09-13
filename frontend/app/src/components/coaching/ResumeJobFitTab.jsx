@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { FileText, Briefcase, Sparkles, CheckCircle2, AlertTriangle, ArrowRight, Upload, Shield, Loader2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Briefcase, Sparkles, CheckCircle2, AlertTriangle, Upload, Loader2 } from 'lucide-react';
 import { api } from '../../api';
 
 const ResumeJobFitTab = () => {

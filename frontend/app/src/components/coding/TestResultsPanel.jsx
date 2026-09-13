@@ -1,13 +1,12 @@
-import React from 'react';
+import { memo } from 'react';
 import { Terminal, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 
-const TestResultsPanel = React.memo(({
+const TestResultsPanel = memo(({
   activeOutputTab,
   setActiveOutputTab,
   consoleOutput,
   testResults,
   executing,
-  complexityResult
 }) => {
   return (
     <div className="rounded-2xl border border-slate-700/60 bg-[#05070E] p-4 space-y-4 shadow-2xl h-full flex flex-col" data-testid="output-panel">

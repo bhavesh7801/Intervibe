@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { api } from '../api';
 
 export const useTextToSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);

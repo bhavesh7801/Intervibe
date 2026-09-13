@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { Sparkles, Wand2, X, CheckCircle2, Loader2, Code2, HelpCircle, ArrowRight } from 'lucide-react';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -67,7 +67,9 @@ const QuestionGeneratorModal = ({
   const [isPossibleRepeat, setIsPossibleRepeat] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+
+    const timer = setTimeout(() => {
       setResult(null);
       setError(null);
       setLoading(false);
@@ -86,8 +88,10 @@ const QuestionGeneratorModal = ({
         setQuestionType(defaultType);
         setTopic(defaultType === 'coding' ? freshTopic : initialTopic);
       }
-    }
-  }, [user?.targetRole, isUserTech, defaultType, defaultTopic, isOpen]);
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [user?.targetRole, isUserTech, defaultType, defaultTopic, initialTopic, isOpen]);
 
   const handleRandomTopic = () => {
     const randomTopic = DSA_TOPICS[Math.floor(Math.random() * DSA_TOPICS.length)];

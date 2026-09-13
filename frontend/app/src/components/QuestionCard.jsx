@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { HelpCircle, Code, MessageSquare, Flame, Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
 

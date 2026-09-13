@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { HelpCircle, Lightbulb, Lock, Unlock, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Lightbulb, Lock, Unlock } from 'lucide-react';
 
 const SocraticHintTab = () => {
   const [unlockedTier, setUnlockedTier] = useState(1);

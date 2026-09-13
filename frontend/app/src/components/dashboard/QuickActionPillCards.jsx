@@ -1,5 +1,3 @@
-import React from 'react';
-
 const QuickActionPillCards = ({ onNavigate, onOpenPrompt }) => {
   const items = [
     { label: 'Resume Tips', icon: '👤', onClick: () => onNavigate('/profile') },

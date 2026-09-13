@@ -1,25 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Camera, CameraOff, Mic, MicOff, Video, Sparkles } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Camera, CameraOff, Video, Sparkles } from 'lucide-react';
 
 const WebcamPreview = ({ isRecording }) => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
-  const [stream, setStream] = useState(null);
   const [cameraOn, setCameraOn] = useState(true);
-  const [micOn, setMicOn] = useState(true);
-  const [audioLevel, setAudioLevel] = useState(0);
+  const [audioLevel] = useState(0);
   const [error, setError] = useState(null);
   const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
 
-  useEffect(() => {
-    startCamera();
-    return () => {
-      stopCamera();
-    };
-  }, []);
-
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     const activeStream = streamRef.current || window.activeWebcamStream;
     if (activeStream) {
       try {
@@ -27,47 +17,51 @@ const WebcamPreview = ({ isRecording }) => {
           track.stop();
           track.enabled = false;
         });
-      } catch (e) {}
+      } catch {
+        /* ignore cleanup error */
+      }
       streamRef.current = null;
       window.activeWebcamStream = null;
     }
     if (audioContextRef.current) {
-      try { audioContextRef.current.close(); } catch (e) {}
+      try { audioContextRef.current.close(); } catch { /* ignore */ }
     }
-  };
+  }, []);
 
-  const startCamera = async () => {
+  const acquireCameraStream = useCallback(async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error("UNSUPPORTED");
+    }
     try {
-      setError(null);
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setError("Camera access requires HTTPS or localhost. If on HTTP, please enable microphone/camera permissions in your browser settings.");
-        return;
-      }
+      return await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false
+      });
+    } catch {
+      return await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
+  }, []);
 
-      let userStream = null;
+  const handleCameraError = useCallback((err) => {
+    if (err.message === "UNSUPPORTED") {
+      setError("Camera access requires HTTPS or localhost. If on HTTP, please enable microphone/camera permissions in your browser settings.");
+    } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      setError("Camera permission denied. Please click the lock/camera icon in your browser's address bar to allow access.");
+    } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+      setError("No camera device detected on your system. Continuing in audio/text mode.");
+    } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+      setError("Camera is currently in use by another application (Zoom, Teams, etc.).");
+    } else {
+      setError("Camera stream unavailable. Click 'Retry Camera' below to grant permission.");
+    }
+  }, []);
 
-      // Tier 1: Try user-facing camera without conflicting audio
-      try {
-        userStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'user',
-            width: { ideal: 640 },
-            height: { ideal: 480 }
-          },
-          audio: false
-        });
-      } catch (tier1Err) {
-        console.warn("Tier 1 camera init failed, attempting fallback:", tier1Err);
-        // Tier 2: Standard video fallback
-        userStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false
-        });
-      }
-
+  const startCamera = useCallback(async () => {
+    try {
+      const userStream = await acquireCameraStream();
       streamRef.current = userStream;
       window.activeWebcamStream = userStream;
-      setStream(userStream);
+      setError(null);
       setCameraOn(true);
 
       if (videoRef.current) {
@@ -75,17 +69,41 @@ const WebcamPreview = ({ isRecording }) => {
       }
     } catch (err) {
       console.warn("Webcam access error:", err);
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        setError("Camera permission denied. Please click the lock/camera icon in your browser's address bar to allow access.");
-      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-        setError("No camera device detected on your system. Continuing in audio/text mode.");
-      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-        setError("Camera is currently in use by another application (Zoom, Teams, etc.).");
-      } else {
-        setError("Camera stream unavailable. Click 'Retry Camera' below to grant permission.");
-      }
+      handleCameraError(err);
     }
-  };
+  }, [acquireCameraStream, handleCameraError]);
+
+  useEffect(() => {
+    let active = true;
+
+    const init = async () => {
+      try {
+        const userStream = await acquireCameraStream();
+        if (!active) {
+          userStream.getTracks().forEach(t => t.stop());
+          return;
+        }
+        streamRef.current = userStream;
+        window.activeWebcamStream = userStream;
+        setCameraOn(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = userStream;
+        }
+      } catch (err) {
+        if (active) {
+          handleCameraError(err);
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      active = false;
+      stopCamera();
+    };
+  }, [acquireCameraStream, handleCameraError, stopCamera]);
 
   const toggleCamera = async () => {
     if (!cameraOn) {
@@ -94,10 +112,6 @@ const WebcamPreview = ({ isRecording }) => {
       stopCamera();
       setCameraOn(false);
     }
-  };
-
-  const toggleMic = () => {
-    setMicOn(!micOn);
   };
 
   return (

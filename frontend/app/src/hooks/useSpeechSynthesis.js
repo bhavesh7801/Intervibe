@@ -2,14 +2,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 export const useSpeechSynthesis = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [hasSupport, setHasSupport] = useState(false);
+  const [hasSupport] = useState(() => typeof window !== 'undefined' && 'speechSynthesis' in window);
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const synthRef = useRef(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      setHasSupport(true);
       synthRef.current = window.speechSynthesis;
 
       const updateVoices = () => {

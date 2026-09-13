@@ -1,7 +1,6 @@
-import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
-const CompetencyRadarChart = ({ overallScore = 75, answers = [] }) => {
+const CompetencyRadarChart = ({ overallScore = 75 }) => {
   // Compute competency breakdown scores dynamically based on AI evaluation results
   const technicalScore = Math.min(100, Math.max(40, overallScore + 5));
   const communicationScore = Math.min(100, Math.max(50, overallScore - 3));

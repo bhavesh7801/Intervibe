@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Cpu, Code2, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { Cpu, Code2, Sparkles } from 'lucide-react';
 
 const AstRefactorTab = () => {
   const [code, setCode] = useState(

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../apiClient';
 
 const AuthContext = createContext(null);
@@ -7,12 +7,17 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    setUser(null);
+    window.location.href = '/login'; 
+  }, []);
+
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          // Use your centralized API call
           const response = await api.getCurrentUser();
           setUser(response.data);
         } catch (error) {
@@ -23,20 +28,18 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     };
     initAuth();
-  }, []);
+  }, [logout]);
+
   const register = async (name, email, password, targetRole, experienceLevel) => {
-    try {
-      const response = await api.register(name, email, password, targetRole, experienceLevel);
-      const { token, user: userData } = response.data;
-      if (token) {
-        localStorage.setItem('token', token);
-        setUser(userData);
-      }
-      return userData;
-    } catch (error) {
-      throw error; // Let the component handle the error
+    const response = await api.register(name, email, password, targetRole, experienceLevel);
+    const { token, user: userData } = response.data;
+    if (token) {
+      localStorage.setItem('token', token);
+      setUser(userData);
     }
+    return userData;
   };
+
   const login = async (email, password) => {
     const response = await api.login(email, password);
     const { token, user: userData } = response.data;
@@ -53,7 +56,6 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
-
   const verifyOTP = async (email, otp) => {
     const response = await api.verifyOTP(email, otp);
     const { token, user: userData } = response.data;
@@ -67,11 +69,6 @@ export const AuthProvider = ({ children }) => {
     return response.data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    window.location.href = '/login'; 
-  };
   return (
     <AuthContext.Provider value={{ user, setUser, loading, login, googleLogin, register, verifyOTP, resendOTP, logout }}>
       {children}
@@ -79,4 +76,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);

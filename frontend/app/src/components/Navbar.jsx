@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, LogIn, UserPlus, LogOut, LayoutDashboard, LayoutGrid, Gauge, Grid, Menu, X, Code2, Layers, Wand2, User, MessageSquare, MoreVertical, Compass, Trophy, ShieldCheck, Award, Flame } from 'lucide-react';
+import { Sparkles, LogIn, UserPlus, LogOut, LayoutGrid, Grid, X, Code2, Layers, Wand2, MessageSquare, Compass, Trophy, ShieldCheck } from 'lucide-react';
 import QuestionGeneratorModal from './QuestionGeneratorModal';
-import { isTechRole } from '../utils/roleUtils';
 
 export const InterviewPrepLogo = ({ size = 32 }) => (
   <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
@@ -34,7 +33,6 @@ const Navbar = () => {
   const { user, logout } = useAuth() || {};
   const navigate = useNavigate();
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navDropdownOpen, setNavDropdownOpen] = useState(false);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -69,7 +67,6 @@ const Navbar = () => {
   // Navigation Interceptor helper: Redirect unauthenticated users to /register
   const handleProtectedNav = (e, path) => {
     e.preventDefault();
-    setMobileMenuOpen(false);
     setNavDropdownOpen(false);
     if (!user) {
       navigate('/register');
@@ -80,7 +77,6 @@ const Navbar = () => {
 
   const handleFeaturesClick = (e) => {
     if (e) e.preventDefault();
-    setMobileMenuOpen(false);
     setNavDropdownOpen(false);
     
     if (location.pathname === '/' || location.pathname === '/landing' || location.pathname === '/home') {
@@ -100,7 +96,6 @@ const Navbar = () => {
   };
 
   const handleAiGeneratorClick = () => {
-    setMobileMenuOpen(false);
     setNavDropdownOpen(false);
     if (!user) {
       navigate('/register');
@@ -111,7 +106,6 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    setMobileMenuOpen(false);
     setNavDropdownOpen(false);
     navigate('/login');
   };

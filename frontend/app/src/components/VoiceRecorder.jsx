@@ -1,4 +1,3 @@
-import React from 'react';
 import { Mic, MicOff, Volume2, AlertTriangle, Activity, RefreshCw, Sparkles } from 'lucide-react';
 
 const VoiceRecorder = ({

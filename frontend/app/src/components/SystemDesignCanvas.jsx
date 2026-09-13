@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Server, Database, Layers, Cpu, HardDrive, RefreshCw, Trash2, Download, Plus, ArrowRight, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { Server, Database, Layers, Cpu, HardDrive, Trash2 } from 'lucide-react';
 
 const NODE_TYPES = [
   { type: 'service', label: 'Microservice', icon: Server, color: 'border-blue-500/50 bg-blue-500/10 text-blue-400' },
@@ -27,14 +27,17 @@ const SystemDesignCanvas = () => {
   ]);
 
   const addNode = (typeObj) => {
-    const newNode = {
-      id: `${Date.now()}`,
-      type: typeObj.type,
-      label: `${typeObj.label} ${nodes.length + 1}`,
-      x: 40 + (nodes.length % 3) * 160 + (Math.random() * 40 - 20),
-      y: 40 + Math.floor(nodes.length / 3) * 100 + (Math.random() * 40 - 20),
-    };
-    setNodes((prev) => [...prev, newNode]);
+    setNodes((prev) => {
+      const newId = `node-${prev.length + 1}`;
+      const newNode = {
+        id: newId,
+        type: typeObj.type,
+        label: `${typeObj.label} ${prev.length + 1}`,
+        x: 40 + (prev.length % 3) * 160 + ((prev.length * 13) % 40 - 20),
+        y: 40 + Math.floor(prev.length / 3) * 100 + ((prev.length * 17) % 40 - 20),
+      };
+      return [...prev, newNode];
+    });
   };
 
   const handleMouseDown = (e, nodeId) => {

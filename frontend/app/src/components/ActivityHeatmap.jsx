@@ -1,23 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Trophy, Calendar, Flame, Zap, Award } from 'lucide-react';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
-const getUserHash = (u) => {
-  const str = String(u?.id || u?.email || u?.name || 'user_activity_key');
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-};
-
-const ActivityHeatmap = ({ userStats, streakCount = 0, user }) => {
+const ActivityHeatmap = ({ userStats, streakCount = 0 }) => {
   const [hoveredDay, setHoveredDay] = useState(null);
-
-  const userHash = getUserHash(user);
   
   // Gather real activity data from backend stats
   const activityMap = {};

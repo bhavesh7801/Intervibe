@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Clock, Zap, Play, RotateCcw, CheckCircle2, Award, Bot } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Clock, Zap, Play, RotateCcw, Award, Bot } from 'lucide-react';
 
 const SpeedRivalTab = () => {
   const [isDuelActive, setIsDuelActive] = useState(false);
@@ -13,18 +13,17 @@ const SpeedRivalTab = () => {
     if (isDuelActive && !duelResult) {
       interval = setInterval(() => {
         setTimer((t) => t + 1);
-        // AI Rival progress simulation
-        setAiProgress((prev) => Math.min(100, prev + Math.floor(Math.random() * 8) + 2));
+        setAiProgress((prev) => {
+          const next = Math.min(100, prev + Math.floor(Math.random() * 8) + 2);
+          if (next >= 100) {
+            setDuelResult('ai_win');
+          }
+          return next;
+        });
       }, 800);
     }
     return () => { if (interval) clearInterval(interval); };
   }, [isDuelActive, duelResult]);
-
-  useEffect(() => {
-    if (aiProgress >= 100 && !duelResult) {
-      setDuelResult('ai_win');
-    }
-  }, [aiProgress, duelResult]);
 
   const handleStartDuel = () => {
     setIsDuelActive(true);

@@ -1,9 +1,14 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { api } from '../apiClient';
 
 export const useAudioRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const mediaSupported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    return !!SpeechRecognition || mediaSupported;
+  });
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
@@ -19,12 +24,6 @@ export const useAudioRecorder = () => {
   const animFrameRef = useRef(null);
   const intervalRef = useRef(null);
 
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const mediaSupported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-    setIsSupported(!!SpeechRecognition || mediaSupported);
-  }, []);
-
   const startRecording = useCallback(async () => {
     setTranscript('');
     setInterimTranscript('');
@@ -39,7 +38,7 @@ export const useAudioRecorder = () => {
     if (SpeechRecognition) {
       try {
         if (recognitionRef.current) {
-          try { recognitionRef.current.stop(); } catch (e) {}
+          try { recognitionRef.current.stop(); } catch { /* ignore */ }
         }
 
         const recognition = new SpeechRecognition();
@@ -78,7 +77,7 @@ export const useAudioRecorder = () => {
             if (isRecordingRef.current) {
               setTimeout(() => {
                 if (isRecordingRef.current && recognitionRef.current) {
-                  try { recognitionRef.current.start(); } catch (e) {}
+                  try { recognitionRef.current.start(); } catch { /* ignore */ }
                 }
               }, 200);
             }
@@ -89,7 +88,7 @@ export const useAudioRecorder = () => {
           if (isRecordingRef.current && !hasNetworkErrorRef.current) {
             try {
               recognition.start();
-            } catch (e) {}
+            } catch { /* ignore */ }
           }
         };
 
@@ -127,7 +126,7 @@ export const useAudioRecorder = () => {
             animFrameRef.current = requestAnimationFrame(updateVolume);
           };
           updateVolume();
-        } catch (audioCtxErr) {
+        } catch {
           // Silent fallback for audio context
         }
 
@@ -151,7 +150,7 @@ export const useAudioRecorder = () => {
           };
           mediaRecorderRef.current.start(250); // Collect chunk slice every 250ms
         }
-      } catch (err) {
+      } catch {
         setErrorMsg("Microphone permission denied. Please allow microphone access in browser settings.");
         isRecordingRef.current = false;
         return;
@@ -174,7 +173,7 @@ export const useAudioRecorder = () => {
                 setTranscript(liveWhisperText);
               }
             }
-          } catch (e) {
+          } catch {
             // Silent fallback for interval slice
           }
         }
@@ -198,10 +197,10 @@ export const useAudioRecorder = () => {
         cancelAnimationFrame(animFrameRef.current);
       }
       if (audioContextRef.current) {
-        try { audioContextRef.current.close(); } catch (e) {}
+        try { audioContextRef.current.close(); } catch { /* ignore */ }
       }
       if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch (e) {}
+        try { recognitionRef.current.stop(); } catch { /* ignore */ }
       }
 
       const finalTranscript = (accumulatedTranscriptRef.current + ' ' + interimTranscript).trim();
@@ -230,7 +229,7 @@ export const useAudioRecorder = () => {
     if (isRecordingRef.current && recognitionRef.current) {
       try {
         recognitionRef.current.start();
-      } catch (e) {}
+      } catch { /* ignore */ }
     }
   }, []);
 

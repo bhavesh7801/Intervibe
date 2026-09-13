@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
 // Purpose: Unified reveal-on-mount / reveal-on-scroll wrapper using Framer Motion.

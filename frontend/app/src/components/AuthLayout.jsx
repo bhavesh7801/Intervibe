@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -249,7 +249,7 @@ export default function AuthLayout({ defaultTab = 'login' }) {
       });
 
       client.requestAccessToken();
-    } catch (err) {
+    } catch {
       setError("Failed to initialize Google login.");
       setLoading(false);
     }

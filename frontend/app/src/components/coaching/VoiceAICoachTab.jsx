@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, Sparkles, RefreshCw, Award, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useSpeechSynthesis } from '../../hooks/useSpeechSynthesis';
 
@@ -38,7 +38,7 @@ const VoiceAICoachTab = () => {
     if (isRecording) {
       setIsRecording(false);
       if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch (e) {}
+        try { recognitionRef.current.stop(); } catch { /* ignore */ }
       }
       analyzeVoiceResponse();
     } else {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'motion/react';
 
 // Purpose: Reduces perceived wait time — content-shaped placeholders

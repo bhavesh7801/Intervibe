@@ -1,7 +1,7 @@
-import React from 'react';
-import { X, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react';
+import { memo } from 'react';
+import { X, Sparkles, ShieldCheck } from 'lucide-react';
 
-const ComplexityModal = React.memo(({
+const ComplexityModal = memo(({
   isOpen,
   onClose,
   analyzing,

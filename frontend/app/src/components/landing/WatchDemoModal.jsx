@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Play, X, Code2, Layers, Cpu, ChevronRight, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 
 const HERO_CODE_SAMPLE = `def two_sum(nums: list[int], target: int) -> list[int]:

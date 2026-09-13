@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Award, Sparkles, CheckCircle2, AlertCircle, TrendingUp, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Award, Sparkles, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
 import { api } from '../../api';
 
 const BEHAVIORAL_PROMPTS = [
