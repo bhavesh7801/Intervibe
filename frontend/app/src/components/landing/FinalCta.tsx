@@ -26,9 +26,9 @@ export const FinalCta: React.FC = () => {
         <div className="flex flex-col items-center justify-center gap-3 relative z-10 w-full sm:w-auto">
           <button
             onClick={() => navigate('/register')}
-            className="w-full sm:w-auto h-13 sm:h-14 px-8 sm:px-10 rounded-2xl text-base font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer group hover:scale-[1.02] active:scale-95 text-center"
+            className="w-full sm:w-[270px] lg:w-[290px] h-13 sm:h-14 px-6 sm:px-8 rounded-2xl text-base font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:brightness-110 shadow-[0_0_35px_rgba(37,99,235,0.45)] border border-blue-400/40 flex items-center justify-center gap-3 transition-all cursor-pointer group hover:scale-[1.02] active:scale-95 text-center"
           >
-            <span>Start practicing free</span>
+            <span>Start Practicing Free</span>
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-white shrink-0" />
           </button>
 

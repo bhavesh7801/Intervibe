@@ -40,7 +40,7 @@ export const SystemDesignPreview: React.FC = () => {
             </ul>
             <button
               onClick={() => navigate('/assessment')}
-              className="w-full sm:w-auto h-12 sm:h-13 px-6 sm:px-8 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm sm:text-base shadow-xl shadow-blue-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer group hover:scale-[1.02] active:scale-95 text-center mt-2"
+              className="w-full sm:w-auto h-12 sm:h-13 px-6 sm:px-8 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-bold text-sm sm:text-base shadow-[0_0_25px_rgba(37,99,235,0.35)] border border-blue-400/40 flex items-center justify-center gap-2.5 transition-all cursor-pointer group hover:scale-[1.02] active:scale-95 text-center mt-2"
             >
               <span>Explore System Design Canvas</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
