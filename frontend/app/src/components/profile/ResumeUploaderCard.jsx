@@ -3,17 +3,25 @@ import {
   FileText,
   Upload,
   CheckCircle2,
-  BookOpen,
+  Sparkles,
   Zap,
+  FolderOpen
 } from "lucide-react";
 import { api } from "../../apiClient";
 
 const ResumeUploaderCard = () => {
   const [resumeLoading, setResumeLoading] = useState(false);
   const [resumeResult, setResumeResult] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleResumeUpload = async (e) => {
-    const file = e.target.files?.[0];
+  const defaultExtractedSkills = [
+    "Project Management",
+    "Data Analysis",
+    "Team Leadership",
+    "System Architecture"
+  ];
+
+  const handleResumeUpload = async (file) => {
     if (!file) return;
     if (!file.name.toLowerCase().endsWith(".pdf")) {
       alert("Please select a valid PDF file.");
@@ -31,81 +39,127 @@ const ResumeUploaderCard = () => {
     }
   };
 
+  const onFileInputChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) handleResumeUpload(file);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleResumeUpload(file);
+  };
+
+  const displaySkills = resumeResult?.extractedSkills && resumeResult.extractedSkills.length > 0
+    ? resumeResult.extractedSkills.slice(0, 4)
+    : defaultExtractedSkills;
+
   return (
-    <div className="bg-[#080D1A]/80 border border-slate-700/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl transform-gpu will-change-filter shadow-xl flex flex-col gap-6 sm:gap-8">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 w-full">
-        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#162035] text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
-            <FileText size={18} />
+    <div className="bg-[#060D24]/90 border border-cyan-500/30 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-[0_0_35px_rgba(6,182,212,0.15)] backdrop-blur-2xl space-y-4 sm:space-y-5">
+      {/* SECTION HEADER */}
+      <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.4)]">
+            <FileText size={16} />
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm sm:text-base font-black text-white truncate">
-              AI Resume Parser & Skill Extractor
+          <div>
+            <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+              <span>AI Resume Scanner</span>
             </h3>
-            <p className="text-[11px] leading-snug text-slate-400 mt-0.5">
-              Upload your resume to extract skills and personalize AI coding questions.
-            </p>
           </div>
         </div>
-        <label className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.4)] cursor-pointer transition-transform hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap">
-          <Upload size={16} />
-          <span>{resumeLoading ? "Parsing..." : "Upload PDF Resume"}</span>
-          <input
-            type="file"
-            accept=".pdf"
-            className="hidden"
-            onChange={handleResumeUpload}
-            disabled={resumeLoading}
-          />
-        </label>
+
+        {resumeResult && (
+          <span className="text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+            <CheckCircle2 size={12} /> Ready
+          </span>
+        )}
       </div>
 
-      {resumeResult && (
-        <div className="bg-[#050A18] p-6 rounded-2xl border border-slate-700/60 space-y-6 animate-fade-in">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-700/60 pb-3 text-sm text-blue-300 font-bold">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={24} className="text-emerald-400" /> Processed: {resumeResult.filename}
-            </span>
-            <span className="text-emerald-400 font-mono text-sm bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-              Analysis Ready
-            </span>
+      {/* SPLIT SCANNER GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+        {/* LEFT DROPZONE (7 COLS ON PC) */}
+        <div className="lg:col-span-8">
+          <label
+            onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+            onDragLeave={() => setIsDragOver(false)}
+            onDrop={onDrop}
+            className={`w-full min-h-[150px] sm:min-h-[170px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 relative overflow-hidden cursor-pointer transition-all duration-300 ${
+              isDragOver
+                ? "bg-cyan-950/40 border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.5)] scale-[1.01]"
+                : "bg-[#04091A]/90 border-cyan-500/40 hover:border-cyan-300 shadow-[0_0_25px_rgba(6,182,212,0.15)]"
+            }`}
+          >
+            {/* ANIMATED GLOWING HORIZONTAL LASER SCAN BEAM */}
+            <div
+              className="absolute inset-x-0 h-0.5 bg-cyan-400 shadow-[0_0_20px_#06b6d4,0_0_40px_#3b82f6] pointer-events-none"
+              style={{
+                top: "50%",
+                animation: "pulse 2s infinite ease-in-out"
+              }}
+            />
+
+            {/* Glowing Laser Center Core Sparkle */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-8 bg-cyan-400/20 blur-xl pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col items-center text-center space-y-2">
+              <FolderOpen size={26} className="text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] animate-bounce" />
+              <h4 className="text-sm sm:text-base font-extrabold text-white tracking-wide drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
+                {resumeLoading ? "AI Scanning & Extracting AST Skills..." : "Drag & Drop Your Resume"}
+              </h4>
+              <p className="text-[11px] text-cyan-300/80 font-mono">
+                Supports PDF (Max 15MB) • Instant ATS Keyword Extraction
+              </p>
+            </div>
+
+            <input
+              type="file"
+              accept=".pdf"
+              className="hidden"
+              onChange={onFileInputChange}
+              disabled={resumeLoading}
+            />
+          </label>
+        </div>
+
+        {/* RIGHT EXTRACTED SKILLS PANEL (4 COLS ON PC) */}
+        <div className="lg:col-span-4 bg-[#04091A]/80 border border-cyan-500/25 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full min-h-[150px] sm:min-h-[170px] shadow-sm">
+          <div>
+            <h4 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <Sparkles size={12} className="text-cyan-400" />
+              <span>Extracted Skills:</span>
+            </h4>
+
+            <div className="space-y-1.5">
+              {displaySkills.map((skill, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-[#08122D] border border-cyan-500/30 text-xs font-bold text-cyan-200 shadow-sm"
+                >
+                  <Zap size={12} className="text-cyan-400 shrink-0" />
+                  <span className="truncate">{skill}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {resumeResult.analysis && (
-            <div className="space-y-6">
-              <div className="p-6 rounded-xl bg-[#080D1A] border border-slate-700/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <span className="text-sm font-extrabold uppercase tracking-wider text-blue-400 font-mono">
-                    Resume Alignment
-                  </span>
-                  <h4 className="text-sm font-bold text-white mt-0.5">
-                    {resumeResult.analysis.overallSummary}
-                  </h4>
-                </div>
-                <div className="px-4 py-2 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-300 font-mono font-black text-lg shrink-0">
-                  Score: {resumeResult.analysis.matchScore}/100
-                </div>
-              </div>
-
-              {resumeResult.analysis.skillsToLearn && (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-black uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-                    <BookOpen size={14} className="text-cyan-400" /> 📚 Skills You Should Learn Next
-                  </h4>
-                  <div className="flex flex-wrap gap-3">
-                    {resumeResult.analysis.skillsToLearn.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1.5 rounded-xl text-sm font-extrabold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5">
-                        <Zap size={12} className="text-cyan-400" /> {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <label className="w-full mt-3 h-9 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(6,182,212,0.35)] cursor-pointer transition-all active:scale-95">
+            <Upload size={13} />
+            <span>{resumeLoading ? "Uploading..." : "Upload New"}</span>
+            <input
+              type="file"
+              accept=".pdf"
+              className="hidden"
+              onChange={onFileInputChange}
+              disabled={resumeLoading}
+            />
+          </label>
         </div>
-      )}
+      </div>
     </div>
   );
 };
+
 export default ResumeUploaderCard;
+
