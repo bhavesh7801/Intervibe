@@ -27,7 +27,7 @@ const Leaderboard = () => {
 
   return (
     <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-8 sm:py-10 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
-      <div className="w-full max-w-7xl mx-auto space-y-6">
+      <div className="w-full max-w-[1600px] mx-auto space-y-6">
         
         {/* Header Bar */}
         <div className="flex justify-between items-center">
