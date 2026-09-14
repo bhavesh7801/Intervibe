@@ -130,8 +130,7 @@ const Profile = () => {
         <div className="absolute top-1/3 right-10 w-[500px] h-[400px] rounded-full bg-cyan-500/10 blur-[140px]" />
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
-        <div className="max-w-[1680px] mx-auto space-y-6">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10 space-y-6">
           
           {/* NAVIGATION BREADCRUMB */}
           <div className="flex items-center justify-between">
@@ -222,7 +221,6 @@ const Profile = () => {
               />
             </div>
           </div>
-        </div>
 
         {/* ===== VERIFIABLE CERTIFICATE MODAL ===== */}
         <CertificateModal

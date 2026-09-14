@@ -32,7 +32,7 @@ const AICoachingPage = () => {
         <div className="absolute bottom-1/3 right-10 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[150px]" />
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
+      <div className="w-full space-y-8 relative z-10">
         {/* Top Page Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#162035] pb-6">
           <div className="space-y-1">

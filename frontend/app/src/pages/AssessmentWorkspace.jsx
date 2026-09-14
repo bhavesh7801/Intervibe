@@ -244,7 +244,7 @@ const AssessmentWorkspace = () => {
 
   return (
     <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-6 sm:py-8 px-3 sm:px-6 lg:px-8 overflow-x-hidden" data-testid="hybrid-assessment-workspace">
-      <div className="w-full max-w-[1600px] mx-auto space-y-6">
+      <div className="w-full space-y-6">
       
       {/* Assessment Configuration Modal */}
       {showConfigModal && (

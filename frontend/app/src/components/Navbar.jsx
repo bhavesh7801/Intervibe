@@ -128,7 +128,7 @@ const Navbar = () => {
         }`} 
         data-testid="navbar"
       >
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 h-[76px] flex items-center justify-between gap-4">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-[76px] flex items-center justify-between gap-4">
           
           {/* Left Side: Drawer Button & Brand Logo (Matching Screenshot) */}
           <div className="flex items-center gap-3">

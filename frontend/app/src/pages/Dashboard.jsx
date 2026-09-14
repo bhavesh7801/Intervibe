@@ -160,8 +160,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-8 sm:py-10 overflow-x-hidden" data-testid="dashboard-page">
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-6 sm:py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden" data-testid="dashboard-page">
+      <div className="w-full">
         
         {/* Mockup Redesign Header Banner */}
         <div className="mb-8 p-6 sm:p-8 rounded-2xl bg-[#0D121F] border border-blue-500/20 shadow-2xl relative overflow-hidden">
