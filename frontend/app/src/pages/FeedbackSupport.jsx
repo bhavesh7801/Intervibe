@@ -94,8 +94,8 @@ const FeedbackSupport = () => {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] text-slate-200 py-8 px-4 sm:px-8 flex flex-col items-center justify-center">
-      <div className="w-full max-w-[1200px] mx-auto space-y-8 px-4">
+    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-8 sm:py-10 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+      <div className="w-full max-w-5xl mx-auto space-y-8">
         
         {/* Header Navigation */}
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-700/60">

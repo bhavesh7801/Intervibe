@@ -191,8 +191,8 @@ const Results = () => {
   if (!session) return null;
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full flex flex-col items-center justify-center bg-[#060813] text-slate-200 py-6 sm:py-10 overflow-x-hidden" data-testid="results-page">
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 space-y-8">
+    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-8 sm:py-10 px-4 sm:px-6 lg:px-8 overflow-x-hidden" data-testid="results-page">
+      <div className="w-full max-w-6xl mx-auto space-y-8">
         
         {/* PDF Export Bar */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">

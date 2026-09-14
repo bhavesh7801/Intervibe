@@ -211,8 +211,8 @@ const InterviewSession = () => {
   const currentQuestion = session.questions[currentQuestionIndex] || {};
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] py-4 sm:py-8 overflow-x-hidden">
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] py-8 sm:py-10 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+      <div className="w-full max-w-6xl mx-auto space-y-6">
         
         {/* Top Navigation Bar: Back to Dashboard & Session Details */}
         <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-700/60">

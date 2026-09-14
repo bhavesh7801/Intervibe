@@ -25,14 +25,14 @@ const AICoachingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#060813] text-slate-100 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden" data-testid="ai-coaching-page">
+    <div className="min-h-[calc(100vh-76px)] bg-[#060813] text-slate-100 py-8 sm:py-10 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden" data-testid="ai-coaching-page">
       {/* Background ambient lighting */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-blue-600/10 blur-[140px]" />
         <div className="absolute bottom-1/3 right-10 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[150px]" />
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
+      <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         {/* Top Page Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#162035] pb-6">
           <div className="space-y-1">

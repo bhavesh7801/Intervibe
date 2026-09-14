@@ -243,7 +243,8 @@ const AssessmentWorkspace = () => {
   const isMcq = currentQuestion?.questionType === 'mcq' || !isUserTech;
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] text-slate-200 p-3 sm:p-5 overflow-x-hidden" data-testid="hybrid-assessment-workspace">
+    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-6 sm:py-8 px-3 sm:px-6 lg:px-8 overflow-x-hidden" data-testid="hybrid-assessment-workspace">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
       
       {/* Assessment Configuration Modal */}
       {showConfigModal && (
@@ -917,6 +918,7 @@ const AssessmentWorkspace = () => {
 
         </>
       )}
+      </div>
 
       <QuestionGeneratorModal
         isOpen={isGeneratorOpen}

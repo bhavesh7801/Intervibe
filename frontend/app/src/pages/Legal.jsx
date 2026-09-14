@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 const Legal = () => {
   return (
-    <div className="min-h-screen bg-[#060813] text-white p-6 md:p-12 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-76px)] bg-[#060813] text-white py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-sky-600/10 rounded-full blur-[120px] pointer-events-none" />

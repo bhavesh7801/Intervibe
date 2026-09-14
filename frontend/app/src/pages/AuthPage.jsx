@@ -264,14 +264,14 @@ const AuthPage = ({ initialMode = 'login' }) => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] text-slate-100 relative overflow-x-hidden flex items-center justify-center py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-10 selection:bg-blue-500/30 selection:text-white" data-testid="auth-page">
+    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-100 relative overflow-x-hidden flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 selection:bg-blue-500/30 selection:text-white" data-testid="auth-page">
       {/* Background Ambient Radial Glows (Exact Screenshot Palette) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(20,32,66,0.85)_0%,transparent_75%)] blur-3xl" />
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(12,18,34,0.7)_0%,transparent_70%)] blur-3xl" />
       </div>
 
-      <main className="max-w-[1700px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center relative z-10 my-auto px-2 sm:px-4 lg:px-8">
+      <main className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10 my-auto px-2 sm:px-4">
         
         {/* LEFT COLUMN — Brand & Feature Showcase */}
         <div className="hidden lg:flex lg:col-span-6 xl:col-span-6 flex-col items-start space-y-8 pr-4">

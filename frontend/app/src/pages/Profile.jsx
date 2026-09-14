@@ -121,7 +121,7 @@ const Profile = () => {
 
   return (
     <div
-      className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#040714] text-slate-100 font-sans relative select-none"
+      className="min-h-[calc(100vh-76px)] w-full max-w-full overflow-x-hidden bg-[#060813] text-slate-100 font-sans relative select-none"
       data-testid="profile-page"
     >
       {/* 3D COSMIC BACKGROUND & GLOWING MESH */}
@@ -153,8 +153,8 @@ const Profile = () => {
         />
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
-        <div className="max-w-[1680px] mx-auto space-y-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-10 relative z-10">
+        <div className="max-w-7xl mx-auto space-y-8">
           
           {/* NAVIGATION BREADCRUMB */}
           <div className="flex items-center justify-between">

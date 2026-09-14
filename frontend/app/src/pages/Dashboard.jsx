@@ -160,11 +160,11 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-73px)] w-full bg-[#060813] text-slate-200 py-6 sm:py-10 overflow-x-hidden" data-testid="dashboard-page">
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-76px)] w-full bg-[#060813] text-slate-200 py-8 sm:py-10 overflow-x-hidden" data-testid="dashboard-page">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Mockup Redesign Header Banner */}
-        <div className="mb-8 p-6 sm:p-8 rounded-2xl bg-[#0D121F] border border-blue-500/20 shadow-2xl relative overflow-hidden animate-entrance">
+        <div className="mb-8 p-6 sm:p-8 rounded-2xl bg-[#0D121F] border border-blue-500/20 shadow-2xl relative overflow-hidden">
           <div className="flex items-center gap-2 mb-2 text-xs font-bold text-blue-400 uppercase tracking-widest">
             <Sparkles size={16} className="animate-pulse text-blue-400" />
             <span>Interview Prep AI Dashboard</span>
