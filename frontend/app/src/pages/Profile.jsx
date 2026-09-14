@@ -121,40 +121,17 @@ const Profile = () => {
 
   return (
     <div
-      className="min-h-[calc(100vh-76px)] w-full max-w-full overflow-x-hidden bg-[#060813] text-slate-100 font-sans relative select-none"
+      className="min-h-[calc(100vh-76px)] w-full max-w-full overflow-x-hidden bg-[#060813] text-slate-100 font-sans relative"
       data-testid="profile-page"
     >
-      {/* 3D COSMIC BACKGROUND & GLOWING MESH */}
+      {/* Stable Ambient Lighting (No blinking / No bottom void) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Subtle grid pattern background */}
-        <div 
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: `radial-gradient(rgba(59, 130, 246, 0.4) 1px, transparent 1px), radial-gradient(rgba(6, 182, 212, 0.4) 1px, transparent 1px)`,
-            backgroundSize: "40px 40px",
-            backgroundPosition: "0 0, 20px 20px",
-          }}
-        />
-
-        {/* Dynamic Glowing Nebula Spheres */}
-        <div className="absolute -top-40 -left-40 w-[700px] h-[700px] rounded-full bg-cyan-600/15 blur-[160px] animate-pulse" style={{ animationDuration: "8s" }} />
-        <div className="absolute top-1/4 -right-40 w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[160px] animate-pulse" style={{ animationDuration: "12s" }} />
-        <div className="absolute bottom-10 left-1/3 w-[800px] h-[500px] rounded-full bg-indigo-700/15 blur-[180px]" />
-
-        {/* Perspective 3D Grid Floor at bottom */}
-        <div 
-          className="absolute bottom-0 left-0 right-0 h-[350px] opacity-25 pointer-events-none"
-          style={{
-            background: `linear-gradient(to bottom, transparent, rgba(6, 182, 212, 0.15)), linear-gradient(90deg, rgba(6, 182, 212, 0.2) 1px, transparent 1px), linear-gradient(0deg, rgba(6, 182, 212, 0.2) 1px, transparent 1px)`,
-            backgroundSize: "100% 100%, 60px 60px, 60px 60px",
-            transform: "perspective(500px) rotateX(60deg)",
-            transformOrigin: "bottom center",
-          }}
-        />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] rounded-full bg-blue-600/10 blur-[140px]" />
+        <div className="absolute top-1/3 right-10 w-[500px] h-[400px] rounded-full bg-cyan-500/10 blur-[140px]" />
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-10 relative z-10">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10">
+        <div className="max-w-7xl mx-auto space-y-6">
           
           {/* NAVIGATION BREADCRUMB */}
           <div className="flex items-center justify-between">
