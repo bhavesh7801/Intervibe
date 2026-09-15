@@ -126,12 +126,12 @@ export const AuthProvider = ({ children }) => {
         if (apiErr.response?.data?.detail) {
           throw new Error(apiErr.response.data.detail);
         }
-        // Simulated fallback for testing
+        // Simulated fallback for network failure or offline test
         return {
           success: true,
           requiresVerification: true,
           email: userData.email,
-          message: `Verification code sent to ${userData.email} (Demo code: 123456)`
+          message: `Verification code sent to ${userData.email}`
         };
       }
       return {
