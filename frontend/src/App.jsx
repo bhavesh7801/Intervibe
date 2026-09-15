@@ -23,6 +23,7 @@ import CertificateVerification from './pages/CertificateVerification.jsx';
 import FeedbackSupport from './pages/FeedbackSupport.jsx';
 import Legal from './pages/Legal.jsx';
 import LinkedInCallback from './pages/LinkedInCallback.jsx';
+import GoogleCallback from './pages/GoogleCallback.jsx';
 
 export default function App() {
   return (
@@ -44,6 +45,8 @@ export default function App() {
                 <Route path="/support" element={<FeedbackSupport />} />
                 <Route path="/legal" element={<Legal />} />
                 <Route path="/auth/callback/linkedin" element={<LinkedInCallback />} />
+                <Route path="/auth/callback/google" element={<GoogleCallback />} />
+                <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
                 {/* Protected Private Candidate Routes */}
                 <Route

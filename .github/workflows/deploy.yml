@@ -14,6 +14,7 @@ jobs:
     env:
       EC2_HOST: ${{ secrets.EC2_HOST }}
       EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+      EC2_USER: ${{ secrets.EC2_USER || 'ubuntu' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -45,6 +46,9 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: ghcr.io/bhavesh7801/intervibe/frontend:latest
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+            VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID || '658426092732-l6odo2d5esndtljmu4brsvu31f3lp9kk.apps.googleusercontent.com' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -53,13 +57,18 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ env.EC2_HOST }}
-          username: ubuntu
+          username: ${{ env.EC2_USER }}
           key: ${{ env.EC2_SSH_KEY }}
           script: |
+            mkdir -p ~/Intervibe
             cd ~/Intervibe
-            git pull https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git main || git pull origin main
+            if [ -d .git ]; then
+              git pull https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git main || git pull origin main || true
+            fi
             echo "${{ secrets.GITHUB_TOKEN }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
             sudo docker compose pull
             sudo docker compose up -d --remove-orphans
             sudo docker image prune -af
+            echo "Deployment to AWS EC2 completed successfully!"
+
 
