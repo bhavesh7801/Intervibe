@@ -21,8 +21,8 @@ export const HeroSection = () => {
     <section className="relative w-full flex flex-col items-center pt-8 sm:pt-14 pb-12 overflow-hidden">
       {/* Subtle Ambient Gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-rose-200/30 via-purple-100/20 to-transparent rounded-full blur-[100px]" />
-        <div className="absolute top-[30%] -left-[10%] w-[400px] h-[300px] bg-sky-100/30 rounded-full blur-[100px]" />
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-rose-500/15 via-purple-500/10 to-transparent rounded-full blur-[100px]" />
+        <div className="absolute top-[30%] -left-[10%] w-[400px] h-[300px] bg-sky-500/10 rounded-full blur-[100px]" />
       </div>
 
       <div className="site-container text-center flex flex-col items-center relative z-10">
@@ -32,16 +32,16 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-50 border border-rose-200 shadow-xs mb-6 sm:mb-8"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 shadow-xs mb-6 sm:mb-8"
         >
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
           </span>
-          <span className="text-xs font-mono font-bold tracking-wide uppercase text-rose-700">
+          <span className="text-xs font-mono font-bold tracking-wide uppercase text-rose-700 dark:text-rose-400">
             Next-Gen AI Interview Intelligence
           </span>
-          <Zap size={13} className="text-rose-600" />
+          <Zap size={13} className="text-rose-600 dark:text-rose-400" />
         </motion.div>
 
         {/* Master Headline */}
@@ -49,10 +49,10 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight leading-[1.08] max-w-4xl mx-auto font-heading"
+          className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.08] max-w-4xl mx-auto font-heading"
         >
           Master your next interview with{' '}
-          <span className="text-rose-600">
+          <span className="text-rose-600 dark:text-rose-500">
             real-time AI feedback.
           </span>
         </motion.h1>
@@ -62,7 +62,7 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-6 sm:mt-7 text-base sm:text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed"
+          className="mt-6 sm:mt-7 text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed"
         >
           Simulate rigorous coding, system design, and behavioral loops with an adaptive AI coach that analyzes your speech cadence, code complexity, and communication clarity.
         </motion.p>
@@ -86,9 +86,9 @@ export const HeroSection = () => {
           <button
             type="button"
             onClick={scrollToPreview}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl text-base font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-95 shadow-xs"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl text-base font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-95 shadow-xs"
           >
-            <Play size={17} className="text-rose-600 group-hover:scale-110 transition-transform" />
+            <Play size={17} className="text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform" />
             <span>Watch 2-Min Demo</span>
           </button>
         </motion.div>
@@ -98,16 +98,16 @@ export const HeroSection = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-6 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-xs"
+          className="mt-6 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs"
         >
           <div className="flex -space-x-1">
             {[1, 2, 3, 4, 5].map((i) => (
               <Star key={i} size={14} className="text-amber-400 fill-amber-400" />
             ))}
           </div>
-          <span className="text-slate-900 font-bold text-xs sm:text-sm">4.9/5 Rating</span>
-          <span className="text-slate-300 text-xs">•</span>
-          <span className="text-slate-600 text-xs sm:text-sm font-medium">50,000+ candidates placed</span>
+          <span className="text-slate-900 dark:text-white font-bold text-xs sm:text-sm">4.9/5 Rating</span>
+          <span className="text-slate-300 dark:text-slate-600 text-xs">•</span>
+          <span className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">50,000+ candidates placed</span>
         </motion.div>
 
         {/* Company Offers Ribbon */}
@@ -116,19 +116,19 @@ export const HeroSection = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-14 sm:mt-18 pt-8 border-t border-slate-200 w-full flex flex-col items-center gap-5"
+          className="mt-14 sm:mt-18 pt-8 border-t border-slate-200 dark:border-slate-800 w-full flex flex-col items-center gap-5"
         >
-          <span className="text-xs text-slate-500 font-mono font-bold tracking-[0.2em] uppercase">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-bold tracking-[0.2em] uppercase">
             Candidates Landed Offers At Top Tech Companies
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 w-full">
             {COMPANIES.map((c) => (
               <div
                 key={c.name}
-                className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-rose-300 hover:bg-rose-50/20 transition-all flex flex-col items-center justify-center text-center group cursor-default shadow-xs"
+                className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-rose-300 dark:hover:border-rose-800 hover:bg-rose-50/20 dark:hover:bg-rose-950/20 transition-all flex flex-col items-center justify-center text-center group cursor-default shadow-xs"
               >
-                <span className="text-sm font-bold text-slate-900 group-hover:text-rose-600 transition-colors">{c.name}</span>
-                <span className="text-[10px] text-slate-500 font-mono mt-0.5">{c.role}</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">{c.name}</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">{c.role}</span>
               </div>
             ))}
           </div>
