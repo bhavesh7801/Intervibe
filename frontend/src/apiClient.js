@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// Empty string = relative URL → nginx proxies to backend on EC2
+// In dev, Vite proxy handles /auth, /api etc → localhost:8000
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
