@@ -21,7 +21,7 @@ services:
   frontend:
     image: ghcr.io/bhavesh7801/intervibe/frontend:latest
     build:
-      context: ./frontend/app
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: interview_prep_frontend
     restart: always
