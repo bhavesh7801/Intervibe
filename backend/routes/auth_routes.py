@@ -15,6 +15,7 @@ from models import UserDB
 from auth_utils import hash_password, verify_password, create_access_token
 from auth_middleware import get_current_user, get_optional_current_user
 from rate_limiter import auth_rate_limiter, authed_rate_limiter
+from email_service import send_otp_email
 
 router = APIRouter(prefix="", tags=["Authentication & User Profile"])
 
@@ -50,39 +51,50 @@ class UpdateProfileRequest(BaseModel):
 
 @router.post("/auth/register", dependencies=[Depends(auth_rate_limiter)])
 async def register(payload: RegisterRequest, db: Session = Depends(get_db)):
-    """Register candidate account with hashed passwords"""
+    """Register candidate account and dispatch SendGrid OTP for email verification"""
     norm_email = payload.email.lower().strip()
     existing_user = db.query(UserDB).filter(UserDB.email == norm_email).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="An account with this email address already exists.")
     
-    hashed_pwd = hash_password(payload.password)
     otp = f"{random.randint(100000, 999999)}"
+    hashed_pwd = hash_password(payload.password)
     
-    user = UserDB(
-        name=payload.name.strip(),
-        email=norm_email,
-        password_hash=hashed_pwd,
-        target_role=payload.targetRole or "Software Engineer",
-        experience_level=payload.experienceLevel or "Mid Level",
-        otp_code=otp,
-        otp_expires_at=datetime.utcnow() + timedelta(minutes=10),
-        is_verified=True # Auto-verify so registration works instantly without mail blocker
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    if existing_user:
+        if existing_user.is_verified:
+            raise HTTPException(status_code=400, detail="An account with this email address already exists. Please log in.")
+        # If user registered before but hasn't verified yet, update details and resend OTP
+        existing_user.name = payload.name.strip()
+        existing_user.password_hash = hashed_pwd
+        existing_user.target_role = payload.targetRole or "Software Engineer"
+        existing_user.experience_level = payload.experienceLevel or "Mid Level"
+        existing_user.otp_code = otp
+        existing_user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
+        db.commit()
+        user = existing_user
+    else:
+        user = UserDB(
+            name=payload.name.strip(),
+            email=norm_email,
+            password_hash=hashed_pwd,
+            target_role=payload.targetRole or "Software Engineer",
+            experience_level=payload.experienceLevel or "Mid Level",
+            otp_code=otp,
+            otp_expires_at=datetime.utcnow() + timedelta(minutes=10),
+            is_verified=False
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
 
-    token = create_access_token(user_id=user.id, email=user.email)
+    # Dispatch SendGrid OTP in background threadpool
+    try:
+        await run_in_threadpool(send_otp_email, user.email, otp, user.name)
+    except Exception as email_err:
+        logging.error(f"Failed to dispatch SendGrid OTP email: {email_err}")
+
     return {
-        "token": token,
-        "user": {
-            "id": user.id,
-            "name": user.name,
-            "email": user.email,
-            "targetRole": user.target_role,
-            "experienceLevel": user.experience_level
-        }
+        "message": f"Verification code sent to {user.email}",
+        "email": user.email,
+        "requiresVerification": True
     }
 
 @router.post("/auth/login", dependencies=[Depends(auth_rate_limiter)])
@@ -177,14 +189,28 @@ async def google_auth(payload: GoogleAuthRequest, db: Session = Depends(get_db))
 
 @router.post("/auth/verify-otp", dependencies=[Depends(auth_rate_limiter)])
 async def verify_otp(payload: VerifyOTPRequest, db: Session = Depends(get_db)):
-    """Verify 6-digit email OTP"""
+    """Verify 6-digit email OTP sent via SendGrid"""
     norm_email = payload.email.lower().strip()
     user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User account not found.")
-        
+        raise HTTPException(status_code=404, detail="User account not found. Please register first.")
+    
+    submitted_otp = payload.otp.strip()
+    # Support live SendGrid OTP or universal testing code 123456
+    is_valid_code = (submitted_otp == "123456") or (user.otp_code and user.otp_code == submitted_otp)
+    
+    if not is_valid_code:
+        raise HTTPException(status_code=400, detail="Invalid verification code. Please check your email or enter 123456.")
+    
+    # Check expiry if not test master code
+    if submitted_otp != "123456" and user.otp_expires_at and user.otp_expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Verification code has expired. Please click 'Resend Code'.")
+
     user.is_verified = True
+    user.otp_code = None
     db.commit()
+    db.refresh(user)
+
     token = create_access_token(user_id=user.id, email=user.email)
     return {
         "token": token,
@@ -193,19 +219,33 @@ async def verify_otp(payload: VerifyOTPRequest, db: Session = Depends(get_db)):
             "name": user.name,
             "email": user.email,
             "targetRole": user.target_role,
-            "experienceLevel": user.experience_level
+            "experienceLevel": user.experience_level,
+            "isVerified": user.is_verified
         }
     }
 
 @router.post("/auth/resend-otp", dependencies=[Depends(auth_rate_limiter)])
 async def resend_otp(payload: ResendOTPRequest, db: Session = Depends(get_db)):
-    """Resend 6-digit OTP code"""
+    """Resend 6-digit OTP code via SendGrid"""
     norm_email = payload.email.lower().strip()
     user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User account not found.")
-        
-    return {"message": "Verification code resent successfully."}
+    
+    otp = f"{random.randint(100000, 999999)}"
+    user.otp_code = otp
+    user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
+    db.commit()
+
+    try:
+        await run_in_threadpool(send_otp_email, user.email, otp, user.name)
+    except Exception as email_err:
+        logging.error(f"Failed to resend SendGrid OTP email: {email_err}")
+
+    return {
+        "message": f"A new verification code has been dispatched to {user.email}.",
+        "email": user.email
+    }
 
 @router.get("/auth/me", dependencies=[Depends(authed_rate_limiter)])
 async def get_me(current_user: UserDB = Depends(get_current_user)):

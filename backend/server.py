@@ -95,7 +95,7 @@ if cors_raw == "*":
 else:
     allowed_origins = [orig.strip() for orig in cors_raw.split(",") if orig.strip()]
     for default_origin in [
-        "http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173",
+        "http://localhost:5175", "http://127.0.0.1:5175",
         "http://intervibe.duckdns.org", "https://intervibe.duckdns.org"
     ]:
         if default_origin not in allowed_origins:

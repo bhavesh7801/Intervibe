@@ -249,14 +249,14 @@ def _extract_json(text: str):
 
 
 def build_llm_prompt(topic: str, difficulty: str, exclude_titles: list = None, resume_text: str = None) -> tuple[str, str]:
-    """Build system and user prompts with creative salt hash, timestamp seed, and strict exclusion list."""
+    """Build system and user prompts with creative salt hash, timestamp seed, and strict LeetCode structure."""
     unique_salt = random.randint(10000, 99999)
     current_time_seed = int(time.time() * 1000)
 
     system_prompt = (
-        "You are an elite competitive programming problem setter and Principal LeetCode author. "
-        "Your job is to invent brand-new, original coding interview questions that have never appeared in standard question banks before. "
-        "Never repeat standard textbook templates or previously seen problems."
+        "You are a Principal LeetCode Problem Setter and competitive programming contest author. "
+        "Your mission is to invent brand-new, original LeetCode-style interview problems that feel 100% authentic to the official LeetCode platform. "
+        "Strictly adhere to LeetCode format conventions: clear problem statement, structured Example blocks (Input, Output, Explanation), bulleted Constraints, and canonical class Solution method signatures."
     )
 
     avoid_clause = ""
@@ -269,25 +269,54 @@ def build_llm_prompt(topic: str, difficulty: str, exclude_titles: list = None, r
         resume_clause = f"\n- CANDIDATE RESUME CONTEXT: Tailor the narrative/scenario of the question to match the domains, industries, or technologies mentioned in this resume snippet: {resume_text[:1000]}"
 
     user_prompt = f"""
-    Create a completely unique, never-before-seen coding interview question.
+    Create a completely unique, authentic LeetCode coding interview problem.
     
     STRICT PARAMETERS:
-    - Target Topic: {topic} (The problem MUST test this exact data structure or algorithm. If '{topic}' is Linked List, use Linked List nodes. If Trees, use binary tree nodes).
+    - Target Topic: {topic} (The problem MUST test this exact data structure or algorithm).
     - Difficulty Level: {difficulty}
-    - Creative Salt & Nonce: {unique_salt}-{current_time_seed} (Use this hash to completely randomize the problem narrative, variable names, constraints, and test scenarios so it is 100% unique).{avoid_clause}{resume_clause}
+    - Creative Salt & Nonce: {unique_salt}-{current_time_seed}{avoid_clause}{resume_clause}
+
+    FORMATTING REQUIREMENTS FOR 'description':
+    The 'description' field MUST contain:
+    1. A precise technical problem statement.
+    2. At least two structured examples in this exact format:
+       Example 1:
+       Input: ...
+       Output: ...
+       Explanation: ...
+
+       Example 2:
+       Input: ...
+       Output: ...
+    3. A bulleted Constraints section:
+       Constraints:
+       • ...
+       • ...
+    4. An optional Follow-up question.
+
+    FORMATTING REQUIREMENTS FOR 'starter_code':
+    Must provide canonical LeetCode boilerplate code:
+    - 'python': 'class Solution:\\n    def methodName(self, ...: ...) -> ...:\\n        pass'
+    - 'javascript': '/**\\n * @param {{...}} ...\\n * @return {{...}}\\n */\\nvar methodName = function(...) {{\\n    \\n}};'
+    - 'typescript': 'function methodName(...: ...): ... {{\\n    \\n}};'
+    - 'cpp': 'class Solution {{\\npublic:\\n    ... methodName(...) {{\\n        \\n    }}\\n}};'
+    - 'java': 'class Solution {{\\n    public ... methodName(...) {{\\n        \\n    }}\\n}};'
+    - 'go': 'func methodName(...) ... {{\\n    \\n}}'
 
     Return ONLY a valid JSON object with this exact structure:
     {{
       "id": "generated-{topic.lower().replace(' ', '-')}-{unique_salt}",
-      "title": "A Creative, Unique Problem Title",
+      "title": "A Creative LeetCode Problem Title",
       "difficulty": "{difficulty}",
       "category": "{topic}",
-      "description": "Write a detailed markdown description with a unique storyline, clear constraints, and at least two examples.",
+      "description": "Full LeetCode markdown description with Example 1/2 and Constraints",
       "starter_code": {{
-        "python": "class Solution:\\n    def solveProblem(self, ...):\\n        # Write your code here\\n        pass",
-        "javascript": "class Solution {{\\n    solveProblem(...) {{\\n        // Write your code here\\n    }}\\n}}",
-        "cpp": "class Solution {{\\npublic:\\n    int solveProblem(...) {{\\n        // Write your code here\\n    \\}};\n}};",
-        "java": "class Solution {{\\n    public int solveProblem(...) {{\\n        // Write your code here\\n        return 0;\\n    }}\\n}}"
+        "python": "class Solution:\\n    def solve(self, nums: List[int]) -> int:\\n        pass",
+        "javascript": "/**\\n * @param {{number[]}} nums\\n * @return {{number}}\\n */\\nvar solve = function(nums) {{\\n    \\n}};",
+        "typescript": "function solve(nums: number[]): number {{\\n    \\n}};",
+        "cpp": "class Solution {{\\npublic:\\n    int solve(vector<int>& nums) {{\\n        return 0;\\n    }}\\n}};",
+        "java": "class Solution {{\\n    public int solve(int[] nums) {{\\n        return 0;\\n    }}\\n}};",
+        "go": "func solve(nums []int) int {{\\n    return 0\\n}}"
       }},
       "test_cases": [
         {{"input": "...", "expected": "..."}},

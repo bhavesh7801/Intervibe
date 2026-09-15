@@ -66,46 +66,54 @@ def send_otp_email(to_email: str, otp_code: str, user_name: str = "Candidate") -
     </html>
     """
 
-    # 1. Primary: SendGrid Transactional Email Dispatch with Brand Name
+    # 1. Primary: SendGrid Transactional Email Dispatch
     if SENDGRID_API_KEY and "your_sendgrid_key" not in SENDGRID_API_KEY.lower():
         try:
+            import socket
             from sendgrid import SendGridAPIClient
             from sendgrid.helpers.mail import Mail, From, To, Content
             
+            # Use verified sender
+            effective_sender = SENDER_EMAIL if SENDER_EMAIL and "@" in SENDER_EMAIL else (SMTP_USER or "noreply@interviewprep.ai")
             message = Mail(
-                from_email=From(SENDER_EMAIL, SENDER_NAME),
+                from_email=From(effective_sender, SENDER_NAME),
                 to_emails=To(to_email),
                 subject=subject,
                 html_content=Content("text/html", html_content)
             )
             sg = SendGridAPIClient(SENDGRID_API_KEY)
-            resp = sg.send(message)
-            if resp.status_code in [200, 201, 202]:
-                logger.info(f"SendGrid system OTP email sent to {to_email}")
-                print(f"\n[SENDGRID LIVE EMAIL SENT] From: {SENDER_NAME} <{SENDER_EMAIL}> | Destination: {to_email} | OTP Code: {otp_code}\n")
-                return True
-            else:
-                logger.error(f"SendGrid returned status code: {resp.status_code}")
+            # Set short socket timeout so failure falls back to SMTP without delay
+            old_timeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(4)
+            try:
+                resp = sg.send(message)
+                if resp.status_code in [200, 201, 202]:
+                    logger.info(f"SendGrid OTP email sent to {to_email}")
+                    print(f"\n[SENDGRID LIVE EMAIL SENT] From: {SENDER_NAME} <{effective_sender}> | Destination: {to_email} | OTP Code: {otp_code}\n")
+                    return True
+            finally:
+                socket.setdefaulttimeout(old_timeout)
         except Exception as sg_err:
-            logger.error(f"SendGrid dispatch error: {sg_err}")
+            logger.warning(f"SendGrid dispatch attempt failed ({sg_err}), switching to backup SMTP...")
 
-    # 2. Secondary Backup: SMTP Dispatch
-    if SMTP_USER and SMTP_PASSWORD:
+    # 2. Secondary: High-Speed SMTP Dispatch (Gmail / Custom SMTP)
+    clean_smtp_pwd = SMTP_PASSWORD.replace(" ", "")
+    if SMTP_USER and clean_smtp_pwd:
         try:
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
-            msg["From"] = formataddr((SENDER_NAME, SENDER_EMAIL))
+            msg["From"] = formataddr((SENDER_NAME, SMTP_USER))
             msg["To"] = to_email
 
             msg.attach(MIMEText(html_content, "html"))
 
-            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=8) as server:
                 server.starttls()
-                server.login(SMTP_USER, SMTP_PASSWORD)
+                server.login(SMTP_USER, clean_smtp_pwd)
                 server.sendmail(SMTP_USER, to_email, msg.as_string())
 
-            logger.info(f"Backup SMTP email successfully sent to {to_email}")
-            print(f"\n[SMTP BACKUP EMAIL SENT] From: {SENDER_NAME} <{SENDER_EMAIL}> | Destination: {to_email} | OTP Code: {otp_code}\n")
+            logger.info(f"SMTP OTP email successfully sent to {to_email}")
+            print(f"\n[SMTP EMAIL DELIVERED] From: {SENDER_NAME} <{SMTP_USER}> | Destination: {to_email} | OTP Code: {otp_code}\n")
             return True
         except Exception as e:
             logger.error(f"Backup SMTP dispatch error to {to_email}: {e}")

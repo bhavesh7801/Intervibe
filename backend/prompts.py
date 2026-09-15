@@ -19,9 +19,20 @@ Persona directive: {persona}
 Include topics like probability, permutations, speed & distance, logical puzzles, number series, or data interpretation.
 Return ONLY a JSON array. Format: {json_template}"""
 
-GENERAL_INTERVIEW_PROMPT = """You are an expert technical interviewer. Generate {num_questions} brand-new, completely unique, non-repetitive interview questions for a {experience_level} level {role} position.
+GENERAL_INTERVIEW_PROMPT = """You are an expert technical interviewer conducting a live conversational technical & behavioral interview for a {experience_level} level {role} position.
 Persona directive: {persona}
-Never repeat common textbook questions. Vary the scenarios, system architectural constraints, and problem domains.
+
+CRITICAL REQUIREMENT: 
+- Do NOT generate LeetCode-style coding puzzles, algorithmic code-typing questions, or syntax tests.
+- Generate REAL-TIME CONVERSATIONAL INTERVIEW QUESTIONS that candidates are asked verbally in actual technical, architectural, and behavioral interview loops at top tier tech companies (e.g., Google, Meta, Amazon, Microsoft, Netflix).
+- Focus on:
+  1. Real-world System Design, Scalability & Architecture Scenarios.
+  2. Production Incident Triage, Performance Tuning & Root Cause Analysis.
+  3. Deep Core Engineering Concepts, Concurrency, and Architectural Trade-offs.
+  4. Behavioral & Leadership scenarios requiring the STAR method (Situation, Task, Action, Result).
+  5. Practical API, Database Schema, and Microservice Design decisions.
+
+Never repeat common textbook questions. Vary the scenarios, constraints, and problem domains.
 Return ONLY a JSON array. Format: {json_template}"""
 
 # Prompts for Resume Analysis
@@ -72,8 +83,30 @@ def get_fallback_questions(role: str, experience_level: str, num_questions: int)
         ]
     else:
         fallback = [
-            {"text": f"Tell me about your core experience with {role} technologies.", "category": "technical", "difficulty": "medium"},
-            {"text": "Describe a challenging project you worked on and how you overcame obstacles.", "category": "behavioral", "difficulty": "medium"},
-            {"text": "How do you handle tight deadlines or technical disagreements on a team?", "category": "behavioral", "difficulty": "medium"}
+            {
+                "text": f"Walk me through a high-stakes production outage or severe performance degradation you diagnosed for a {role} system. What was your root cause analysis process, how did you mitigate downtime under pressure, and what permanent architectural guardrails did you implement?",
+                "category": "Incident Triage & Reliability",
+                "difficulty": "hard"
+            },
+            {
+                "text": "How do you approach designing a resilient microservices communication architecture when downstream third-party dependencies experience intermittent latency spikes? Discuss circuit breakers, retry with exponential backoff, and dead-letter queues.",
+                "category": "System Architecture & Resilience",
+                "difficulty": "medium"
+            },
+            {
+                "text": "Tell me about a time you had a fundamental technical disagreement with a senior engineer or product manager regarding database schema design or system architecture. How did you advocate your perspective with data, and what was the outcome?",
+                "category": "Behavioral Leadership (STAR)",
+                "difficulty": "medium"
+            },
+            {
+                "text": "Explain how database indexing strategies (B-Tree vs Hash vs GiST) impact query latency and write throughput on high-velocity transactional databases. How would you optimize a query spanning hundreds of millions of rows?",
+                "category": "Database & Query Optimization",
+                "difficulty": "hard"
+            },
+            {
+                "text": "Describe a scenario where you had to balance technical debt vs shipping a critical feature under aggressive deadlines. How did you communicate the trade-offs to non-technical stakeholders and manage long-term system health?",
+                "category": "Engineering Pragmatism & Delivery",
+                "difficulty": "medium"
+            }
         ]
     return fallback[:num_questions]

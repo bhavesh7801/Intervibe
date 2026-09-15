@@ -2,6 +2,7 @@
 node_modules/
 dist/
 dist-ssr/
+folder1/
 
 # Python cache & virtual environments
 __pycache__/
