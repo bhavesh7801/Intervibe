@@ -63,12 +63,19 @@ async def apply_exponential_backoff(key: str, max_attempts: int, window: int):
             headers={"Retry-After": str(delay)}
         )
 
+import ipaddress
+
 def get_client_ip(request: Request) -> str:
-    """Extract true client IP address honoring reverse proxies (Nginx/Cloudflare/AWS ALB)."""
+    """Extract and validate true client IP address honoring reverse proxies (Nginx/Cloudflare/AWS ALB)."""
     forwarded = request.headers.get("x-forwarded-for") or request.headers.get("x-real-ip")
     if forwarded:
-        # X-Forwarded-For can be a comma-separated list; first entry is the client
-        return forwarded.split(",")[0].strip()
+        raw_ip = forwarded.split(",")[0].strip()
+        try:
+            # Validate IP format to prevent header injection
+            ipaddress.ip_address(raw_ip)
+            return raw_ip
+        except ValueError:
+            pass
     return request.client.host if request.client else "127.0.0.1"
 
 async def auth_rate_limiter(request: Request):

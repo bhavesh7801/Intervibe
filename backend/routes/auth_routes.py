@@ -99,11 +99,17 @@ async def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/auth/login", dependencies=[Depends(auth_rate_limiter)])
 async def login(payload: LoginRequest, db: Session = Depends(get_db)):
-    """Authenticate candidate credentials"""
+    """Authenticate candidate credentials with verification check"""
     norm_email = payload.email.lower().strip()
     user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     if not user or not user.password_hash or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
+    
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Your email address has not been verified yet. Please enter the verification code sent to your email to activate your account."
+        )
     
     token = create_access_token(user_id=user.id, email=user.email)
     return {
@@ -196,18 +202,25 @@ async def verify_otp(payload: VerifyOTPRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User account not found. Please register first.")
     
     submitted_otp = payload.otp.strip()
-    # Support live SendGrid OTP or universal testing code 123456
-    is_valid_code = (submitted_otp == "123456") or (user.otp_code and user.otp_code == submitted_otp)
     
-    if not is_valid_code:
-        raise HTTPException(status_code=400, detail="Invalid verification code. Please check your email or enter 123456.")
+    # Environment-gated test bypass (ONLY allowed in local development)
+    env = os.environ.get("ENVIRONMENT", "development").lower()
+    allow_test_code = os.environ.get("ALLOW_TEST_OTP", "false").lower() in ("true", "1") or env == "development"
     
-    # Check expiry if not test master code
-    if submitted_otp != "123456" and user.otp_expires_at and user.otp_expires_at < datetime.utcnow():
-        raise HTTPException(status_code=400, detail="Verification code has expired. Please click 'Resend Code'.")
+    is_master_test = (submitted_otp == "123456" and allow_test_code)
+    is_live_match = bool(user.otp_code and user.otp_code == submitted_otp)
+    
+    if not (is_master_test or is_live_match):
+        raise HTTPException(status_code=400, detail="Invalid verification code. Please check your email or click 'Resend Code'.")
+    
+    # Check expiry for all live OTP submissions
+    if not is_master_test:
+        if user.otp_expires_at and user.otp_expires_at < datetime.utcnow():
+            raise HTTPException(status_code=400, detail="Verification code has expired. Please click 'Resend Code'.")
 
     user.is_verified = True
     user.otp_code = None
+    user.otp_expires_at = None
     db.commit()
     db.refresh(user)
 

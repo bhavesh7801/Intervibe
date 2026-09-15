@@ -88,25 +88,27 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An internal server error occurred. Please try again later."}
     )
 
-# Robust Multi-Origin CORS Configuration
-cors_raw = os.environ.get("CORS_ORIGINS") or os.environ.get("FRONTEND_URL") or "http://localhost:5173"
-if cors_raw == "*":
-    allowed_origins = ["*"]
+# Robust Secure Multi-Origin CORS Configuration
+cors_raw = os.environ.get("CORS_ORIGINS") or os.environ.get("FRONTEND_URL") or ""
+default_safe_origins = [
+    "http://localhost:5173", "http://localhost:5175", "http://localhost:5176",
+    "http://localhost:3000", "http://localhost:80",
+    "http://127.0.0.1:5173", "http://127.0.0.1:5175", "http://127.0.0.1:5176",
+    "http://intervibe.duckdns.org", "https://intervibe.duckdns.org"
+]
+
+if cors_raw and cors_raw != "*":
+    custom_origins = [orig.strip() for orig in cors_raw.split(",") if orig.strip()]
+    allowed_origins = list(set(default_safe_origins + custom_origins))
 else:
-    allowed_origins = [orig.strip() for orig in cors_raw.split(",") if orig.strip()]
-    for default_origin in [
-        "http://localhost:5175", "http://127.0.0.1:5175",
-        "http://intervibe.duckdns.org", "https://intervibe.duckdns.org"
-    ]:
-        if default_origin not in allowed_origins:
-            allowed_origins.append(default_origin)
+    allowed_origins = default_safe_origins
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With"],
 )
 
 # Mount Domain APIRouters (Auth routes have internal specific rate limiters)

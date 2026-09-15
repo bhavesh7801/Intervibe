@@ -96,16 +96,23 @@ FORBIDDEN_PYTHON_MODULES = {
     "http", "ftplib", "builtins", "__builtin__", "importlib", "pty",
     "pathlib", "ctypes", "posix", "nt", "signal", "multiprocessing",
     "threading", "asyncio", "resource", "gc", "inspect", "marshal",
-    "pickle", "shelve", "dbm", "sqlite3"
+    "pickle", "shelve", "dbm", "sqlite3", "pdb", "traceback"
 }
 
 FORBIDDEN_PYTHON_CALLS = {
     "__import__", "eval", "exec", "open", "compile", "globals", "locals",
-    "input", "breakpoint", "memoryview", "delattr"
+    "input", "breakpoint", "memoryview", "delattr", "setattr", "getattr",
+    "hasattr"
+}
+
+FORBIDDEN_PYTHON_ATTRIBUTES = {
+    "__class__", "__bases__", "__subclasses__", "__mro__", "__builtins__",
+    "__globals__", "__dict__", "__code__", "__getattribute__", "__qualname__",
+    "system", "popen", "spawn", "fork", "execv", "execve"
 }
 
 def validate_code_safety(source_code: str, target_lang: str) -> Optional[str]:
-    """Inspect source code for security violations before execution."""
+    """Inspect source code for security violations and reflection attacks before execution."""
     if target_lang == "python":
         import ast
         try:
@@ -129,20 +136,23 @@ def validate_code_safety(source_code: str, target_lang: str) -> Optional[str]:
                     if node.func.id in FORBIDDEN_PYTHON_CALLS:
                         return f"Security Restriction: Function '{node.func.id}()' is prohibited in execution sandbox."
                 elif isinstance(node.func, ast.Attribute):
-                    if node.func.attr in {"system", "popen", "spawn", "exec", "fork"}:
-                        return f"Security Restriction: System method call '{node.func.attr}()' is prohibited."
+                    if node.func.attr in FORBIDDEN_PYTHON_ATTRIBUTES:
+                        return f"Security Restriction: Attribute/Method '{node.func.attr}' is prohibited in sandbox."
+            elif isinstance(node, ast.Attribute):
+                if node.attr in FORBIDDEN_PYTHON_ATTRIBUTES:
+                    return f"Security Restriction: Introspection attribute '{node.attr}' is prohibited in sandbox."
 
-    elif target_lang in ["javascript", "js"]:
+    elif target_lang in ["javascript", "js", "typescript", "ts"]:
         lower = source_code.lower()
-        if any(bad in lower for bad in ["child_process", "require('fs')", "require(\"fs\")", "process.env", "process.exit"]):
-            return "Security Restriction: File system and process spawning APIs are prohibited in sandbox."
+        if any(bad in lower for bad in ["child_process", "require('fs')", "require(\"fs\")", "process.env", "process.exit", "eval(", "function("]):
+            return "Security Restriction: File system, process spawning, and dynamic evaluation APIs are prohibited in sandbox."
 
     elif target_lang == "java":
         if any(bad in source_code for bad in ["Runtime.getRuntime()", "ProcessBuilder", "java.lang.reflect", "System.exit"]):
             return "Security Restriction: System process and reflection APIs are prohibited in sandbox."
 
-    elif target_lang in ["cpp", "c++"]:
-        if any(bad in source_code for bad in ["system(", "popen(", "fork(", "exec(", "<cstdlib>"]):
+    elif target_lang in ["cpp", "c++", "c"]:
+        if any(bad in source_code for bad in ["system(", "popen(", "fork(", "exec(", "<cstdlib>", "<unistd.h>"]):
             return "Security Restriction: System process spawning functions are prohibited in sandbox."
 
     return None
