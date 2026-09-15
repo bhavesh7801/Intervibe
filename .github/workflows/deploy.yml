@@ -60,14 +60,19 @@ jobs:
           username: ${{ env.EC2_USER }}
           key: ${{ env.EC2_SSH_KEY }}
           script: |
+            # Free disk space before deployment
+            sudo docker system prune -af --volumes || true
+
             mkdir -p ~/Intervibe
             cd ~/Intervibe
             if [ -d .git ]; then
               git pull https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git main || git pull origin main || true
             fi
+
+            # Login to GHCR and pull pre-built images (NO local build)
             echo "${{ secrets.GITHUB_TOKEN }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
             sudo docker compose pull
-            sudo docker compose up -d --remove-orphans
+            sudo docker compose up -d --remove-orphans --no-build
             sudo docker image prune -af
             echo "Deployment to AWS EC2 completed successfully!"
 
