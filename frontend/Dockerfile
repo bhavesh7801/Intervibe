@@ -8,8 +8,8 @@ WORKDIR /app
 # Copy dependency definition files
 COPY package.json package-lock.json ./
 
-# Install dependencies cleanly
-RUN npm ci || npm install
+# Install dependencies cleanly with zero audit/fund overhead
+RUN (npm ci --no-audit --no-fund || npm install --no-audit --no-fund) && npm cache clean --force
 
 # Copy source code and build config
 COPY . .
