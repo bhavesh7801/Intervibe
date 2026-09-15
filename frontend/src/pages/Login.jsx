@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { InterviewPrepLogo } from '../components/Navbar.jsx';
+import { GoogleAuthButton } from '../components/auth/GoogleAuthButton.jsx';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export const Login = () => {
@@ -16,6 +17,13 @@ export const Login = () => {
   const [successMsg, setSuccessMsg] = useState('');
 
   const from = location.state?.from?.pathname || '/dashboard';
+
+  const handleGoogleSuccess = () => {
+    setSuccessMsg('Successfully authenticated with Google! Redirecting...');
+    setTimeout(() => {
+      navigate(from, { replace: true });
+    }, 400);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,6 +84,22 @@ export const Login = () => {
               <span className="font-medium">{successMsg}</span>
             </div>
           )}
+
+          {/* Google Sign-In Button */}
+          <GoogleAuthButton
+            text="Continue with Google"
+            mode="login"
+            onSuccess={handleGoogleSuccess}
+            onError={(err) => setError(err)}
+          />
+
+          {/* Divider */}
+          <div className="relative flex items-center justify-center">
+            <div className="border-t border-slate-200 dark:border-slate-800 w-full" />
+            <span className="bg-white dark:bg-slate-900 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0">
+              or with email
+            </span>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             

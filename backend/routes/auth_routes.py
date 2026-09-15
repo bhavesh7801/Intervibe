@@ -132,7 +132,19 @@ def verify_google_token_sync(token: str) -> Optional[dict]:
         ssl_ctx.check_hostname = False
         ssl_ctx.verify_mode = ssl.CERT_NONE
 
-    # 1. Access Token via Header
+    # 1. ID Token via Google TokenInfo (Standard Google Identity Services JWT)
+    try:
+        url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, context=ssl_ctx, timeout=10) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode("utf-8"))
+                if data.get("email"):
+                    return data
+    except Exception as e:
+        logging.debug(f"Google ID tokeninfo check error: {e}")
+
+    # 2. Access Token via Header
     try:
         url = "https://www.googleapis.com/oauth2/v3/userinfo"
         req = urllib.request.Request(url, method="GET")
@@ -143,7 +155,7 @@ def verify_google_token_sync(token: str) -> Optional[dict]:
     except Exception as e:
         logging.warning(f"Google auth bearer error: {e}")
 
-    # 2. Access Token via Query Param
+    # 3. Access Token via Query Param
     try:
         url = f"https://www.googleapis.com/oauth2/v3/userinfo?access_token={token}"
         req = urllib.request.Request(url, method="GET")

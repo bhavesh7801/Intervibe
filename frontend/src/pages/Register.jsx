@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { InterviewPrepLogo } from '../components/Navbar.jsx';
+import { GoogleAuthButton } from '../components/auth/GoogleAuthButton.jsx';
 import { 
   User, Mail, Lock, Eye, EyeOff, ArrowRight, 
   CheckCircle2, AlertCircle, ShieldCheck, RefreshCw, 
@@ -202,6 +203,13 @@ export const Register = () => {
     }
   };
 
+  const handleGoogleSuccess = () => {
+    setSuccessMsg('Successfully registered with Google! Redirecting to workspace...');
+    setTimeout(() => {
+      navigate('/dashboard', { replace: true });
+    }, 400);
+  };
+
   return (
     <div className="min-h-[calc(100vh-80px)] w-full flex items-center justify-center py-10 px-4 sm:px-6 relative overflow-hidden">
       {/* Subtle Background Glows */}
@@ -246,7 +254,24 @@ export const Register = () => {
 
           {/* ================= STEP 1: Registration Form ================= */}
           {step === 1 && (
-            <form onSubmit={handleRegisterSubmit} className="space-y-4">
+            <>
+              {/* Google Sign Up Button */}
+              <GoogleAuthButton
+                text="Sign up with Google"
+                mode="signup"
+                onSuccess={handleGoogleSuccess}
+                onError={(err) => setError(err)}
+              />
+
+              {/* Divider */}
+              <div className="relative flex items-center justify-center">
+                <div className="border-t border-slate-200 dark:border-slate-800 w-full" />
+                <span className="bg-white dark:bg-slate-900 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0">
+                  or register with email
+                </span>
+              </div>
+
+              <form onSubmit={handleRegisterSubmit} className="space-y-4">
               
               {/* Full Name */}
               <div className="space-y-1.5">
@@ -374,6 +399,7 @@ export const Register = () => {
                 <ArrowRight size={16} />
               </button>
             </form>
+            </>
           )}
 
           {/* ================= STEP 2: SendGrid OTP Verification ================= */}
