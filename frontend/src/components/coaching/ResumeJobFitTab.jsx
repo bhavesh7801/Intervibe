@@ -46,7 +46,7 @@ const COMPANY_PRESETS = [
 export const ResumeJobFitTab = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const toast = useToast();
 
   const fileInputRef = useRef(null);
   const [activeInputMode, setActiveInputMode] = useState('upload'); // 'upload' | 'text'
@@ -70,7 +70,7 @@ export const ResumeJobFitTab = () => {
   const handleApplyPreset = (preset) => {
     setTargetRole(preset.role);
     setJobDescription(preset.jd);
-    showToast(`Loaded ${preset.name} rubric preset`, 'info');
+    toast.info?.(`Loaded ${preset.name} rubric preset`);
   };
 
   const handleFileSelect = (file) => {
@@ -91,7 +91,7 @@ export const ResumeJobFitTab = () => {
 
     setError('');
     setSelectedFile(file);
-    showToast(`Attached ${file.name}`, 'success');
+    toast.success?.(`Attached ${file.name}`);
   };
 
   const handleDragOver = (e) => {
@@ -150,12 +150,12 @@ export const ResumeJobFitTab = () => {
         setAnalysisResult(response.data.analysis);
       }
 
-      showToast('Resume compatibility analysis complete!', 'success');
+      toast.success?.('Resume compatibility analysis complete!');
     } catch (err) {
       console.error('Resume Analysis Error:', err);
       const errMsg = err.response?.data?.detail || err.message || 'Failed to complete resume analysis.';
       setError(errMsg);
-      showToast(errMsg, 'error');
+      toast.error?.(errMsg);
     } finally {
       setLoading(false);
     }

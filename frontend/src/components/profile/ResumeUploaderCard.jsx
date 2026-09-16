@@ -10,7 +10,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 
 export const ResumeUploaderCard = () => {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const toast = useToast();
 
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -49,12 +49,12 @@ export const ResumeUploaderCard = () => {
       });
 
       setAnalysis(res.data?.analysis || null);
-      showToast('Resume parsed and synchronized with AI model!', 'success');
+      toast.success?.('Resume parsed and synchronized with AI model!');
     } catch (err) {
       console.error('Resume upload error:', err);
       const msg = err.response?.data?.detail || 'Failed to analyze resume document.';
       setError(msg);
-      showToast(msg, 'error');
+      toast.error?.(msg);
     } finally {
       setUploading(false);
     }
