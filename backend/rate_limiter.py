@@ -5,12 +5,12 @@ from fastapi import Request, HTTPException, status
 from redis_service import redis_client
 
 # Configs
-AUTH_IP_MAX = int(os.getenv("RATE_LIMIT_AUTH_IP_MAX", 5))
-AUTH_ACCOUNT_MAX = int(os.getenv("RATE_LIMIT_AUTH_ACCOUNT_MAX", 5))
-PUBLIC_MAX = int(os.getenv("RATE_LIMIT_PUBLIC_MAX", 20))
-AUTHED_MAX = int(os.getenv("RATE_LIMIT_AUTHED_MAX", 100))
+AUTH_IP_MAX = int(os.getenv("RATE_LIMIT_AUTH_IP_MAX", 30))
+AUTH_ACCOUNT_MAX = int(os.getenv("RATE_LIMIT_AUTH_ACCOUNT_MAX", 20))
+PUBLIC_MAX = int(os.getenv("RATE_LIMIT_PUBLIC_MAX", 60))
+AUTHED_MAX = int(os.getenv("RATE_LIMIT_AUTHED_MAX", 300))
 WINDOW = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", 60))
-LLM_MAX = int(os.getenv("RATE_LIMIT_LLM_MAX", 10))
+LLM_MAX = int(os.getenv("RATE_LIMIT_LLM_MAX", 30))
 LLM_WINDOW = int(os.getenv("RATE_LIMIT_LLM_WINDOW_SECONDS", 3600)) # 1 hour
 
 async def get_email_from_request(request: Request) -> str | None:

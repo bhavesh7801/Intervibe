@@ -25,9 +25,15 @@ export const ToastProvider = ({ children }) => {
   const error = useCallback((msg, duration) => addToast(msg, 'error', duration), [addToast]);
   const warning = useCallback((msg, duration) => addToast(msg, 'warning', duration), [addToast]);
   const info = useCallback((msg, duration) => addToast(msg, 'info', duration), [addToast]);
+  const showToast = useCallback((msg, type = 'info', duration) => {
+    if (type === 'success') success(msg, duration);
+    else if (type === 'error') error(msg, duration);
+    else if (type === 'warning') warning(msg, duration);
+    else info(msg, duration);
+  }, [success, error, warning, info]);
 
   return (
-    <ToastContext.Provider value={{ addToast, removeToast, success, error, warning, info }}>
+    <ToastContext.Provider value={{ addToast, removeToast, success, error, warning, info, showToast }}>
       {children}
       {/* Toast Render Portal Container */}
       <div className="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4">
@@ -76,6 +82,7 @@ export const useToast = () => {
   const ctx = useContext(ToastContext);
   if (!ctx) {
     return {
+      showToast: (m) => console.log('Toast:', m),
       success: (m) => console.log('Toast [success]:', m),
       error: (m) => console.error('Toast [error]:', m),
       warning: (m) => console.warn('Toast [warning]:', m),
