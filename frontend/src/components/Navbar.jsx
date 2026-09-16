@@ -195,69 +195,84 @@ export const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Hamburger */}
-        <div className="flex md:hidden items-center">
+        {/* Mobile Menu Controls */}
+        <div className="flex md:hidden items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            aria-label="Toggle Dark / Light Theme"
+          >
+            {isDark ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-slate-600" />}
+          </button>
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             aria-label={mobileMenuOpen ? 'Close Menu' : 'Open Menu'}
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 py-6 shadow-xl space-y-4">
-          <nav className="flex flex-col space-y-2.5 font-bold text-slate-700 text-xs">
+        <div className="md:hidden bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-4 py-6 shadow-xl space-y-4">
+          <nav className="flex flex-col space-y-2.5 font-bold text-slate-700 dark:text-slate-200 text-xs">
             {user ? (
               <>
-                <Link to="/dashboard" className="py-2 px-3 rounded-lg hover:bg-slate-50">Dashboard</Link>
-                <Link to="/interview" className="py-2 px-3 rounded-lg hover:bg-slate-50">Mock Interview</Link>
-                <Link to="/coding" className="py-2 px-3 rounded-lg hover:bg-slate-50">IDE Workspace</Link>
-                <Link to="/assessment" className="py-2 px-3 rounded-lg hover:bg-slate-50">System Design</Link>
-                <Link to="/coaching" className="py-2 px-3 rounded-lg hover:bg-slate-50">AI Coaching</Link>
-                <Link to="/profile" className="py-2 px-3 rounded-lg hover:bg-slate-50">Profile & Certs</Link>
-                <Link to="/leaderboard" className="py-2 px-3 rounded-lg hover:bg-slate-50">Leaderboard</Link>
+                <Link to="/dashboard" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">Dashboard</Link>
+                <Link to="/interview" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">Mock Interview</Link>
+                <Link to="/coding" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">IDE Workspace</Link>
+                <Link to="/assessment" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">System Design</Link>
+                <Link to="/coaching" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">AI Coaching</Link>
+                <Link to="/profile" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">Profile & Certs</Link>
+                <Link to="/leaderboard" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">Leaderboard</Link>
               </>
             ) : (
               <>
                 <button
                   type="button"
                   onClick={() => scrollToSection('features')}
-                  className="text-left py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="text-left py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Features
                 </button>
                 <button
                   type="button"
                   onClick={() => scrollToSection('preview')}
-                  className="text-left py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="text-left py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Product Preview
                 </button>
                 <button
                   type="button"
                   onClick={() => scrollToSection('tracks')}
-                  className="text-left py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="text-left py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Company Tracks
                 </button>
-                <Link to="/leaderboard" className="py-2 px-3 rounded-lg hover:bg-slate-50">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('how-it-works')}
+                  className="text-left py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  How it Works
+                </button>
+                <Link to="/leaderboard" className="py-2 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
                   Leaderboard
                 </Link>
               </>
             )}
           </nav>
 
-          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
             {user ? (
               <button
                 type="button"
                 onClick={logout}
-                className="w-full py-2.5 text-center font-bold text-xs rounded-xl bg-slate-100 text-rose-600"
+                className="w-full py-2.5 text-center font-bold text-xs rounded-xl bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400"
               >
                 Logout
               </button>
@@ -265,7 +280,7 @@ export const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="w-full py-2.5 text-center font-bold text-xs rounded-xl bg-slate-100 text-slate-800"
+                  className="w-full py-2.5 text-center font-bold text-xs rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
                 >
                   Sign In
                 </Link>

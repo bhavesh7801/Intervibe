@@ -37,9 +37,18 @@ Return ONLY a JSON array. Format: {json_template}"""
 
 # Prompts for Resume Analysis
 
-RESUME_ANALYSIS_PROMPT = """You are a Senior Technical Recruiter & Engineering Hiring Manager evaluating a resume for a {target_role} position.
-Carefully analyze the provided resume text and return a JSON object ONLY.
-JSON Format:
+RESUME_ANALYSIS_PROMPT = """You are a Principal Engineering Hiring Manager and Technical Recruiter evaluating a candidate's resume for a {target_role} position.
+Target Role Context / Job Description: {job_description}
+
+Carefully evaluate the candidate's skills, project experience, architectural depth, and tools mentioned in their resume against the industry-standard expectations for a {target_role}.
+
+CRITICAL REQUIREMENTS:
+1. Identify all MATCHED SKILLS (technical skills, frameworks, tools, or concepts present in the resume that match the role).
+2. Identify all MISSING / UNAVAILABLE SKILLS (critical or highly recommended skills for a {target_role} that are NOT present in the candidate's resume).
+3. Compute an objective Overall Compatibility Score (0 - 100) based on role requirements.
+4. Categorize missing skills and provide actionable step-by-step suggestions on how the candidate can acquire these skills, build demonstration projects, or optimize their interview preparation.
+
+Return ONLY a valid JSON object matching this exact format:
 {json_template}"""
 
 # Prompts for Answer Scoring

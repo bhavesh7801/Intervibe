@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Sparkles, Mic, Code2, ShieldCheck, Terminal } from 'lucide-react';
+import { Sparkles, Mic, Code2, ShieldCheck, Terminal, ArrowRight, LogIn } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export const InteractivePreview = () => {
+  const { user } = useAuth();
   const [activeStage, setActiveStage] = useState('coding');
 
   return (
@@ -155,6 +158,31 @@ export const InteractivePreview = () => {
                   <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
                     <div className="h-full bg-emerald-600 rounded-full" style={{ width: '96%' }} />
                   </div>
+                </div>
+              </div>
+
+              {/* Bottom Conversion Action Bar */}
+              <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium text-center sm:text-left">
+                  Practice with full voice dialog, automatic hints, and detailed grading rubrics.
+                </div>
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                  {!user && (
+                    <Link
+                      to="/login"
+                      className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+                    >
+                      <LogIn size={13} />
+                      <span>Sign In</span>
+                    </Link>
+                  )}
+                  <Link
+                    to={user ? "/interview" : "/register"}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-sm shadow-rose-600/20 transition-all flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+                  >
+                    <span>{user ? "Launch Interview" : "Try Free Session"}</span>
+                    <ArrowRight size={13} />
+                  </Link>
                 </div>
               </div>
 

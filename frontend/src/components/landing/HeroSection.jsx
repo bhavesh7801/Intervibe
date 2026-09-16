@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Play, Star, Zap } from 'lucide-react';
+import { ArrowRight, Play, Star, Zap, LogIn } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const COMPANIES = [
   { name: 'Google', role: 'L5 / Senior SWE' },
@@ -12,6 +14,8 @@ const COMPANIES = [
 ];
 
 export const HeroSection = () => {
+  const { user } = useAuth();
+
   const scrollToPreview = () => {
     const elem = document.getElementById('preview');
     if (elem) elem.scrollIntoView({ behavior: 'smooth' });
@@ -72,25 +76,39 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
+          className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4 w-full sm:w-auto"
         >
-          <button
-            type="button"
-            onClick={scrollToPreview}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl text-base font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-md shadow-rose-600/20 transition-all cursor-pointer group flex items-center justify-center gap-2.5 active:scale-95"
-          >
-            <span>Start Free Mock Interview</span>
-            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            <Link
+              to={user ? "/interview" : "/register"}
+              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl text-base font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-md shadow-rose-600/20 transition-all cursor-pointer group flex items-center justify-center gap-2.5 active:scale-95"
+            >
+              <span>{user ? "Go to Mock Interview" : "Start Free Mock Interview"}</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
 
-          <button
-            type="button"
-            onClick={scrollToPreview}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl text-base font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-95 shadow-xs"
-          >
-            <Play size={17} className="text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform" />
-            <span>Watch 2-Min Demo</span>
-          </button>
+            <button
+              type="button"
+              onClick={scrollToPreview}
+              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl text-base font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 flex items-center justify-center gap-2.5 transition-all cursor-pointer active:scale-95 shadow-xs"
+            >
+              <Play size={17} className="text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform" />
+              <span>Try Interactive Demo</span>
+            </button>
+          </div>
+
+          {!user && (
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <span>Already have an account?</span>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1 font-bold text-rose-600 dark:text-rose-400 hover:underline"
+              >
+                <span>Sign In</span>
+                <LogIn size={13} />
+              </Link>
+            </div>
+          )}
         </motion.div>
 
         {/* Social Proof Capsule */}

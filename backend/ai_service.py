@@ -347,109 +347,224 @@ class AIService:
             data = json.loads(resp.read().decode("utf-8"))
             return data["candidates"][0]["content"]["parts"][0]["text"]
 
-    def _call_hf_sync(self, system_message: str, user_message: str) -> str:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
+    def _clean_json(self, text: str) -> str:
+        if not text:
+            return "{}"
+        cleaned = re.sub(r'^```(?:json)?\s*', '', text.strip(), flags=re.MULTILINE)
+        cleaned = re.sub(r'\s*```$', '', cleaned.strip(), flags=re.MULTILINE)
+        match = re.search(r'(\{.*\}|\[.*\])', cleaned, re.DOTALL)
+        return match.group(1) if match else cleaned
 
-        payload = {
-            "model": HF_MODEL,
-            "messages": [
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": user_message}
-            ],
-            "temperature": 0.3
+    async def _call_llm(self, system_prompt: str, user_prompt: str, is_json: bool = True) -> str:
+        if self.client:
+            try:
+                response = await self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    response_format={"type": "json_object"} if is_json else None,
+                    temperature=0.4
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                logger.warning(f"Groq LLM call failed ({e}), trying fallback model: {self.fallback_model}")
+                response = await self.client.chat.completions.create(
+                    model=self.fallback_model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    response_format={"type": "json_object"} if is_json else None,
+                    temperature=0.4
+                )
+                return response.choices[0].message.content
+        elif self.gemini_key:
+            return await asyncio.to_thread(self._call_gemini_sync, system_prompt, user_prompt, is_json)
+        elif self.hf_token:
+            return await asyncio.to_thread(self._call_hf_sync, system_prompt, user_prompt)
+        raise ValueError("No LLM engine available")
+
+    async def analyze_resume(self, resume_text: str, target_role: str = "Software Engineer", job_description: str = "") -> dict:
+        """
+        Analyzes candidate resume against target role and job description.
+        Computes compatibility score, matches skills, identifies missing skills with suggestions.
+        """
+        json_template = """{
+    "overallScore": 84,
+    "fitVerdict": "Strong Match",
+    "role": "Senior Backend Engineer",
+    "experienceSummary": "Solid backend background with high API and database fluency.",
+    "matchedSkills": ["Python", "FastAPI", "PostgreSQL", "Docker", "RESTful APIs", "Redis"],
+    "missingSkills": [
+        {"skill": "Kafka", "category": "Message Streaming", "importance": "High", "reason": "Target role requires event-driven high-throughput pub/sub streaming architecture."},
+        {"skill": "Kubernetes", "category": "DevOps & Orchestration", "importance": "Medium", "reason": "Cloud container orchestration is essential for modern backend microservices deployment."}
+    ],
+    "strengths": [
+        "Strong fundamentals in backend API development and asynchronous programming",
+        "Demonstrated database design and query optimization experience"
+    ],
+    "skillGapsByCategory": {
+        "Languages & Frameworks": {"score": 90, "status": "Strong", "missing": []},
+        "System Architecture & Scaling": {"score": 75, "status": "Moderate", "missing": ["Distributed Event Streaming (Kafka)"]},
+        "Cloud & Infrastructure": {"score": 70, "status": "Needs Improvement", "missing": ["Kubernetes (k8s)", "Terraform IaC"]},
+        "Databases & Caching": {"score": 88, "status": "Strong", "missing": []}
+    },
+    "actionableSuggestions": [
+        {
+            "skill": "Kafka",
+            "action": "Build a hands-on event-driven microservice using Kafka partitions to handle asynchronous order processing or real-time telemetry.",
+            "studyTopic": "Partition rebalancing, consumer groups, and exactly-once delivery semantics"
+        },
+        {
+            "skill": "Kubernetes",
+            "action": "Deploy your backend service to a local Minikube / K3s cluster with Helm charts, Ingress routing, and Horizontal Pod Autoscaling (HPA).",
+            "studyTopic": "K8s Pod lifecycles, ConfigMaps/Secrets, and zero-downtime rolling updates"
         }
-        req = urllib.request.Request(
-            HF_ROUTER_URL,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {self.hf_token}",
-                "Content-Type": "application/json"
-            },
-            method="POST"
-        )
-        with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data["choices"][0]["message"]["content"]
-
-    async def generate_adaptive_followup(self, question: str, candidate_answer: str, role: str, persona: str = "Standard") -> dict:
-        """Generates an intelligent, FAANG-level follow-up question that challenges candidate trade-offs and omissions."""
-        system_prompt = f"""You are a Lead Staff Interviewer conducting a mock interview for a {role} position.
-Persona modifier: {prompts.PERSONA_MODIFIERS.get(persona, prompts.PERSONA_MODIFIERS["Standard"])}
-
-Analyze the candidate's answer to the primary question. Identify:
-1. Missing architectural edge cases or unaddressed failure modes.
-2. Vague statements that require deeper technical justification.
-3. Trade-offs (e.g. latency vs consistency, memory vs computation, cost vs scalability).
-
-Return valid JSON with exactly this schema:
-{{
-    "needs_followup": true,
-    "followup_question": "...",
-    "probing_reason": "Candidate mentioned X but did not explain how to handle cache stampede / failure recovery.",
-    "expected_keypoints": ["Point 1", "Point 2"],
-    "encouraging_feedback": "Great start on the baseline approach."
-}}"""
-
-        user_prompt = f"Original Question: {question}\n\nCandidate Answer:\n{candidate_answer}"
-
-        try:
-            raw_text = await self._call_llm(system_prompt, user_prompt, is_json=True)
-            cleaned = self._clean_json(raw_text)
-            data = json.loads(cleaned)
-            return data
-        except Exception as e:
-            logger.error(f"Error in generate_adaptive_followup: {e}")
-            return {
-                "needs_followup": True,
-                "followup_question": f"How would your approach scale if traffic increased 100x and network partitions occurred?",
-                "probing_reason": "Probing system scalability and distributed failure resilience.",
-                "expected_keypoints": ["Load distribution", "Replication & Failover", "Graceful degradation"],
-                "encouraging_feedback": "Solid initial reasoning. Let's explore scale and resilience."
-            }
-
-    async def evaluate_system_architecture(self, topology: dict, problem_title: str, requirements: list = None) -> dict:
-        """Evaluates a visual system design architecture graph (nodes, edges) and identifies SPOFs, scalability, and bottlenecks."""
-        system_prompt = """You are a Principal Cloud Systems Architect evaluating a candidate's visual system design topology.
-Analyze the provided graph nodes (services, databases, caches, load balancers, message queues) and connections (edges).
-
-Evaluate:
-1. Architectural Completeness (Did they include Load Balancers, API Gateways, Caching, DB Replicas, Async Queues?)
-2. Single Points of Failure (SPOF)
-3. Scalability & Throughput Bottlenecks
-4. Cache Invalidation & Data Consistency Strategy
-
-Return valid JSON matching this schema:
-{
-    "overall_score": 88,
-    "grade": "Strong Hire",
-    "spof_detected": ["Single primary database without read replica", "..."],
-    "strengths": ["Decoupled async workers with Kafka", "..."],
-    "critical_bottlenecks": ["Direct write traffic to un-cached API endpoint", "..."],
-    "recommendations": ["Add Redis cluster for session caching", "Implement multi-region database replication"],
-    "latency_estimate": "12ms p99",
-    "estimated_tps_capacity": "250,000 req/sec"
+    ],
+    "interviewFocusAreas": [
+        "Distributed message broker partition strategies",
+        "Container scaling and production health probe configurations"
+    ]
 }"""
 
-        user_prompt = f"Problem: {problem_title}\nRequirements: {requirements or ['Scalable to 10M DAU', 'Sub-50ms latency', '99.99% availability']}\n\nTopology Structure:\n{json.dumps(topology, indent=2)}"
+        default_jd = job_description.strip() if job_description and job_description.strip() else f"Standard industry requirements for a {target_role} specializing in scalable architecture, performance, clean code, and production reliability."
+        
+        system_prompt = prompts.RESUME_ANALYSIS_PROMPT.format(
+            target_role=target_role,
+            job_description=default_jd,
+            json_template=json_template
+        )
+        user_prompt = f"Target Role: {target_role}\n\nCandidate Resume Content:\n{resume_text[:6000]}"
 
         try:
             raw_text = await self._call_llm(system_prompt, user_prompt, is_json=True)
             cleaned = self._clean_json(raw_text)
-            return json.loads(cleaned)
+            parsed = json.loads(cleaned, strict=False)
+            if isinstance(parsed, dict) and "overallScore" in parsed:
+                return parsed
         except Exception as e:
-            logger.error(f"Error evaluating system architecture: {e}")
-            return {
-                "overall_score": 82,
-                "grade": "Hire",
-                "spof_detected": ["Check database read/write replication"],
-                "strengths": ["Clean separation of frontend and microservice tiers", "Asynchronous messaging queue in place"],
-                "critical_bottlenecks": ["Ensure cache invalidation handles peak write volume"],
-                "recommendations": ["Add Redis cache layer", "Deploy multi-AZ active-active failover"],
-                "latency_estimate": "18ms p99",
-                "estimated_tps_capacity": "100,000 req/sec"
-            }
+            logger.error(f"Error analyzing resume via LLM: {e}")
+
+        # Deterministic Rule-Based Fallback
+        return self._get_deterministic_resume_analysis(resume_text, target_role, default_jd)
+
+    def _get_deterministic_resume_analysis(self, resume_text: str, target_role: str, job_description: str) -> dict:
+        """Deterministic skill matrix evaluation fallback if LLM is unavailable."""
+        role_lower = target_role.lower()
+        resume_lower = resume_text.lower()
+
+        # Skill taxonomy map
+        role_skills_map = {
+            "backend": [
+                ("Python", "Languages", "High", "Core backend development language"),
+                ("Go / Golang", "Languages", "Medium", "High-concurrency systems programming"),
+                ("FastAPI / Express / Spring", "Frameworks", "High", "RESTful web services & APIs"),
+                ("PostgreSQL / MySQL", "Databases", "High", "Relational database modeling and indexing"),
+                ("Redis", "Caching", "High", "In-memory caching and distributed session management"),
+                ("Kafka / RabbitMQ", "Streaming & Queues", "High", "Event-driven asynchronous messaging"),
+                ("Docker", "Containerization", "High", "Service containerization & reproducible builds"),
+                ("Kubernetes", "DevOps", "Medium", "Container cluster orchestration & scaling"),
+                ("System Design", "Architecture", "High", "Distributed scalability and microservice patterns"),
+                ("CI/CD & GitHub Actions", "DevOps", "Medium", "Automated build and test deployment pipelines")
+            ],
+            "frontend": [
+                ("JavaScript (ES6+)", "Languages", "High", "Core web programming language"),
+                ("TypeScript", "Languages", "High", "Type safety for large-scale web applications"),
+                ("React", "Frameworks", "High", "Component-driven UI architecture"),
+                ("Next.js", "Frameworks", "Medium", "Server-side rendering and static site generation"),
+                ("Tailwind CSS", "Styling", "Medium", "Modern utility-first responsive styling"),
+                ("State Management (Redux/Zustand)", "State", "High", "Global application state architecture"),
+                ("Web Performance & Vitals", "Optimization", "High", "Bundle splitting, lazy loading, and sub-100ms render"),
+                ("REST & GraphQL APIs", "Networking", "High", "Client-side data fetching and mutation"),
+                ("Unit Testing (Jest/Playwright)", "Testing", "Medium", "Automated front-end testing"),
+                ("Accessibility (a11y)", "Best Practices", "Medium", "WCAG compliance and keyboard navigation")
+            ],
+            "full stack": [
+                ("TypeScript", "Languages", "High", "Full-stack end-to-end type safety"),
+                ("React / Next.js", "Frontend", "High", "Interactive user interfaces"),
+                ("Node.js / Python", "Backend", "High", "Backend API servers and business logic"),
+                ("PostgreSQL / MongoDB", "Databases", "High", "Database design and ORM management"),
+                ("Redis", "Caching", "Medium", "Low-latency query and session caching"),
+                ("Docker", "DevOps", "High", "Containerization for local and cloud environments"),
+                ("AWS / Cloud Infrastructure", "Cloud", "Medium", "Cloud service provisioning and deployment"),
+                ("REST & GraphQL APIs", "Networking", "High", "End-to-end API contracts"),
+                ("Authentication & JWT/OAuth", "Security", "High", "Secure user authorization and session state"),
+                ("CI/CD Automation", "DevOps", "Medium", "Continuous integration and delivery")
+            ],
+            "system design": [
+                ("Distributed Caching (Redis)", "Caching", "High", "Cache-aside, write-through, and stampede prevention"),
+                ("Message Queues (Kafka)", "Messaging", "High", "Decoupled asynchronous event pipelines"),
+                ("Database Sharding & Replication", "Storage", "High", "Horizontal scaling and read/write splitting"),
+                ("Load Balancers & Reverse Proxies", "Networking", "High", "Traffic distribution and SSL termination"),
+                ("CAP Theorem & PACELC", "Theory", "High", "Consistency vs availability trade-offs"),
+                ("Rate Limiting & Throttling", "Resilience", "High", "Token bucket and leaky bucket algorithms"),
+                ("Microservices Architecture", "Architecture", "High", "Service boundaries and gRPC/REST communication"),
+                ("High Availability & Multi-AZ", "Reliability", "High", "Zero-downtime failover and disaster recovery"),
+                ("Monitoring & Observability", "Ops", "Medium", "Distributed tracing (OpenTelemetry) and metrics"),
+                ("Data Warehousing / Analytics", "Storage", "Medium", "OLAP vs OLTP data pipelines")
+            ]
+        }
+
+        # Select closest matched role skills
+        selected_key = "full stack"
+        for k in role_skills_map:
+            if k in role_lower:
+                selected_key = k
+                break
+
+        skill_entries = role_skills_map[selected_key]
+
+        matched = []
+        missing = []
+        actionable_suggestions = []
+
+        for skill_name, category, importance, reason in skill_entries:
+            # Check presence
+            check_words = [w.lower() for w in re.split(r'[\s/()]+', skill_name) if len(w) > 2]
+            is_present = any(w in resume_lower for w in check_words)
+
+            if is_present:
+                matched.append(skill_name)
+            else:
+                missing.append({
+                    "skill": skill_name,
+                    "category": category,
+                    "importance": importance,
+                    "reason": reason
+                })
+                actionable_suggestions.append({
+                    "skill": skill_name,
+                    "action": f"Build a practical project module demonstrating hands-on {skill_name} implementation.",
+                    "studyTopic": f"{skill_name} core architecture, failure modes, and production best practices."
+                })
+
+        score = max(45, int((len(matched) / max(1, len(skill_entries))) * 100))
+        verdict = "Strong Match" if score >= 80 else ("Moderate Fit" if score >= 65 else "Skill Gaps Detected")
+
+        return {
+            "overallScore": score,
+            "fitVerdict": verdict,
+            "role": target_role,
+            "experienceSummary": f"Candidate demonstrates competencies in {', '.join(matched[:4]) if matched else 'core software engineering'}, with targeted growth areas in {', '.join([m['skill'] for m in missing[:3]]) if missing else 'specialized tools'}.",
+            "matchedSkills": matched if matched else ["Software Engineering", "Problem Solving", "Git"],
+            "missingSkills": missing,
+            "strengths": [
+                f"Demonstrated background in {matched[0]}" if matched else "Clear engineering background",
+                f"Experience with {matched[1]}" if len(matched) > 1 else "Direct problem solving abilities"
+            ],
+            "skillGapsByCategory": {
+                "Core Engineering": {"score": min(95, score + 10), "status": "Strong", "missing": []},
+                "Architecture & Scaling": {"score": max(50, score - 15), "status": "Needs Review", "missing": [m["skill"] for m in missing if m["category"] in ["Architecture", "Storage", "Messaging"]][:2]},
+                "Cloud & DevOps": {"score": max(55, score - 10), "status": "Needs Review", "missing": [m["skill"] for m in missing if m["category"] in ["DevOps", "Cloud", "Containerization"]][:2]}
+            },
+            "actionableSuggestions": actionable_suggestions[:4],
+            "interviewFocusAreas": [
+                f"Deep-dive practice on {missing[0]['skill']}" if missing else "System scalability tradeoffs",
+                f"Hands-on scenarios for {missing[1]['skill']}" if len(missing) > 1 else "Production failure recovery"
+            ]
+        }
 
     def _get_fallback_questions(self, role: str, experience_level: str, num_questions: int) -> list:
         if "system design" in role.lower():

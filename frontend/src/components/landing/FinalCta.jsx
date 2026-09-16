@@ -1,11 +1,10 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, LogIn } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export const FinalCta = () => {
-  const scrollToPreview = () => {
-    const elem = document.getElementById('preview');
-    if (elem) elem.scrollIntoView({ behavior: 'smooth' });
-  };
+  const { user } = useAuth();
 
   return (
     <section className="w-full py-12 sm:py-16">
@@ -28,15 +27,26 @@ export const FinalCta = () => {
               Join thousands of software engineers who use Intervibe to practice realistic coding, architecture, and behavioral loops.
             </p>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={scrollToPreview}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl text-base font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-md shadow-rose-600/30 transition-all cursor-pointer flex items-center justify-center gap-2.5 active:scale-95"
-              >
-                <span>Start Free Practice Now</span>
-                <ArrowRight size={18} />
-              </button>
+            <div className="pt-4 flex flex-col items-center justify-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+                <Link
+                  to={user ? "/interview" : "/register"}
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-2xl text-base font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-md shadow-rose-600/30 transition-all cursor-pointer flex items-center justify-center gap-2.5 active:scale-95"
+                >
+                  <span>{user ? "Go to Workspace" : "Start Free Practice Now"}</span>
+                  <ArrowRight size={18} />
+                </Link>
+
+                {!user && (
+                  <Link
+                    to="/login"
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-2xl text-base font-semibold text-slate-200 bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-xs"
+                  >
+                    <LogIn size={16} className="text-rose-400" />
+                    <span>Sign In</span>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
