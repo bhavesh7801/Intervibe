@@ -1,5 +1,6 @@
 import logging
-import random
+import secrets
+import os
 import urllib.request
 import json
 import ssl
@@ -55,7 +56,7 @@ async def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     norm_email = payload.email.lower().strip()
     existing_user = db.query(UserDB).filter(UserDB.email == norm_email).first()
     
-    otp = f"{random.randint(100000, 999999)}"
+    otp = f"{secrets.randbelow(900000) + 100000}"
     hashed_pwd = hash_password(payload.password)
     
     if existing_user:
@@ -269,7 +270,7 @@ async def resend_otp(payload: ResendOTPRequest, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User account not found.")
     
-    otp = f"{random.randint(100000, 999999)}"
+    otp = f"{secrets.randbelow(900000) + 100000}"
     user.otp_code = otp
     user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
     db.commit()

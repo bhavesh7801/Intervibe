@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import faviconManager from '../utils/faviconManager.js';
 
 export const useAudioRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -36,7 +37,9 @@ export const useAudioRecorder = () => {
             analyserRef.current.getByteFrequencyData(dataArray);
             const sum = dataArray.reduce((acc, val) => acc + val, 0);
             const avg = sum / dataArray.length;
-            setVolumeLevel(Math.min(100, Math.round((avg / 128) * 100)));
+            const lvl = Math.min(100, Math.round((avg / 128) * 100));
+            setVolumeLevel(lvl);
+            if (faviconManager) faviconManager.setAudioLevel(lvl);
             animFrameRef.current = requestAnimationFrame(updateVolume);
           }
         };
@@ -67,11 +70,17 @@ export const useAudioRecorder = () => {
           cancelAnimationFrame(animFrameRef.current);
         }
         setVolumeLevel(0);
+        if (faviconManager) {
+          faviconManager.setStatus('idle');
+        }
       };
 
       mediaRecorder.start(200);
       setIsRecording(true);
       setRecordingTime(0);
+      if (faviconManager) {
+        faviconManager.setStatus('recording');
+      }
 
       timerRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
@@ -80,6 +89,7 @@ export const useAudioRecorder = () => {
       console.error('Audio recorder error:', err);
       setPermissionError(err.message || 'Microphone access denied.');
       setIsRecording(false);
+      if (faviconManager) faviconManager.setStatus('idle');
     }
   }, []);
 
@@ -91,6 +101,9 @@ export const useAudioRecorder = () => {
       clearInterval(timerRef.current);
     }
     setIsRecording(false);
+    if (faviconManager) {
+      faviconManager.setStatus('idle');
+    }
   }, []);
 
   const resetRecording = useCallback(() => {
@@ -102,6 +115,7 @@ export const useAudioRecorder = () => {
     }
     setRecordingTime(0);
     setVolumeLevel(0);
+    if (faviconManager) faviconManager.setStatus('idle');
   }, [stopRecording, audioUrl]);
 
   useEffect(() => {

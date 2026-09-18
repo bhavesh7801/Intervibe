@@ -9,6 +9,7 @@ import QuestionGeneratorModal from '../components/QuestionGeneratorModal.jsx';
 import QuestionCard from '../components/QuestionCard.jsx';
 import CopyButton from '../components/CopyButton.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { useFavicon } from '../context/FaviconContext.jsx';
 import {
   Bot,
   Play,

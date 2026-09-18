@@ -81,15 +81,11 @@ def _is_service_reachable(url: str, timeout: float = 0.3) -> bool:
         _service_health_cache[url] = {"status": False, "time": now}
         return False
 
+ENABLE_LOCAL_SUBPROCESS_FALLBACK = os.getenv("ENABLE_LOCAL_SUBPROCESS_FALLBACK", "false").lower() in ("true", "1", "yes")
+
 def _create_ssl_context():
-    """Create standard verified SSL context for external HTTPS API calls."""
-    try:
-        return ssl.create_default_context()
-    except Exception:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        return ctx
+    """Create verified SSL context for external HTTPS API calls."""
+    return ssl.create_default_context()
 
 FORBIDDEN_PYTHON_MODULES = {
     "os", "sys", "subprocess", "shutil", "socket", "urllib", "requests",
@@ -298,84 +294,12 @@ async def run_sandboxed_code(request: CodeRunPayload):
     except Exception:
         pass
 
-    # 5. Isolated Subprocess Fallback (Zero in-process exec, strictly sandboxed subprocess)
-    if target_lang == 'python':
-        try:
-            proc = subprocess.run(
-                [sys.executable, "-c", request.source_code],
-                input=request.stdin or "",
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=5
-            )
-            elapsed = (datetime.now() - start_time).total_seconds()
-            stdout_str = (proc.stdout or "").strip()
-            stderr_str = (proc.stderr or "").strip()
-            if proc.returncode == 0:
-                out = stdout_str if stdout_str else "Code executed cleanly with no stdout."
-                return CodeRunResult(output=out, stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
-            else:
-                return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=proc.returncode, status="Execution Error")
-        except subprocess.TimeoutExpired:
-            elapsed = (datetime.now() - start_time).total_seconds()
-            return CodeRunResult(output="❌ Execution Timeout: Program exceeded max runtime (5.00s).", stderr="Time limit exceeded", execution_time=f"{elapsed:.2f}s", exit_code=124, status="Timeout")
-        except Exception as py_err:
-            elapsed = (datetime.now() - start_time).total_seconds()
-            return CodeRunResult(output=f"❌ Execution Error:\n{str(py_err)}", stderr=str(py_err), execution_time=f"{elapsed:.2f}s", exit_code=1, status="Execution Error")
-
-    elif target_lang in ['javascript', 'js']:
-        try:
-            proc = subprocess.run(
-                ["node", "-e", request.source_code],
-                input=request.stdin or "",
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=5
-            )
-            elapsed = (datetime.now() - start_time).total_seconds()
-            stdout_str = (proc.stdout or "").strip()
-            stderr_str = (proc.stderr or "").strip()
-
-            if proc.returncode == 0:
-                out = stdout_str if stdout_str else "Code executed cleanly with no stdout."
-                return CodeRunResult(output=out, stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
-            else:
-                return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=proc.returncode, status="Execution Error")
-        except Exception as js_err:
-            print(f"[code-execution] Local Node runner failed, falling back: {js_err}", file=sys.stderr)
-
-    elif target_lang == 'java':
-        try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                java_file = os.path.join(tmpdir, "Solution.java")
-                with open(java_file, "w", encoding="utf-8") as f:
-                    f.write(request.source_code)
-
-                compile_proc = subprocess.run(
-                    ["javac", java_file],
-                    capture_output=True,
-                    text=True,
-                    encoding="utf-8",
-                    errors="replace",
-                    timeout=5
-                )
-                compile_stderr = (compile_proc.stderr or "").strip()
-                if compile_proc.returncode != 0:
-                    elapsed = (datetime.now() - start_time).total_seconds()
-                    return CodeRunResult(
-                        output=f"❌ Compilation Error:\n{compile_stderr}",
-                        stderr=compile_stderr,
-                        execution_time=f"{elapsed:.2f}s",
-                        exit_code=compile_proc.returncode,
-                        status="Execution Error"
-                    )
-
-                run_proc = subprocess.run(
-                    ["java", "-cp", tmpdir, "Solution"],
+    # 5. Local Subprocess Fallback (Strictly gated behind ENABLE_LOCAL_SUBPROCESS_FALLBACK configuration)
+    if ENABLE_LOCAL_SUBPROCESS_FALLBACK:
+        if target_lang == 'python':
+            try:
+                proc = subprocess.run(
+                    [sys.executable, "-c", request.source_code],
                     input=request.stdin or "",
                     capture_output=True,
                     text=True,
@@ -384,45 +308,24 @@ async def run_sandboxed_code(request: CodeRunPayload):
                     timeout=5
                 )
                 elapsed = (datetime.now() - start_time).total_seconds()
-                stdout_str = (run_proc.stdout or "").strip()
-                stderr_str = (run_proc.stderr or "").strip()
-                if run_proc.returncode == 0:
+                stdout_str = (proc.stdout or "").strip()
+                stderr_str = (proc.stderr or "").strip()
+                if proc.returncode == 0:
                     out = stdout_str if stdout_str else "Code executed cleanly with no stdout."
                     return CodeRunResult(output=out, stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
                 else:
-                    return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=run_proc.returncode, status="Execution Error")
-        except Exception as java_err:
-            print(f"[code-execution] Local Java runner failed, falling back: {java_err}", file=sys.stderr)
+                    return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=proc.returncode, status="Execution Error")
+            except subprocess.TimeoutExpired:
+                elapsed = (datetime.now() - start_time).total_seconds()
+                return CodeRunResult(output="❌ Execution Timeout: Program exceeded max runtime (5.00s).", stderr="Time limit exceeded", execution_time=f"{elapsed:.2f}s", exit_code=124, status="Timeout")
+            except Exception as py_err:
+                elapsed = (datetime.now() - start_time).total_seconds()
+                return CodeRunResult(output=f"❌ Execution Error:\n{str(py_err)}", stderr=str(py_err), execution_time=f"{elapsed:.2f}s", exit_code=1, status="Execution Error")
 
-    elif target_lang in ['cpp', 'c++']:
-        try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                cpp_file = os.path.join(tmpdir, "solution.cpp")
-                exe_file = os.path.join(tmpdir, "solution.exe" if os.name == "nt" else "solution")
-                with open(cpp_file, "w", encoding="utf-8") as f:
-                    f.write(request.source_code)
-
-                compile_proc = subprocess.run(
-                    ["g++", "-O0", cpp_file, "-o", exe_file],
-                    capture_output=True,
-                    text=True,
-                    encoding="utf-8",
-                    errors="replace",
-                    timeout=12
-                )
-                compile_stderr = (compile_proc.stderr or "").strip()
-                if compile_proc.returncode != 0:
-                    elapsed = (datetime.now() - start_time).total_seconds()
-                    return CodeRunResult(
-                        output=f"❌ Compilation Error:\n{compile_stderr}",
-                        stderr=compile_stderr,
-                        execution_time=f"{elapsed:.2f}s",
-                        exit_code=compile_proc.returncode,
-                        status="Execution Error"
-                    )
-
-                run_proc = subprocess.run(
-                    [exe_file],
+        elif target_lang in ['javascript', 'js']:
+            try:
+                proc = subprocess.run(
+                    ["node", "-e", request.source_code],
                     input=request.stdin or "",
                     capture_output=True,
                     text=True,
@@ -431,15 +334,109 @@ async def run_sandboxed_code(request: CodeRunPayload):
                     timeout=5
                 )
                 elapsed = (datetime.now() - start_time).total_seconds()
-                stdout_str = (run_proc.stdout or "").strip()
-                stderr_str = (run_proc.stderr or "").strip()
-                if run_proc.returncode == 0:
+                stdout_str = (proc.stdout or "").strip()
+                stderr_str = (proc.stderr or "").strip()
+
+                if proc.returncode == 0:
                     out = stdout_str if stdout_str else "Code executed cleanly with no stdout."
                     return CodeRunResult(output=out, stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
                 else:
-                    return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=run_proc.returncode, status="Execution Error")
-        except Exception as cpp_err:
-            print(f"[code-execution] Local C++ runner failed, falling back: {cpp_err}", file=sys.stderr)
+                    return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=proc.returncode, status="Execution Error")
+            except Exception as js_err:
+                print(f"[code-execution] Local Node runner failed, falling back: {js_err}", file=sys.stderr)
+
+        elif target_lang == 'java':
+            try:
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    java_file = os.path.join(tmpdir, "Solution.java")
+                    with open(java_file, "w", encoding="utf-8") as f:
+                        f.write(request.source_code)
+
+                    compile_proc = subprocess.run(
+                        ["javac", java_file],
+                        capture_output=True,
+                        text=True,
+                        encoding="utf-8",
+                        errors="replace",
+                        timeout=5
+                    )
+                    compile_stderr = (compile_proc.stderr or "").strip()
+                    if compile_proc.returncode != 0:
+                        elapsed = (datetime.now() - start_time).total_seconds()
+                        return CodeRunResult(
+                            output=f"❌ Compilation Error:\n{compile_stderr}",
+                            stderr=compile_stderr,
+                            execution_time=f"{elapsed:.2f}s",
+                            exit_code=compile_proc.returncode,
+                            status="Execution Error"
+                        )
+
+                    run_proc = subprocess.run(
+                        ["java", "-cp", tmpdir, "Solution"],
+                        input=request.stdin or "",
+                        capture_output=True,
+                        text=True,
+                        encoding="utf-8",
+                        errors="replace",
+                        timeout=5
+                    )
+                    elapsed = (datetime.now() - start_time).total_seconds()
+                    stdout_str = (run_proc.stdout or "").strip()
+                    stderr_str = (run_proc.stderr or "").strip()
+                    if run_proc.returncode == 0:
+                        out = stdout_str if stdout_str else "Code executed cleanly with no stdout."
+                        return CodeRunResult(output=out, stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
+                    else:
+                        return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=run_proc.returncode, status="Execution Error")
+            except Exception as java_err:
+                print(f"[code-execution] Local Java runner failed, falling back: {java_err}", file=sys.stderr)
+
+        elif target_lang in ['cpp', 'c++']:
+            try:
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    cpp_file = os.path.join(tmpdir, "solution.cpp")
+                    exe_file = os.path.join(tmpdir, "solution.exe" if os.name == "nt" else "solution")
+                    with open(cpp_file, "w", encoding="utf-8") as f:
+                        f.write(request.source_code)
+
+                    compile_proc = subprocess.run(
+                        ["g++", "-O0", cpp_file, "-o", exe_file],
+                        capture_output=True,
+                        text=True,
+                        encoding="utf-8",
+                        errors="replace",
+                        timeout=12
+                    )
+                    compile_stderr = (compile_proc.stderr or "").strip()
+                    if compile_proc.returncode != 0:
+                        elapsed = (datetime.now() - start_time).total_seconds()
+                        return CodeRunResult(
+                            output=f"❌ Compilation Error:\n{compile_stderr}",
+                            stderr=compile_stderr,
+                            execution_time=f"{elapsed:.2f}s",
+                            exit_code=compile_proc.returncode,
+                            status="Execution Error"
+                        )
+
+                    run_proc = subprocess.run(
+                        [exe_file],
+                        input=request.stdin or "",
+                        capture_output=True,
+                        text=True,
+                        encoding="utf-8",
+                        errors="replace",
+                        timeout=5
+                    )
+                    elapsed = (datetime.now() - start_time).total_seconds()
+                    stdout_str = (run_proc.stdout or "").strip()
+                    stderr_str = (run_proc.stderr or "").strip()
+                    if run_proc.returncode == 0:
+                        out = stdout_str if stdout_str else "Code executed cleanly with no stdout."
+                        return CodeRunResult(output=out, stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=0, status="Success")
+                    else:
+                        return CodeRunResult(output=f"❌ Execution Error:\n{stderr_str if stderr_str else stdout_str}", stderr=stderr_str, execution_time=f"{elapsed:.2f}s", exit_code=run_proc.returncode, status="Execution Error")
+            except Exception as cpp_err:
+                print(f"[code-execution] Local C++ runner failed, falling back: {cpp_err}", file=sys.stderr)
 
     elapsed = (datetime.now() - start_time).total_seconds()
     return CodeRunResult(

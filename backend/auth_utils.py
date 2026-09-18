@@ -29,7 +29,29 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 # JWT token handling
 import secrets
-JWT_SECRET = os.environ.get('JWT_SECRET') or secrets.token_hex(32)
+import logging
+
+logger = logging.getLogger("auth_utils")
+
+_raw_jwt_secret = os.environ.get('JWT_SECRET', '').strip()
+_env = os.environ.get('ENVIRONMENT', 'development').lower()
+
+if _raw_jwt_secret and _raw_jwt_secret not in ("YOUR_JWT_SECRET_HERE", "secret", "changeme", "default_secret"):
+    JWT_SECRET = _raw_jwt_secret
+else:
+    if _env == "production":
+        raise RuntimeError(
+            "CRITICAL SECURITY ERROR: 'JWT_SECRET' environment variable is missing or using an insecure default in production! "
+            "Please configure a strong, random 64-character JWT_SECRET in your backend environment variables."
+        )
+    else:
+        logger.warning(
+            "⚠️ JWT_SECRET is not configured in backend/.env. Using a generated ephemeral secret for development. "
+            "Define a fixed JWT_SECRET in .env to maintain active login sessions across restarts."
+        )
+        JWT_SECRET = os.environ.get("EPHEMERAL_DEV_JWT_SECRET") or secrets.token_hex(32)
+        os.environ["EPHEMERAL_DEV_JWT_SECRET"] = JWT_SECRET
+
 JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM', 'HS256')
 JWT_EXPIRATION_HOURS = int(os.environ.get('JWT_EXPIRATION_HOURS', '24'))
 
