@@ -66,6 +66,14 @@ code, pre, .font-code {
   overflow-wrap: normal;
 }
 
+/* Monaco Editor Container & Glyph Isolation (Prevents cursor displacement / horizontal drift) */
+.monaco-editor,
+.monaco-editor * {
+  letter-spacing: 0px !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
 /* Main Site Wrapper Standard (Max 1200px, 1.5rem padding, centered) */
 .site-container {
   width: 100%;

@@ -29,6 +29,7 @@ from routes.leaderboard_routes import router as leaderboard_router
 from routes.system_design_routes import router as system_design_router
 from routes.certificate_routes import router as certificate_router
 from routes.linkedin_routes import router as linkedin_router
+from routes.coaching_routes import router as coaching_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -120,6 +121,7 @@ app.include_router(resume_router, dependencies=[Depends(authed_rate_limiter)])
 app.include_router(leaderboard_router, dependencies=[Depends(public_rate_limiter)])
 app.include_router(system_design_router, dependencies=[Depends(authed_rate_limiter)])
 app.include_router(certificate_router, dependencies=[Depends(public_rate_limiter)])
+app.include_router(coaching_router, dependencies=[Depends(public_rate_limiter)])
 
 # Mount AI Engine Sub-Routers
 app.include_router(question_generation_router, dependencies=[Depends(authed_rate_limiter)])  # /api/questions/generate

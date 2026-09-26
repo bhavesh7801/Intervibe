@@ -247,6 +247,23 @@ export const CodingWorkspace = () => {
     }
   };
 
+  const handleEditorDidMount = (editor, monaco) => {
+    // Re-measure font glyphs once web fonts load to prevent cursor-drift / offset
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        try {
+          monaco.editor.remeasureFonts();
+        } catch {}
+      });
+    }
+    setTimeout(() => {
+      try {
+        monaco.editor.remeasureFonts();
+        editor.layout();
+      } catch {}
+    }, 150);
+  };
+
   const handleDownloadCode = () => {
     const extMap = {
       javascript: 'js',
@@ -598,10 +615,15 @@ export const CodingWorkspace = () => {
               language={language === 'c++' ? 'cpp' : language}
               value={code}
               onChange={(value) => setCode(value || '')}
+              onMount={handleEditorDidMount}
               theme="vs-dark"
               options={{
-                fontSize: 13,
-                fontFamily: 'JetBrains Mono, Menlo, monospace',
+                fontSize: 14,
+                fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace",
+                letterSpacing: 0,
+                cursorBlinking: 'smooth',
+                cursorSmoothCaretAnimation: 'on',
+                cursorStyle: 'line',
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 lineNumbers: 'on',

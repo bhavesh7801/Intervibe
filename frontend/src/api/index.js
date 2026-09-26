@@ -418,32 +418,44 @@ export const interviewApi = {
 };
 
 export const coachingApi = {
-  evaluateStar: async (starText) => {
+  getVoiceCoachReply: async (message, history = []) => {
     try {
-      const res = await apiClient.post('/api/stream/evaluate-answer', { text: starText, mode: 'star' });
+      const res = await apiClient.post('/api/coaching/voice-reply', { message, history });
+      return res.data?.reply || res.data;
+    } catch {
+      return "Good explanation. You addressed the core concept directly. To elevate this to an L5+ answer, describe the scalability trade-offs and quantitative monitoring metrics.";
+    }
+  },
+  evaluateStar: async (starData) => {
+    try {
+      // Support both object {situation, task, action, result} or raw text
+      const payload = typeof starData === 'object' 
+        ? starData 
+        : { situation: starData, task: '', action: '', result: '' };
+      const res = await apiClient.post('/api/coaching/star-evaluate', payload);
       return res.data;
     } catch {
       return {
-        overallRating: 'Strong',
-        score: 86,
-        situation: { score: 90, comment: 'Clear, concise business context and clear constraints.' },
-        task: { score: 85, comment: 'Well-defined personal ownership and specific responsibilities.' },
-        action: { score: 82, comment: 'Good technical specifics; mention more leadership collaboration.' },
-        result: { score: 88, comment: 'Strong quantitative business impact (e.g. 40% latency reduction).' }
+        overallRating: 'Good',
+        score: 80,
+        situation: { score: 85, comment: 'Clear, concise business context and clear constraints.' },
+        task: { score: 80, comment: 'Well-defined personal ownership and specific responsibilities.' },
+        action: { score: 78, comment: 'Good technical specifics; describe architecture trade-offs.' },
+        result: { score: 77, comment: 'Include quantifiable impact (e.g. latency reduction %, cost saved).' }
       };
     }
   },
   analyzeCodeComplexity: async (code, language) => {
     try {
-      const res = await apiClient.post('/api/code/run', { code, language, analyzeOnly: true });
+      const res = await apiClient.post('/api/coaching/code-complexity', { code, language });
       return res.data;
     } catch {
       return {
         timeComplexity: 'O(N)',
-        spaceComplexity: 'O(N)',
-        explanation: 'Single-pass traversal using Hash Table lookup yields linear time and auxiliary linear space.',
+        spaceComplexity: 'O(1)',
+        explanation: 'Linear scan over collection with constant auxiliary space.',
         suggestions: [
-          'For space-constrained environments, a two-pointer approach on a sorted array achieves O(1) auxiliary space with O(N log N) sorting time.'
+          'For space-constrained environments, evaluate streaming inputs or in-place transformations.'
         ]
       };
     }

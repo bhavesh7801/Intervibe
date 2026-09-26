@@ -15,8 +15,7 @@ export const StarEvaluatorTab = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const combined = `Situation: ${situation}\nTask: ${task}\nAction: ${action}\nResult: ${result}`;
-      const res = await coachingApi.evaluateStar(combined);
+      const res = await coachingApi.evaluateStar({ situation, task, action, result });
       setEvaluation(res);
     } finally {
       setLoading(false);

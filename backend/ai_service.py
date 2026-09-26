@@ -582,3 +582,69 @@ class AIService:
                 {"text": "How do you handle tight deadlines or technical disagreements on a team?", "category": "behavioral", "difficulty": "medium"}
             ]
         return fallback[:num_questions]
+
+    async def generate_coaching_reply(self, history: list, user_message: str) -> str:
+        """Generate interactive, personalized AI coach feedback based on candidate's answer."""
+        formatted_history = "\n".join([f"{item.get('sender', 'user').upper()}: {item.get('text', '')}" for item in history[-6:]]) if history else "None"
+        system_prompt = prompts.VOICE_COACH_PROMPT.format(history=formatted_history, user_message=user_message)
+        user_prompt = f"Candidate Answer: {user_message}"
+
+        try:
+            reply = await self._call_llm(system_prompt, user_prompt, is_json=False)
+            return reply.strip().strip('"')
+        except Exception as e:
+            logger.error(f"Error generating coaching reply via LLM: {e}")
+            return "Good breakdown. You explained the concept clearly. To stand out even more in senior loops, mention how you would measure latency and monitor for edge cases under heavy load."
+
+    async def evaluate_star_response(self, situation: str, task: str, action: str, result: str, role: str = "Software Engineer") -> dict:
+        """Evaluate a candidate's STAR story components and return detailed scores and feedback."""
+        system_prompt = prompts.STAR_EVALUATION_PROMPT.format(
+            role=role,
+            situation=situation or "N/A",
+            task=task or "N/A",
+            action=action or "N/A",
+            result=result or "N/A"
+        )
+        user_prompt = f"Evaluate this STAR response for {role}."
+
+        try:
+            raw = await self._call_llm(system_prompt, user_prompt, is_json=True)
+            cleaned = self._clean_json(raw)
+            data = json.loads(cleaned, strict=False)
+            if isinstance(data, dict) and "score" in data:
+                return data
+        except Exception as e:
+            logger.error(f"Error evaluating STAR response via LLM: {e}")
+
+        # Dynamic heuristic fallback if LLM is unavailable
+        sit_len = len(situation.split())
+        task_len = len(task.split())
+        act_len = len(action.split())
+        res_len = len(result.split())
+
+        s_score = min(95, max(60, 70 + sit_len))
+        t_score = min(95, max(60, 70 + task_len))
+        a_score = min(95, max(60, 68 + act_len))
+        r_score = min(95, max(60, 65 + res_len * 2))
+        avg = round((s_score + t_score + a_score + r_score) / 4)
+
+        return {
+            "overallRating": "Strong" if avg >= 85 else ("Good" if avg >= 75 else "Needs Improvement"),
+            "score": avg,
+            "situation": {
+                "score": s_score,
+                "comment": "Good contextual setup. Consider adding the exact team size and business impact."
+            },
+            "task": {
+                "score": t_score,
+                "comment": "Clear objective. Highlight what specific responsibility fell on you versus others."
+            },
+            "action": {
+                "score": a_score,
+                "comment": "Detailed technical steps. Emphasize why you chose this solution over alternative architectures."
+            },
+            "result": {
+                "score": r_score,
+                "comment": "Solid outcome. Adding exact quantitative business metrics (e.g., % latency drop, $ saved) makes this top-tier."
+            }
+        }

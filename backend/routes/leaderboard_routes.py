@@ -22,6 +22,7 @@ def Math_percentile(score: int, completed_count: int) -> int:
     base = round((score * 0.9) + min(10, completed_count * 2))
     return min(99, max(1, base))
 
+@router.get("/leaderboard")
 @router.get("/user/leaderboard")
 async def get_global_leaderboard(
     db: Session = Depends(get_db),
