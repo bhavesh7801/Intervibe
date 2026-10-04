@@ -108,67 +108,184 @@ code, pre, .font-code {
 }
 
 /* Global Dark Theme Component Overrides */
-html.dark .bg-white {
+html.dark,
+.dark {
+  --bg-canvas: #090D16;
+  --bg-surface: #0F172A;
+  --bg-input: #151D2E;
+  --border-subtle: #1E293B;
+  --border-hover: #334155;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+
+  /* Tailwind CSS color token mappings in dark mode */
+  --color-slate-950: #F8FAFC;
+  --color-slate-900: #F8FAFC;
+  --color-slate-800: #F1F5F9;
+  --color-slate-700: #E2E8F0;
+  --color-slate-600: #CBD5E1;
+  --color-slate-500: #94A3B8;
+  --color-gray-950: #F9FAFB;
+  --color-gray-900: #F9FAFB;
+  --color-gray-800: #F3F4F6;
+  --color-neutral-900: #FAFAFA;
+  --color-zinc-900: #FAFAFA;
+}
+
+/* Surfaces & Containers */
+html.dark .bg-white,
+.dark .bg-white {
   background-color: #0F172A !important;
 }
 
 html.dark .bg-slate-50,
+html.dark .bg-slate-50\/90,
 html.dark .bg-slate-50\/80,
 html.dark .bg-slate-50\/70,
 html.dark .bg-slate-50\/60,
 html.dark .bg-slate-50\/50,
 html.dark .bg-slate-50\/40,
-html.dark .bg-slate-50\/30 {
+html.dark .bg-slate-50\/30,
+.dark .bg-slate-50,
+.dark .bg-slate-50\/90,
+.dark .bg-slate-50\/80,
+.dark .bg-slate-50\/70,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/40,
+.dark .bg-slate-50\/30 {
   background-color: #151D2E !important;
 }
 
-html.dark .bg-slate-100 {
+html.dark .bg-slate-100,
+html.dark .bg-slate-100\/80,
+.dark .bg-slate-100,
+.dark .bg-slate-100\/80 {
   background-color: #1E293B !important;
 }
 
-html.dark .bg-slate-200 {
+html.dark .bg-slate-200,
+.dark .bg-slate-200 {
   background-color: #334155 !important;
 }
 
-html.dark .text-slate-900 {
+/* Text Visibility & Contrast Fixes */
+html.dark .text-slate-950,
+html.dark .text-slate-900,
+html.dark .text-black,
+html.dark .text-gray-950,
+html.dark .text-gray-900,
+html.dark .text-neutral-900,
+html.dark .text-zinc-900,
+.dark .text-slate-950,
+.dark .text-slate-900,
+.dark .text-black,
+.dark .text-gray-950,
+.dark .text-gray-900,
+.dark .text-neutral-900,
+.dark .text-zinc-900 {
   color: #F8FAFC !important;
 }
 
-html.dark .text-slate-800 {
+html.dark .text-slate-800,
+html.dark .text-gray-800,
+html.dark .text-neutral-800,
+.dark .text-slate-800,
+.dark .text-gray-800,
+.dark .text-neutral-800 {
   color: #F1F5F9 !important;
 }
 
-html.dark .text-slate-700 {
+html.dark .text-slate-700,
+html.dark .text-gray-700,
+html.dark .text-neutral-700,
+.dark .text-slate-700,
+.dark .text-gray-700,
+.dark .text-neutral-700 {
+  color: #E2E8F0 !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-gray-600,
+.dark .text-slate-600,
+.dark .text-gray-600 {
   color: #CBD5E1 !important;
 }
 
-html.dark .text-slate-600 {
+html.dark .text-slate-500,
+html.dark .text-gray-500,
+.dark .text-slate-500,
+.dark .text-gray-500 {
   color: #94A3B8 !important;
 }
 
-html.dark .text-slate-500 {
-  color: #64748B !important;
+/* Ensure Headings, Labels, Table Headers and Paragraphs have clean contrast */
+html.dark h1:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]),
+html.dark h2:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]),
+html.dark h3:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]),
+html.dark h4:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]),
+.dark h1:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]),
+.dark h2:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]),
+.dark h3:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]),
+.dark h4:not([class*="text-rose-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]) {
+  color: #F8FAFC;
 }
 
+/* Borders */
 html.dark .border-slate-100,
 html.dark .border-slate-200,
 html.dark .border-slate-200\/90,
 html.dark .border-slate-200\/80,
 html.dark .border-slate-200\/70,
-html.dark .border-slate-200\/60 {
+html.dark .border-slate-200\/60,
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/90,
+.dark .border-slate-200\/80,
+.dark .border-slate-200\/70,
+.dark .border-slate-200\/60 {
   border-color: #1E293B !important;
 }
 
-html.dark .border-slate-300 {
+html.dark .border-slate-300,
+.dark .border-slate-300 {
   border-color: #334155 !important;
 }
 
+/* Form Controls & Inputs */
 html.dark input:not([type="checkbox"]):not([type="radio"]),
 html.dark textarea,
-html.dark select {
+html.dark select,
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
   background-color: #151D2E !important;
   color: #F8FAFC !important;
   border-color: #334155 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder,
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748B !important;
+}
+
+html.dark option,
+.dark option {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+/* Badges on vibrant backgrounds preserve dark text for high legibility */
+html.dark .bg-amber-400 .text-slate-950,
+html.dark .bg-yellow-400 .text-slate-950,
+html.dark .bg-amber-300 .text-slate-950,
+.dark .bg-amber-400 .text-slate-950,
+.dark .bg-yellow-400 .text-slate-950,
+.dark .bg-amber-300 .text-slate-950 {
+  color: #090D16 !important;
 }
 
 /* Hide scrollbar for clean tab rails */

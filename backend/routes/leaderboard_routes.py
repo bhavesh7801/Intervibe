@@ -56,16 +56,32 @@ async def get_global_leaderboard(
         avg_score = round(float(raw_score)) if raw_score is not None else 82
         readiness_percentile = Math_percentile(avg_score, completed)
 
+        # Dynamic badge assignment based on percentile and score
+        if readiness_percentile >= 95 or avg_score >= 95:
+            badge = "FAANG Elite"
+        elif readiness_percentile >= 90 or avg_score >= 90:
+            badge = "Algorithm Master"
+        elif readiness_percentile >= 85 or avg_score >= 85:
+            badge = "System Architect"
+        elif readiness_percentile >= 75 or avg_score >= 75:
+            badge = "STAR Expert"
+        else:
+            badge = "Rising Star"
+
         leaderboard_data.append({
             "id": f"CAND-{user.id[:8].upper()}",
-            "name": user.name,
+            "name": user.name or "Candidate",
             "email": mask_email(user.email),
             "targetRole": user.target_role or "Software Engineer",
+            "role": user.target_role or "Software Engineer",
             "experienceLevel": user.experience_level or "Mid Level",
             "completedSessions": completed,
             "averageScore": avg_score,
+            "score": avg_score,
             "readinessPercentile": readiness_percentile,
             "streakDays": max(1, completed * 2 + 1),
+            "streak": max(1, completed * 2 + 1),
+            "badge": badge,
             "isCurrentUser": bool(current_user and current_user.id == user.id)
         })
 

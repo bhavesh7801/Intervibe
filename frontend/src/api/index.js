@@ -466,14 +466,15 @@ export const leaderboardApi = {
   getTopCandidates: async () => {
     try {
       const res = await apiClient.get('/leaderboard');
-      return res.data?.rankings || res.data || [];
+      const list = res.data?.leaderboard || res.data?.rankings || (Array.isArray(res.data) ? res.data : []);
+      return Array.isArray(list) ? list : [];
     } catch {
       return [
-        { rank: 1, name: 'Elena Rostova', role: 'Staff Distributed Systems', score: 98, streak: 24, badge: 'FAANG Elite' },
-        { rank: 2, name: 'David Chen', role: 'Senior Backend Engineer', score: 95, streak: 19, badge: 'Algorithm Master' },
-        { rank: 3, name: 'Sophia Patel', role: 'Frontend Lead', score: 92, streak: 14, badge: 'System Architect' },
-        { rank: 4, name: 'Marcus Aurelius', role: 'Machine Learning Engineer', score: 91, streak: 12, badge: 'STAR Expert' },
-        { rank: 5, name: 'Alex Johnson', role: 'Full Stack Engineer', score: 88, streak: 7, badge: 'Rising Star' }
+        { id: '1', rank: 1, name: 'Elena Rostova', role: 'Staff Distributed Systems', targetRole: 'Staff Distributed Systems', score: 98, averageScore: 98, streak: 24, streakDays: 24, badge: 'FAANG Elite', completedSessions: 32, readinessPercentile: 99 },
+        { id: '2', rank: 2, name: 'David Chen', role: 'Senior Backend Engineer', targetRole: 'Senior Backend Engineer', score: 95, averageScore: 95, streak: 19, streakDays: 19, badge: 'Algorithm Master', completedSessions: 26, readinessPercentile: 96 },
+        { id: '3', rank: 3, name: 'Sophia Patel', role: 'Frontend Lead', targetRole: 'Frontend Lead', score: 92, averageScore: 92, streak: 14, streakDays: 14, badge: 'System Architect', completedSessions: 21, readinessPercentile: 93 },
+        { id: '4', rank: 4, name: 'Marcus Aurelius', role: 'Machine Learning Engineer', targetRole: 'Machine Learning Engineer', score: 91, averageScore: 91, streak: 12, streakDays: 12, badge: 'STAR Expert', completedSessions: 18, readinessPercentile: 91 },
+        { id: '5', rank: 5, name: 'Alex Johnson', role: 'Full Stack Engineer', targetRole: 'Full Stack Engineer', score: 88, averageScore: 88, streak: 7, streakDays: 7, badge: 'Rising Star', completedSessions: 12, readinessPercentile: 88 }
       ];
     }
   }
