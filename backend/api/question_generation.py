@@ -34,8 +34,8 @@ HF_ROUTER_URL = "https://router.huggingface.co/v1/chat/completions"
 HF_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
-GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = "qwen/qwen3.8-27b"
+GROQ_FALLBACK_MODEL = "openai/gpt-oss-120b"
 
 
 def _create_ssl_context():
@@ -56,9 +56,8 @@ def _call_gemini(prompt_system: str, prompt_user: str) -> str:
     
     models_to_try = [
         "gemini-2.5-flash",
+        "gemini-3.8-flash",
         "gemini-flash-latest",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
         "gemini-2.5-pro"
     ]
     

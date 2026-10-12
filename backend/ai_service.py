@@ -32,9 +32,9 @@ class AIService:
         else:
             self.client = None
             
-        self.model = "llama-3.3-70b-versatile"
-        self.fallback_model = "llama-3.1-8b-instant"
-        self.gemini_model = "gemini-1.5-flash"
+        self.model = "qwen/qwen3.8-27b"
+        self.fallback_model = "openai/gpt-oss-120b"
+        self.gemini_model = "gemini-2.5-flash"
 
     async def generate_questions(self, role: str, experience_level: str, num_questions: int = 5, persona: str = "Standard") -> list:
         # Check Redis Cache with random batch variation to avoid duplicate static sessions
@@ -318,8 +318,6 @@ class AIService:
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.gemini_model}:generateContent?key={self.gemini_key}"
-        
         payload = {
             "systemInstruction": {
                 "parts": [{"text": system_message}]
@@ -335,17 +333,25 @@ class AIService:
         }
         if is_json:
             payload["generationConfig"]["responseMimeType"] = "application/json"
-            
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST"
-        )
-        
-        with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data["candidates"][0]["content"]["parts"][0]["text"]
+
+        models_to_try = [self.gemini_model, "gemini-3.8-flash", "gemini-flash-latest"]
+        last_error = None
+        for m in models_to_try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={self.gemini_key}"
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            try:
+                with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    return data["candidates"][0]["content"]["parts"][0]["text"]
+            except Exception as e:
+                last_error = e
+                continue
+        raise last_error or RuntimeError("Gemini models failed")
 
     def _clean_json(self, text: str) -> str:
         if not text:
