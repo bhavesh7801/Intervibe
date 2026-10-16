@@ -194,6 +194,7 @@ def _call_groq(prompt_system: str, prompt_user: str) -> str:
             headers={
                 "Authorization": f"Bearer {key}",
                 "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             },
             method="POST",
         )
@@ -502,122 +503,134 @@ def get_curated_interview_questions(topic: str, role: str, difficulty: str, num_
 
 
 CURATED_CODING_FALLBACKS = {
-    "binary search": {
-        "title": "Search in Rotated Sorted Array",
-        "description": "Given the array `nums` after a possible rotation and an integer `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`.\n\nYou must write an algorithm with `O(log n)` runtime complexity.\n\n### Example 1:\n- **Input:** `nums = [4,5,6,7,0,1,2], target = 0`\n- **Output:** `4`\n\n### Example 2:\n- **Input:** `nums = [4,5,6,7,0,1,2], target = 3`\n- **Output:** `-1`\n\n### Constraints:\n- `1 <= nums.length <= 5000`\n- `-10^4 <= nums[i] <= 10^4`\n- All values of `nums` are unique.",
-        "starter_code": {
-            "python": "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        # Write your O(log n) solution here\n        pass",
-            "javascript": "class Solution {\n    search(nums, target) {\n        // Write your O(log n) solution here\n        return -1;\n    }\n}",
-            "cpp": "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        // Write your solution here\n        return -1;\n    }\n};",
-            "java": "class Solution {\n    public int search(int[] nums, int target) {\n        // Write your solution here\n        return -1;\n    }\n}"
+    "binary search": [
+        {
+            "title": "Search in Rotated Sorted Array",
+            "description": "Given the array `nums` after a possible rotation and an integer `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`.\n\nYou must write an algorithm with `O(log n)` runtime complexity.\n\n### Example 1:\n- **Input:** `nums = [4,5,6,7,0,1,2], target = 0`\n- **Output:** `4`\n\n### Constraints:\n- `1 <= nums.length <= 5000`\n- `-10^4 <= nums[i] <= 10^4`",
+            "starter_code": {
+                "python": "class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        pass",
+                "javascript": "class Solution {\n    search(nums, target) {\n        return -1;\n    }\n}"
+            },
+            "test_cases": [{"input": "[4,5,6,7,0,1,2], 0", "expected": "4"}, {"input": "[4,5,6,7,0,1,2], 3", "expected": "-1"}]
         },
-        "test_cases": [
-            {"input": "[4,5,6,7,0,1,2], 0", "expected": "4"},
-            {"input": "[4,5,6,7,0,1,2], 3", "expected": "-1"},
-            {"input": "[1], 0", "expected": "-1"}
-        ]
-    },
-    "arrays & hashing": {
-        "title": "Product of Array Except Self",
-        "description": "Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`.\n\nThe product of any prefix or suffix of `nums` is guaranteed to fit in a 32-bit integer.\n\nYou must write an algorithm that runs in `O(n)` time and without using the division operation.\n\n### Example:\n- **Input:** `nums = [1,2,3,4]`\n- **Output:** `[24,12,8,6]`",
-        "starter_code": {
-            "python": "class Solution:\n    def productExceptSelf(self, nums: list[int]) -> list[int]:\n        pass",
-            "javascript": "class Solution {\n    productExceptSelf(nums) {\n        return [];\n    }\n}",
-            "cpp": "class Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        return {};\n    }\n};",
-            "java": "class Solution {\n    public int productExceptSelf(int[] nums) {\n        return new int[]{};\n    }\n}"
+        {
+            "title": "Find Minimum in Rotated Sorted Array",
+            "description": "Suppose an array of length `n` sorted in ascending order is rotated between 1 and `n` times. Given the sorted rotated array `nums` of unique elements, return the minimum element of this array.\n\nYou must write an algorithm that runs in `O(log n)` time.\n\n### Example 1:\n- **Input:** `nums = [3,4,5,1,2]`\n- **Output:** `1`",
+            "starter_code": {
+                "python": "class Solution:\n    def findMin(self, nums: list[int]) -> int:\n        pass",
+                "javascript": "class Solution {\n    findMin(nums) {\n        return 0;\n    }\n}"
+            },
+            "test_cases": [{"input": "[3,4,5,1,2]", "expected": "1"}, {"input": "[4,5,6,7,0,1,2]", "expected": "0"}]
+        }
+    ],
+    "arrays & hashing": [
+        {
+            "title": "Product of Array Except Self",
+            "description": "Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`.\n\nYou must write an algorithm that runs in `O(n)` time and without using division.\n\n### Example:\n- **Input:** `nums = [1,2,3,4]`\n- **Output:** `[24,12,8,6]`",
+            "starter_code": {
+                "python": "class Solution:\n    def productExceptSelf(self, nums: list[int]) -> list[int]:\n        pass",
+                "javascript": "class Solution {\n    productExceptSelf(nums) {\n        return [];\n    }\n}"
+            },
+            "test_cases": [{"input": "[1,2,3,4]", "expected": "[24,12,8,6]"}, {"input": "[-1,1,0,-3,3]", "expected": "[0,0,9,0,0]"}]
         },
-        "test_cases": [
-            {"input": "[1,2,3,4]", "expected": "[24,12,8,6]"},
-            {"input": "[-1,1,0,-3,3]", "expected": "[0,0,9,0,0]"}
-        ]
-    },
-    "dynamic programming": {
-        "title": "Coin Change",
-        "description": "You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.\n\n### Example 1:\n- **Input:** `coins = [1,2,5], amount = 11`\n- **Output:** `3` (11 = 5 + 5 + 1)\n\n### Constraints:\n- `1 <= coins.length <= 12`\n- `0 <= amount <= 10^4`",
-        "starter_code": {
-            "python": "class Solution:\n    def coinChange(self, coins: list[int], amount: int) -> int:\n        pass",
-            "javascript": "class Solution {\n    coinChange(coins, amount) {\n        return -1;\n    }\n}",
-            "cpp": "class Solution {\npublic:\n    int coinChange(vector<int>& coins, int amount) {\n        return -1;\n    }\n};",
-            "java": "class Solution {\n    public int coinChange(int[] coins, int amount) {\n        return -1;\n    }\n}"
+        {
+            "title": "Top K Frequent Elements",
+            "description": "Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. You may return the answer in any order.\n\nTime complexity must be better than `O(n log n)`.\n\n### Example:\n- **Input:** `nums = [1,1,1,2,2,3], k = 2`\n- **Output:** `[1,2]`",
+            "starter_code": {
+                "python": "class Solution:\n    def topKFrequent(self, nums: list[int], k: int) -> list[int]:\n        pass",
+                "javascript": "class Solution {\n    topKFrequent(nums, k) {\n        return [];\n    }\n}"
+            },
+            "test_cases": [{"input": "[1,1,1,2,2,3], 2", "expected": "[1,2]"}]
+        }
+    ],
+    "dynamic programming": [
+        {
+            "title": "Coin Change",
+            "description": "You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up, return `-1`.\n\n### Example 1:\n- **Input:** `coins = [1,2,5], amount = 11`\n- **Output:** `3`",
+            "starter_code": {
+                "python": "class Solution:\n    def coinChange(self, coins: list[int], amount: int) -> int:\n        pass",
+                "javascript": "class Solution {\n    coinChange(coins, amount) {\n        return -1;\n    }\n}"
+            },
+            "test_cases": [{"input": "[1,2,5], 11", "expected": "3"}, {"input": "[2], 3", "expected": "-1"}]
         },
-        "test_cases": [
-            {"input": "[1,2,5], 11", "expected": "3"},
-            {"input": "[2], 3", "expected": "-1"}
-        ]
-    },
-    "sliding window": {
-        "title": "Longest Substring Without Repeating Characters",
-        "description": "Given a string `s`, find the length of the longest substring without repeating characters.\n\n### Example:\n- **Input:** `s = \"abcabcbb\"`\n- **Output:** `3` (\"abc\")",
-        "starter_code": {
-            "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        pass",
-            "javascript": "class Solution {\n    lengthOfLongestSubstring(s) {\n        return 0;\n    }\n}",
-            "cpp": "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        return 0;\n    }\n};",
-            "java": "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        return 0;\n    }\n}"
+        {
+            "title": "Longest Increasing Subsequence",
+            "description": "Given an integer array `nums`, return the length of the longest strictly increasing subsequence.\n\n### Example 1:\n- **Input:** `nums = [10,9,2,5,3,7,101,18]`\n- **Output:** `4`",
+            "starter_code": {
+                "python": "class Solution:\n    def lengthOfLIS(self, nums: list[int]) -> int:\n        pass",
+                "javascript": "class Solution {\n    lengthOfLIS(nums) {\n        return 0;\n    }\n}"
+            },
+            "test_cases": [{"input": "[10,9,2,5,3,7,101,18]", "expected": "4"}]
+        }
+    ],
+    "sliding window": [
+        {
+            "title": "Longest Substring Without Repeating Characters",
+            "description": "Given a string `s`, find the length of the longest substring without repeating characters.\n\n### Example:\n- **Input:** `s = \"abcabcbb\"`\n- **Output:** `3`",
+            "starter_code": {
+                "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        pass",
+                "javascript": "class Solution {\n    lengthOfLongestSubstring(s) {\n        return 0;\n    }\n}"
+            },
+            "test_cases": [{"input": "\"abcabcbb\"", "expected": "3"}, {"input": "\"bbbbb\"", "expected": "1"}]
         },
-        "test_cases": [
-            {"input": "\"abcabcbb\"", "expected": "3"},
-            {"input": "\"bbbbb\"", "expected": "1"}
-        ]
-    },
-    "two pointers": {
-        "title": "Container With Most Water",
-        "description": "You are given an integer array `height` of length `n`. Find two lines that together with the x-axis form a container, such that the container contains the most water.\n\nReturn the maximum amount of water a container can store.",
-        "starter_code": {
-            "python": "class Solution:\n    def maxArea(self, height: list[int]) -> int:\n        pass",
-            "javascript": "class Solution {\n    maxArea(height) {\n        return 0;\n    }\n}",
-            "cpp": "class Solution {\npublic:\n    int maxArea(vector<int>& height) {\n        return 0;\n    }\n};",
-            "java": "class Solution {\n    public int maxArea(int[] height) {\n        return 0;\n    }\n}"
+        {
+            "title": "Minimum Window Substring",
+            "description": "Given two strings `s` and `t` of lengths `m` and `n` respectively, return the minimum window substring of `s` such that every character in `t` (including duplicates) is included in the window.\n\n### Example 1:\n- **Input:** `s = \"ADOBECODEBANC\", t = \"ABC\"`\n- **Output:** `\"BANC\"`",
+            "starter_code": {
+                "python": "class Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        pass",
+                "javascript": "class Solution {\n    minWindow(s, t) {\n        return \"\";\n    }\n}"
+            },
+            "test_cases": [{"input": "\"ADOBECODEBANC\", \"ABC\"", "expected": "\"BANC\""}]
+        }
+    ],
+    "two pointers": [
+        {
+            "title": "Container With Most Water",
+            "description": "You are given an integer array `height` of length `n`. Find two lines that together with the x-axis form a container, such that the container contains the most water.\n\n### Example:\n- **Input:** `[1,8,6,2,5,4,8,3,7]`\n- **Output:** `49`",
+            "starter_code": {
+                "python": "class Solution:\n    def maxArea(self, height: list[int]) -> int:\n        pass",
+                "javascript": "class Solution {\n    maxArea(height) {\n        return 0;\n    }\n}"
+            },
+            "test_cases": [{"input": "[1,8,6,2,5,4,8,3,7]", "expected": "49"}]
         },
-        "test_cases": [
-            {"input": "[1,8,6,2,5,4,8,3,7]", "expected": "49"},
-            {"input": "[1,1]", "expected": "1"}
-        ]
-    },
-    "trees": {
-        "title": "Binary Tree Level Order Traversal",
-        "description": "Given the `root` of a binary tree, return the level order traversal of its nodes' values (i.e., from left to right, level by level).",
-        "starter_code": {
-            "python": "class Solution:\n    def levelOrder(self, root) -> list[list[int]]:\n        pass",
-            "javascript": "class Solution {\n    levelOrder(root) {\n        return [];\n    }\n}",
-            "cpp": "class Solution {\npublic:\n    vector<vector<int>> levelOrder(TreeNode* root) {\n        return {};\n    }\n};",
-            "java": "class Solution {\n    public List<List<Integer>> levelOrder(TreeNode root) {\n        return new ArrayList<>();\n    }\n}"
-        },
-        "test_cases": [
-            {"input": "[3,9,20,null,null,15,7]", "expected": "[[3],[9,20],[15,7]]"}
-        ]
-    },
-    "graphs": {
-        "title": "Number of Islands",
-        "description": "Given an `m x n` 2D binary grid `grid` which represents a map of '1's (land) and '0's (water), return the number of islands.",
-        "starter_code": {
-            "python": "class Solution:\n    def numIslands(self, grid: list[list[str]]) -> int:\n        pass",
-            "javascript": "class Solution {\n    numIslands(grid) {\n        return 0;\n    }\n}",
-            "cpp": "class Solution {\npublic:\n    int numIslands(vector<vector<char>>& grid) {\n        return 0;\n    }\n};",
-            "java": "class Solution {\n    public int numIslands(char[][] grid) {\n        return 0;\n    }\n}"
-        },
-        "test_cases": [
-            {"input": "[[\"1\",\"1\",\"0\"],[\"0\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]]", "expected": "2"}
-        ]
-    }
+        {
+            "title": "3Sum",
+            "description": "Given an integer array nums, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`.\n\nNotice that the solution set must not contain duplicate triplets.",
+            "starter_code": {
+                "python": "class Solution:\n    def threeSum(self, nums: list[int]) -> list[list[int]]:\n        pass",
+                "javascript": "class Solution {\n    threeSum(nums) {\n        return [];\n    }\n}"
+            },
+            "test_cases": [{"input": "[-1,0,1,2,-1,-4]", "expected": "[[-1,-1,2],[-1,0,1]]"}]
+        }
+    ]
 }
 
 
 def get_curated_coding_fallback(topic: str, difficulty: str, language: str = "python", exclude_titles: list = None) -> dict:
     t_lower = topic.lower().strip()
-    match = None
-    for key, val in CURATED_CODING_FALLBACKS.items():
-        if key in t_lower or t_lower in key:
-            match = val
-            break
-    if not match:
-        match = random.choice(list(CURATED_CODING_FALLBACKS.values()))
+    candidates = []
     
-    rand_id = random.randint(100, 999)
-    base_title = match['title']
-    title = f"{base_title} (Variant #{rand_id})"
+    for key, problem_list in CURATED_CODING_FALLBACKS.items():
+        if key in t_lower or t_lower in key:
+            candidates = problem_list
+            break
+            
+    if not candidates:
+        all_problems = []
+        for lst in CURATED_CODING_FALLBACKS.values():
+            all_problems.extend(lst)
+        candidates = all_problems
+
+    # Exclude already generated titles
+    if exclude_titles:
+        filtered = [p for p in candidates if p["title"] not in exclude_titles]
+        if filtered:
+            candidates = filtered
+
+    match = random.choice(candidates)
     
     return {
-        "title": title,
+        "title": match["title"],
         "description": match["description"],
         "starter_code": match["starter_code"],
         "test_cases": match["test_cases"]
@@ -715,10 +728,7 @@ async def generate_question(request: QuestionGenRequest):
             }
             return QuestionGenResponse(mcq=MCQResponse(**mcq_data))
 
-        rand_suffix = random.randint(100, 999)
-        raw_title = data.get("title") or f"{target_topic} Question"
-        if "#" not in raw_title and "Variant" not in raw_title:
-            raw_title = f"{raw_title} (Variant #{rand_suffix})"
+        raw_title = str(data.get("title") or f"{target_topic} Question")
         raw_options = data.get("options") or ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"]
         if not isinstance(raw_options, list) or len(raw_options) == 0:
             raw_options = ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"]
@@ -746,7 +756,6 @@ async def generate_question(request: QuestionGenRequest):
             fb = get_curated_coding_fallback(target_topic, request.difficulty or "Medium", request.language or "python", request.exclude_titles)
             return QuestionGenResponse(coding=CodingResponse(**fb))
 
-        rand_suffix = random.randint(100, 999)
         lang = request.language or "python"
         raw_starter = data.get("starter_code") or data.get("starterCode")
         if isinstance(raw_starter, str):
@@ -768,9 +777,7 @@ async def generate_question(request: QuestionGenRequest):
         if not test_cases:
             test_cases = [{"input": "nums = [1, 2, 3]", "expected": "true"}]
 
-        raw_title = data.get("title") or f"{target_topic} Coding Challenge"
-        if "#" not in raw_title and "Variant" not in raw_title:
-            raw_title = f"{raw_title} (Variant #{rand_suffix})"
+        raw_title = str(data.get("title") or f"{target_topic} Coding Challenge")
 
         coding_data = {
             "title": str(raw_title),
