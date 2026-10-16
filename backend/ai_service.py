@@ -23,7 +23,9 @@ HF_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 
 class AIService:
     def __init__(self):
-        self.groq_key = settings.GROQ_API_KEY
+        self.groq_key = (settings.GROQ_API_KEY or os.getenv("GROQ_API_KEY", "")).strip()
+        if not self.groq_key or "your_groq" in self.groq_key:
+            self.groq_key = None
         self.hf_token = settings.HF_API_TOKEN
         self.gemini_key = settings.GEMINI_API_KEY
         

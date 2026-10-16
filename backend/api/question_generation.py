@@ -149,8 +149,8 @@ def _call_hf(prompt_system: str, prompt_user: str) -> str:
 def _call_groq(prompt_system: str, prompt_user: str) -> str:
     """Call Groq Chat API with primary and fallback models."""
     key = os.getenv("GROQ_API_KEY", "").strip()
-    if not key:
-        raise ValueError("GROQ_API_KEY is not configured")
+    if not key or "your_groq" in key:
+        raise ValueError("GROQ_API_KEY is not configured or is a placeholder in .env")
     
     groq_models = [GROQ_MODEL, GROQ_FALLBACK_MODEL, "openai/gpt-oss-20b"]
     
@@ -211,25 +211,29 @@ def _call_llm(prompt_system: str, prompt_user: str) -> str:
     """Try Groq API first (ultra-fast), then Gemini, then Hugging Face."""
     errors = []
 
-    if os.getenv("GROQ_API_KEY"):
-        try:
-            return _call_groq(prompt_system, prompt_user)
-        except Exception as e:
-            errors.append(f"[Groq Error] {str(e)}")
+    # 1. Primary: Groq (ultra-fast, active key)
+    try:
+        return _call_groq(prompt_system, prompt_user)
+    except Exception as e:
+        errors.append(f"[Groq Error] {str(e)}")
 
-    if os.getenv("GEMINI_API_KEY"):
+    # 2. Secondary: Gemini (if configured and not placeholder)
+    gem_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if gem_key and "your_gemini" not in gem_key and not gem_key.startswith("AQ."):
         try:
             return _call_gemini(prompt_system, prompt_user)
         except Exception as e:
             errors.append(f"[Gemini Error] {str(e)}")
 
-    if os.getenv("HF_API_TOKEN"):
+    # 3. Tertiary: Hugging Face (if configured and not expired)
+    hf_token = os.getenv("HF_API_TOKEN", "").strip()
+    if hf_token and "your_huggingface" not in hf_token and not hf_token.startswith("hf_JYW"):
         try:
             return _call_hf(prompt_system, prompt_user)
         except Exception as e:
             errors.append(f"[HuggingFace Error] {str(e)}")
 
-    err_detail = " ; ".join(errors) if errors else "No valid API keys found in .env"
+    err_detail = " ; ".join(errors) if errors else "No working LLM provider available"
     raise RuntimeError(f"LLM Generation Failed: {err_detail}")
 
 
@@ -598,7 +602,7 @@ CURATED_CODING_FALLBACKS = {
 }
 
 
-def get_curated_coding_fallback(topic: str, difficulty: str, language: str = "python") -> dict:
+def get_curated_coding_fallback(topic: str, difficulty: str, language: str = "python", exclude_titles: list = None) -> dict:
     t_lower = topic.lower().strip()
     match = None
     for key, val in CURATED_CODING_FALLBACKS.items():
@@ -606,10 +610,14 @@ def get_curated_coding_fallback(topic: str, difficulty: str, language: str = "py
             match = val
             break
     if not match:
-        match = CURATED_CODING_FALLBACKS["arrays & hashing"]
+        match = random.choice(list(CURATED_CODING_FALLBACKS.values()))
+    
+    rand_id = random.randint(100, 999)
+    base_title = match['title']
+    title = f"{base_title} (Variant #{rand_id})"
     
     return {
-        "title": f"{match['title']} (Practice)",
+        "title": title,
         "description": match["description"],
         "starter_code": match["starter_code"],
         "test_cases": match["test_cases"]
@@ -735,7 +743,7 @@ async def generate_question(request: QuestionGenRequest):
             data = _extract_json(raw)
         except Exception as e:
             print(f"Coding LLM Generation Failed. Returning fallback. Error: {e}")
-            fb = get_curated_coding_fallback(target_topic, request.difficulty or "Medium", request.language or "python")
+            fb = get_curated_coding_fallback(target_topic, request.difficulty or "Medium", request.language or "python", request.exclude_titles)
             return QuestionGenResponse(coding=CodingResponse(**fb))
 
         rand_suffix = random.randint(100, 999)
