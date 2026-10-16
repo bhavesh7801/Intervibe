@@ -21,3 +21,10 @@ env/
 # Testing & Logs
 .pytest_cache/
 *.log
+tests/
+scratch/
+
+# Local databases
+*.db
+app.db
+

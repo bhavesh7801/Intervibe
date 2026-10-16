@@ -232,6 +232,36 @@ export const QuestionGeneratorModal = ({
     setIsGenerating(true);
     try {
       if (questionType === 'aptitude') {
+        try {
+          const generated = await questionsApi.generateAIQuestion({
+            role,
+            company,
+            difficulty,
+            topic,
+            persona,
+            question_type: 'aptitude'
+          });
+
+          if (generated?.mcq) {
+            const m = generated.mcq;
+            onGenerate({
+              id: 'apt_' + Math.floor(100 + Math.random() * 890),
+              title: m.title || `${topic} Problem`,
+              questionType: 'mcq',
+              category: topic,
+              difficulty,
+              description: m.description,
+              options: m.options || ['A. ...', 'B. ...', 'C. ...', 'D. ...'],
+              correctAnswer: m.correct_answer || 'A',
+              explanation: m.explanation || 'Optimal approach verified.'
+            });
+            onClose();
+            return;
+          }
+        } catch (eApt) {
+          console.warn('Aptitude AI Gen error, using fallback:', eApt);
+        }
+
         const aptProblem = generateAptitudeProblem({ topic, difficulty });
         onGenerate(aptProblem);
         onClose();

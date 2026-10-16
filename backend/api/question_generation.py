@@ -12,7 +12,9 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, Field
 from rate_limiter import authed_rate_limiter
-from question_models.question_generation import QuestionGenRequest, QuestionGenResponse, MCQResponse, CodingResponse
+from question_models.question_generation import (
+    QuestionGenRequest, QuestionGenResponse, MCQResponse, CodingResponse, InterviewQuestionItem
+)
 
 try:
     from api.topic_question_bank import get_curated_assessment_questions
@@ -150,11 +152,13 @@ def _call_groq(prompt_system: str, prompt_user: str) -> str:
     if not key:
         raise ValueError("GROQ_API_KEY is not configured")
     
+    groq_models = [GROQ_MODEL, GROQ_FALLBACK_MODEL, "openai/gpt-oss-20b"]
+    
     # Try official Groq SDK first
     try:
         from groq import Groq
         client = Groq(api_key=key)
-        for model_name in [GROQ_MODEL, GROQ_FALLBACK_MODEL]:
+        for model_name in groq_models:
             try:
                 resp = client.chat.completions.create(
                     model=model_name,
@@ -174,7 +178,7 @@ def _call_groq(prompt_system: str, prompt_user: str) -> str:
         pass
 
     # Fallback to direct HTTP request
-    for model_name in [GROQ_MODEL, GROQ_FALLBACK_MODEL]:
+    for model_name in groq_models:
         payload = {
             "model": model_name,
             "messages": [
@@ -230,7 +234,7 @@ def _call_llm(prompt_system: str, prompt_user: str) -> str:
 
 
 def _extract_json(text: str):
-    """Extract first JSON object or array from raw LLM text with strict=False and regex cleanup."""
+    """Extract first JSON object or array from raw LLM text with strict=False and robust cleanup."""
     cleaned_text = re.sub(r"^```(?:json)?\s*", "", text.strip(), flags=re.MULTILINE)
     cleaned_text = re.sub(r"\s*```$", "", cleaned_text, flags=re.MULTILINE)
 
@@ -242,9 +246,22 @@ def _extract_json(text: str):
     try:
         return json.loads(json_str, strict=False)
     except Exception:
+        pass
+
+    try:
         sanitized = re.sub(r'"""(.*?)"""', lambda m: json.dumps(m.group(1)), json_str, flags=re.DOTALL)
         sanitized = re.sub(r"'''(.*?)'''", lambda m: json.dumps(m.group(1)), sanitized, flags=re.DOTALL)
+        sanitized = re.sub(r",\s*([\]}])", r"\1", sanitized)
         return json.loads(sanitized, strict=False)
+    except Exception:
+        pass
+
+    try:
+        fixed = re.sub(r'("(?:[^"\\]|\\.)*")', lambda m: m.group(1).replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t'), json_str)
+        fixed = re.sub(r",\s*([\]}])", r"\1", fixed)
+        return json.loads(fixed, strict=False)
+    except Exception as final_e:
+        raise final_e
 
 
 def build_llm_prompt(topic: str, difficulty: str, exclude_titles: list = None, resume_text: str = None) -> tuple[str, str]:
@@ -324,6 +341,160 @@ def build_llm_prompt(topic: str, difficulty: str, exclude_titles: list = None, r
     }}
     """
     return system_prompt, user_prompt
+
+
+def build_interview_prompt(
+    topic: str,
+    role: str,
+    difficulty: str,
+    num_questions: int = 3,
+    company: str = "Google",
+    persona: str = "Standard",
+    exclude_titles: list = None
+) -> tuple[str, str]:
+    """Build system and user prompts for multi-question FAANG verbal mock interviews."""
+    unique_salt = random.randint(10000, 99999)
+    current_time_seed = int(time.time() * 1000)
+    avoid_clause = ""
+    if exclude_titles and len(exclude_titles) > 0:
+        titles_str = ", ".join([f"'{t}'" for t in exclude_titles[:15]])
+        avoid_clause = f"\n- PREVIOUSLY GENERATED / EXCLUDED TITLES: Do NOT generate questions matching: {titles_str}."
+
+    system_prompt = (
+        "You are an elite Principal Interviewer and Bar Raiser at top tech companies (Google, Meta, Amazon, Netflix, Stripe).\n"
+        f"Generate {num_questions} brand-new, realistic conversational verbal mock interview scenarios specifically testing '{topic}'.\n"
+        f"Target Role: {role}. Difficulty Level: {difficulty}. Company Track: {company}. Interviewer Persona: {persona}.\n"
+        "Each scenario must present a deep real-world production challenge, distributed system design tradeoff, incident triage problem, or behavioral engineering situation.\n"
+        "Return ONLY a valid JSON list of objects (or an object with a 'questions' array) where each question has these exact fields:\n"
+        "- id: string (e.g. 'int_1')\n"
+        "- title: string (concise scenario title)\n"
+        "- category: string (e.g. 'System Design & Scalability', 'Incident Triage & Reliability', 'Core Concurrency & DB', 'Behavioral Leadership')\n"
+        "- difficulty: string ('Easy', 'Medium', or 'Hard')\n"
+        "- company: string\n"
+        "- role: string\n"
+        "- timeLimitMinutes: integer (e.g. 20 or 25)\n"
+        "- prompt: string (A thorough, realistic scenario problem description explaining scale, constraints, and specific technical questions the candidate must answer out loud)\n"
+        "- evaluationRubric: list of 3-4 strings detailing what a top candidate should mention\n"
+        "- speakingTips: list of 2-3 spoken delivery suggestions\n"
+        "- hints: list of 1-2 architectural hints\n"
+        "Do NOT include markdown formatting outside the JSON."
+    )
+    user_prompt = (
+        f"Nonce: {unique_salt}-{current_time_seed}. Topic: '{topic}'. Role: '{role}'. Difficulty: '{difficulty}'. Company: '{company}'.\n"
+        f"Generate {num_questions} fresh, distinct FAANG verbal interview questions.{avoid_clause}"
+    )
+    return system_prompt, user_prompt
+
+
+def get_curated_interview_questions(topic: str, role: str, difficulty: str, num_questions: int = 3, company: str = "Google") -> list:
+    """Generate dynamic topic-customized interview questions if LLM service is offline."""
+    scenarios = [
+        {
+            "suffix": "Distributed Architecture & High-Throughput Scalability",
+            "category": "System Design & Scalability",
+            "prompt": f"You are tasked with architecting the core production infrastructure for {topic} handling 100,000 active requests per second for a {role} position at {company}.\n\nKey Scenario Focus:\n1. Propose end-to-end architecture, transport layer (HTTP/2 vs gRPC vs WebSockets), and state management for {topic}.\n2. Address replication lag, consistency guarantees (CAP theorem), and partition tolerance.\n3. How would you prevent cascading failovers during sudden downstream traffic spikes?\n\nStructure your verbal response with high-level architecture, database schema choice, and failure mode mitigation.",
+            "rubric": [
+                f"Mastery of {topic} architecture and distributed patterns",
+                "Traffic volume estimation and bandwidth calculations",
+                "Clear verbal communication and failure modes coverage"
+            ],
+            "tips": [
+                "Clarify throughput SLAs and latency limits before proposing a solution.",
+                "Explicitly compare technologies rather than picking one arbitrarily."
+            ],
+            "hints": [
+                f"Consider how {topic} handles write contention and network partitions."
+            ]
+        },
+        {
+            "suffix": "Production Outage & Real-Time Incident Triage",
+            "category": "Incident Triage & Reliability",
+            "prompt": f"During peak traffic hours at {company}, the core service relying on {topic} experiences a sudden P99 latency spike from 35ms to 3,200ms, resulting in cascading gateway timeouts for users.\n\nWalk me through your real-time verbal troubleshooting playbook:\n1. First 5 minutes: Immediate blast-radius containment, traffic shedding, and circuit breaking.\n2. Telemetry & Metrics: What specific metrics (CPU, thread pool exhaustion, locks, database connection pool) would you check first to isolate the root cause in {topic}?\n3. Hot-fix cutover and blameless post-mortem preventative guardrails.",
+            "rubric": [
+                "Structured incident command protocol and blast radius containment",
+                f"Diagnostic depth isolating root causes in {topic}",
+                "Blameless post-mortem planning and preventative SLI/SLO guardrails"
+            ],
+            "tips": [
+                "Outline your chronological steps clearly: Contain -> Diagnose -> Recover -> Post-mortem.",
+                "Specify exact telemetry tools (e.g. Grafana, Prometheus, distributed tracing)."
+            ],
+            "hints": [
+                "Check for connection pool starvation or unindexed hot partition queries."
+            ]
+        },
+        {
+            "suffix": "Concurrency Control, Race Conditions & Data Integrity",
+            "category": "Core Engineering & Concurrency",
+            "prompt": f"In a high-concurrency environment at {company}, multiple asynchronous workers simultaneously update shared state managed by {topic}.\n\nCompare and contrast the following concurrency control strategies in your spoken response:\n1. Optimistic Concurrency Control (version increments and CAS operations).\n2. Pessimistic Row Locking (SELECT ... FOR UPDATE).\n3. Distributed Locks (e.g. Redis Redlock or Chubby/ZooKeeper).\n\nAnalyze throughput, latency, failure modes during lease expiration, and how to guarantee idempotent transactions.",
+            "rubric": [
+                "Deep understanding of database isolation levels and locking mechanisms",
+                "Distributed lock failure modes, clock drift, and lease renewal pitfalls",
+                "Implementation of idempotency keys to guarantee exactly-once execution"
+            ],
+            "tips": [
+                "Structure your comparison using throughput, latency overhead, and failure modes.",
+                "Mention fencing tokens to protect shared resources from delayed lock holders."
+            ],
+            "hints": [
+                "Consider the Martin Kleppmann critique of Redis Redlock and when optimistic locking is superior."
+            ]
+        },
+        {
+            "suffix": "Zero-Downtime Data Migration & Partitioning Strategy",
+            "category": "Database Architecture & Migration",
+            "prompt": f"Your team at {company} needs to migrate a legacy high-volume dataset into a modern {topic} architecture without incurring any user-facing downtime or dropped transactions.\n\nDetail your step-by-step spoken playbook:\n1. Dual-write and Change Data Capture (CDC with Debezium/Kafka) strategy.\n2. Historical backfill jobs and checksum reconciliation workers.\n3. Canary traffic cutover, shadow reading, and instant rollback triggers.",
+            "rubric": [
+                "Comprehensive 5-phase migration plan (Dual-write -> Backfill -> Verify -> Canary -> Cutover)",
+                "Reconciliation worker design to resolve asynchronous write drift",
+                "Zero-downtime rollback capability at any stage"
+            ],
+            "tips": [
+                "State your phased migration roadmap upfront before diving into details.",
+                "Explain how you handle writes that occur while historical backfilling is in progress."
+            ],
+            "hints": [
+                "Use shadow reads comparing old and new query results to verify correctness."
+            ]
+        },
+        {
+            "suffix": "Behavioral Leadership & Technical Trade-off Debate",
+            "category": "Behavioral Leadership (STAR Method)",
+            "prompt": f"Describe a real-world scenario from your career where you advocated for a specific technical strategy regarding {topic} that was contested by senior engineers or stakeholders at {company}.\n\nUsing the STAR Method (Situation, Task, Action, Result):\n1. Detail the technical trade-offs and business stakes.\n2. Explain how you used empirical data and proof-of-concept benchmarks to achieve consensus.\n3. Share the final business outcome and quantifiable metric gains.",
+            "rubric": [
+                "Structured STAR framework delivery with concise Situation & Task",
+                "Data-driven persuasion (POC benchmarks, latency comparisons)",
+                "Quantifiable business metrics (latency reduction %, cloud spend saved)"
+            ],
+            "tips": [
+                "Keep Situation & Task under 2 minutes to leave ample time for Action and Results.",
+                "Emphasize emotional intelligence and disagree-and-commit principles."
+            ],
+            "hints": [
+                "Highlight trade-offs you conceded to reach team consensus."
+            ]
+        }
+    ]
+
+    count = max(1, min(num_questions, 10))
+    res = []
+    rand_seed = uuid.uuid4().hex[:5]
+    for i in range(count):
+        s = scenarios[i % len(scenarios)]
+        res.append(InterviewQuestionItem(
+            id=f"int_{rand_seed}_{i+1}",
+            title=f"{topic}: {s['suffix']}",
+            category=s["category"],
+            difficulty=difficulty or "Hard",
+            company=company or "Google",
+            role=role or "Senior Software Engineer",
+            timeLimitMinutes=20,
+            prompt=s["prompt"],
+            evaluationRubric=s["rubric"],
+            speakingTips=s["tips"],
+            hints=s["hints"]
+        ))
+    return res
 
 
 CURATED_CODING_FALLBACKS = {
@@ -447,12 +618,51 @@ def get_curated_coding_fallback(topic: str, difficulty: str, language: str = "py
 
 @router.post("/questions/generate", response_model=QuestionGenResponse)
 async def generate_question(request: QuestionGenRequest):
-    """Generate a coding or MCQ question on-demand using Google Gemini API or Groq LLM with strict topic enforcement."""
+    """Generate a coding, MCQ, or mock interview question on-demand using Groq LLM or Gemini API with strict topic enforcement."""
     target_topic = request.clean_topic
     seed_token = uuid.uuid4().hex[:6]
     is_dsa = request.is_dsa_or_coding
+    q_type = (request.question_type or request.type or "coding").lower().strip()
 
-    if not is_dsa and (request.question_type == "mcq" or request.type == "mcq"):
+    # 1. Real-Time Verbal Mock Interview Scenarios Generation Flow
+    if q_type == "interview":
+        num_q = max(1, min(request.num_questions or 3, 10))
+        comp = request.company or "FAANG / Tier-1 Tech"
+        role_title = request.role or "Senior Software Engineer"
+        system_prompt, user_prompt = build_interview_prompt(
+            target_topic, role_title, request.difficulty or "Hard", num_q, comp, request.persona or "Standard", request.exclude_titles
+        )
+        try:
+            raw = _call_llm(system_prompt, user_prompt)
+            data = _extract_json(raw)
+            raw_list = data if isinstance(data, list) else (data.get("questions") if isinstance(data, dict) else [])
+            if isinstance(raw_list, list) and len(raw_list) > 0:
+                formatted_questions = []
+                for i, item in enumerate(raw_list):
+                    if isinstance(item, dict):
+                        formatted_questions.append(InterviewQuestionItem(
+                            id=item.get("id") or f"gen_int_{uuid.uuid4().hex[:6]}_{i+1}",
+                            title=str(item.get("title") or f"{target_topic}: Scenario {i+1}"),
+                            category=str(item.get("category") or target_topic),
+                            difficulty=str(item.get("difficulty") or request.difficulty or "Medium"),
+                            company=str(item.get("company") or comp),
+                            role=str(item.get("role") or role_title),
+                            timeLimitMinutes=int(item.get("timeLimitMinutes") or 20),
+                            prompt=str(item.get("prompt") or item.get("description") or f"Analyze system requirements and architecture for {target_topic}."),
+                            evaluationRubric=[str(x) for x in item.get("evaluationRubric", [])] if isinstance(item.get("evaluationRubric"), list) and item.get("evaluationRubric") else [f"Deep technical mastery in {target_topic}", "System trade-offs and bottleneck mitigation", "Structured verbal delivery"],
+                            speakingTips=[str(x) for x in item.get("speakingTips", [])] if isinstance(item.get("speakingTips"), list) and item.get("speakingTips") else ["Clarify core constraints and volume assumptions before proposing solutions."],
+                            hints=[str(x) for x in item.get("hints", [])] if isinstance(item.get("hints"), list) and item.get("hints") else [f"Consider how {target_topic} behaves under peak throughput and network partitions."]
+                        ))
+                if formatted_questions:
+                    return QuestionGenResponse(questions=formatted_questions, status="success")
+        except Exception as e:
+            print(f"Interview LLM Generation Warning: {e}")
+
+        fallback_list = get_curated_interview_questions(target_topic, role_title, request.difficulty or "Hard", num_q, comp)
+        return QuestionGenResponse(questions=fallback_list, status="success")
+
+    # 2. Technical MCQ / Aptitude Generation Flow
+    elif q_type in ["mcq", "aptitude"]:
         unique_salt = random.randint(10000, 99999)
         current_time_seed = int(time.time() * 1000)
         avoid_clause = ""
@@ -477,18 +687,12 @@ async def generate_question(request: QuestionGenRequest):
             f"Seed Token: {seed_token}-{unique_salt}-{current_time_seed}. Target Topic: {target_topic}. Difficulty: {request.difficulty}.\n"
             f"Invent a realistic, original technical scenario with 4 distinct, plausible options.{avoid_clause}{resume_clause}"
         )
-    else:
-        system_prompt, user_prompt = build_llm_prompt(
-            target_topic, request.difficulty or "Medium", request.exclude_titles, request.resume_text
-        )
 
-    # Directly call the LLM — no static catalogs or pre-written mocks.
-    try:
-        raw = _call_llm(system_prompt, user_prompt)
-        data = _extract_json(raw)
-    except Exception as e:
-        print(f"LLM Generation Failed. Returning fallback. Error: {e}")
-        if not is_dsa and (request.question_type == "mcq" or request.type == "mcq"):
+        try:
+            raw = _call_llm(system_prompt, user_prompt)
+            data = _extract_json(raw)
+        except Exception as e:
+            print(f"MCQ LLM Generation Failed. Returning fallback. Error: {e}")
             mcq_data = {
                 "title": f"Core {target_topic} Fundamentals",
                 "description": f"Which of the following statements accurately characterizes {target_topic} in modern software engineering?",
@@ -502,13 +706,9 @@ async def generate_question(request: QuestionGenRequest):
                 "explanation": f"In {target_topic}, understanding fundamental data layout and algorithmic complexity is the foundation for optimal system performance."
             }
             return QuestionGenResponse(mcq=MCQResponse(**mcq_data))
-        else:
-            fb = get_curated_coding_fallback(target_topic, request.difficulty or "Medium", request.language or "python")
-            return QuestionGenResponse(coding=CodingResponse(**fb))
 
-    rand_suffix = random.randint(100, 999)
-    if not is_dsa and (request.question_type == "mcq" or request.type == "mcq"):
-        raw_title = data.get("title") or f"{target_topic} MCQ Question"
+        rand_suffix = random.randint(100, 999)
+        raw_title = data.get("title") or f"{target_topic} Question"
         if "#" not in raw_title and "Variant" not in raw_title:
             raw_title = f"{raw_title} (Variant #{rand_suffix})"
         raw_options = data.get("options") or ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"]
@@ -517,13 +717,28 @@ async def generate_question(request: QuestionGenRequest):
 
         mcq_data = {
             "title": str(raw_title),
-            "description": str(data.get("description") or f"Multiple choice question for {target_topic}."),
+            "description": str(data.get("description") or f"Question focused on {target_topic}."),
             "options": [str(opt) for opt in raw_options],
             "correct_answer": str(data.get("correct_answer") or data.get("correctAnswer") or "A"),
             "explanation": str(data.get("explanation") or "Option A is the correct answer."),
         }
         return QuestionGenResponse(mcq=MCQResponse(**mcq_data))
+
+    # 3. LeetCode Coding Challenge Generation Flow
     else:
+        system_prompt, user_prompt = build_llm_prompt(
+            target_topic, request.difficulty or "Medium", request.exclude_titles, request.resume_text
+        )
+
+        try:
+            raw = _call_llm(system_prompt, user_prompt)
+            data = _extract_json(raw)
+        except Exception as e:
+            print(f"Coding LLM Generation Failed. Returning fallback. Error: {e}")
+            fb = get_curated_coding_fallback(target_topic, request.difficulty or "Medium", request.language or "python")
+            return QuestionGenResponse(coding=CodingResponse(**fb))
+
+        rand_suffix = random.randint(100, 999)
         lang = request.language or "python"
         raw_starter = data.get("starter_code") or data.get("starterCode")
         if isinstance(raw_starter, str):

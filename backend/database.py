@@ -20,7 +20,7 @@ try:
         pool_pre_ping=True,
         pool_size=10,
         max_overflow=20,
-        connect_args={"connect_timeout": 5} if "postgresql" in DATABASE_URL else {}
+        connect_args={"connect_timeout": 2} if "postgresql" in DATABASE_URL else {}
     )
     # Test connection on startup
     with engine.connect() as test_conn:

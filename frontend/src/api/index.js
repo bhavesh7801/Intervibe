@@ -278,6 +278,7 @@ export const interviewApi = {
   generateCustomInterviewQuestions: async ({ topic = 'Distributed Systems', numQuestions = 3, role = 'Senior Software Engineer', difficulty = 'Hard' }) => {
     try {
       const res = await apiClient.post('/api/questions/generate', {
+        topic,
         prompt: topic,
         role,
         difficulty,

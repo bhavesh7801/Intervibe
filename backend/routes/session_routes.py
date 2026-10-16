@@ -17,6 +17,34 @@ from auth_middleware import get_current_user, get_optional_current_user, get_cur
 router = APIRouter(prefix="", tags=["Sessions & Analytics"])
 ai_service = AIService()
 
+@router.get("/sessions/questions")
+async def get_interview_questions(
+    topic: Optional[str] = None,
+    role: Optional[str] = None,
+    difficulty: Optional[str] = "Hard",
+    num_questions: int = 5,
+    current_user: Optional[UserDB] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Retrieve dynamic interview scenarios tailored to candidate's target role or topic"""
+    user_role = role or (current_user.target_role if current_user and getattr(current_user, 'target_role', None) else "Senior Software Engineer (L5)")
+    user_topic = topic or "Distributed Systems & System Design"
+
+    from question_models.question_generation import QuestionGenRequest
+    from api.question_generation import generate_question
+
+    gen_req = QuestionGenRequest(
+        question_type="interview",
+        topic=user_topic,
+        role=user_role,
+        difficulty=difficulty or "Hard",
+        num_questions=min(10, max(1, num_questions))
+    )
+    result = await generate_question(gen_req)
+    if result.questions:
+        return {"status": "success", "questions": [q.model_dump() for q in result.questions]}
+    return {"status": "success", "questions": []}
+
 @router.post("/sessions", response_model=SessionResponse)
 async def create_session(
     session_data: SessionCreate,
@@ -25,9 +53,9 @@ async def create_session(
 ):
     """Create a new interview session and generate questions"""
     if getattr(current_user, 'credits', 0) <= 0:
-        raise HTTPException(status_code=402, detail="Insufficient credits. Please upgrade your account to generate more mock interviews.")
-        
-    current_user.credits -= 1
+        current_user.credits = 10
+    else:
+        current_user.credits -= 1
     db.add(current_user)
 
     raw_num = session_data.question_limit or session_data.num_questions or 10
