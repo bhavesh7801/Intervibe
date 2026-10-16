@@ -662,6 +662,7 @@ export const CodingWorkspace = () => {
       <QuestionGeneratorModal
         isOpen={showGenModal}
         onClose={() => setShowGenModal(false)}
+        excludeTitles={questionList.map((q) => q.title).filter(Boolean)}
         onGenerate={(newQuestion) => {
           setQuestionList((prev) => [newQuestion, ...prev]);
           setQuestion(newQuestion);

@@ -978,6 +978,7 @@ export const AssessmentWorkspace = () => {
       <QuestionGeneratorModal
         isOpen={isGeneratorOpen}
         onClose={() => setIsGeneratorOpen(false)}
+        excludeTitles={questions.map((q) => q.title).filter(Boolean)}
         onGenerate={handleSingleQuestionGenerated}
         defaultType={generatorDefaultType}
         defaultTopic={generatorDefaultTopic}

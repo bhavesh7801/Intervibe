@@ -215,7 +215,8 @@ export const QuestionGeneratorModal = ({
   onClose,
   onGenerate,
   defaultType = 'coding',
-  defaultTopic = ''
+  defaultTopic = '',
+  excludeTitles = []
 }) => {
   const [questionType, setQuestionType] = useState(defaultType || 'coding');
   const [role, setRole] = useState(ROLES[0]);
@@ -239,7 +240,8 @@ export const QuestionGeneratorModal = ({
             difficulty,
             topic,
             persona,
-            question_type: 'aptitude'
+            question_type: 'aptitude',
+            exclude_titles: excludeTitles
           });
 
           if (generated?.mcq) {
@@ -276,7 +278,8 @@ export const QuestionGeneratorModal = ({
             difficulty,
             topic,
             persona,
-            question_type: 'mcq'
+            question_type: 'mcq',
+            exclude_titles: excludeTitles
           });
 
           if (generated?.mcq) {
@@ -310,7 +313,8 @@ export const QuestionGeneratorModal = ({
         difficulty,
         topic,
         persona,
-        question_type: 'coding'
+        question_type: 'coding',
+        exclude_titles: excludeTitles
       });
 
       let finalProblem = null;
